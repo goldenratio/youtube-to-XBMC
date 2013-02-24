@@ -1,8 +1,8 @@
 /**
- * @author: Karthik
+ * Content Script
+ * @author: Karthik VJ
  */
 
-//alert(window.location.pathname);
 var pathName = window.location.pathname;
 //var template = '<div class="xbmc_control">YouTube to XBMC: <a href="#" id="play_$pid" onclick="return false;">Play Now</a> | <a href="#" id="queue_$qid" onclick="return false;">[+] Add to Queue</a></div>';
 var template = '<div class="xbmc_control">YouTube to XBMC: <span id="play_$pid" class="xbmc_link" onclick="return false;">Play Now</span> | <span id="queue_$qid" class="xbmc_link" onclick="return false;">[+] Add to Queue</span></div>';

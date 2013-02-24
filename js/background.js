@@ -1,5 +1,5 @@
 /**
- * 
+ * Background Script
  * @author: Karthik VJ
  */
 

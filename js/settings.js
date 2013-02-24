@@ -1,4 +1,5 @@
 /**
+ * Handles settings page javascript
  * @author: Karthik VJ
  */
 
