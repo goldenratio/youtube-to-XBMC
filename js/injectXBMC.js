@@ -83,12 +83,7 @@ this.injectLinks = function()
 			if(videoId)
 			{
 				console.log("videoId, "  +videoId);
-				var copyTemp = template;
-				//console.log("class," + $(this).attr("class"));
-				if($(this).attr("class") == "video-list-item")
-				{										
-					copyTemp = template_videoPage;
-				}				
+				var copyTemp = template;								
 				copyTemp = copyTemp.replace("$pid", videoId);
 				copyTemp = copyTemp.replace("$qid", videoId);
 				$(this).prepend(copyTemp);
