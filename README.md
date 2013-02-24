@@ -2,6 +2,8 @@ youtube-to-XBMC media center (Chrome Extension)
 ===============================================
 also supports RaspBMC
 
+Download the extension from here, https://chrome.google.com/webstore/detail/youtube-to-xbmc/gbghegmimhjemkhpimohkdopkeahldbh
+
 Chrome Extension: Send YouTube videos to XBMC.
 Adds "Play Now" and "Add to Queue" link to all youtube video content.
 
