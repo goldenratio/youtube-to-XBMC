@@ -60,16 +60,20 @@ var Player = function()
 	    		{
 	    			thisObject.getActivePlayers(function(activeResult)
 		    		{
-		    			console.log("active players, " + activeResult);	  
+		    			console.log("active players result");
 		    			// check if no video is playing and start the first video in queue
-		    			if(!activeResult.playerid)
+		    			if(activeResult.length <= 0)
 		    			{
+							
+		    				console.log("playing queue");
 							thisObject.playCurrentVideoFromList(function(playResult)
 			    			{	    				
 			    				console.log("video play success!");	
 			    				    				
 			    			});	    				
-		    			}  				    				    				    			
+			    					    				
+		    			}
+		    			  				    				    				    			
 		    		});	    			
 	    		}
 	    		else

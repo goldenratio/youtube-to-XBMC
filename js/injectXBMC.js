@@ -4,8 +4,8 @@
  */
 
 var pathName = window.location.pathname;
-//var template = '<div class="xbmc_control">YouTube to XBMC: <a href="#" id="play_$pid" onclick="return false;">Play Now</a> | <a href="#" id="queue_$qid" onclick="return false;">[+] Add to Queue</a></div>';
-var template = '<div class="xbmc_control">YouTube to XBMC: <span id="play_$pid" class="xbmc_link" onclick="return false;">Play Now</span> | <span id="queue_$qid" class="xbmc_link" onclick="return false;">[+] Add to Queue</span></div>';
+var template = '<div class="xbmc_control">YouTube to XBMC: <a href="#" id="play_$pid" onclick="return false;">Play Now</a> | <a href="#" id="queue_$qid" onclick="return false;">[+] Add to Queue</a></div>';
+var template_list = '<div class="xbmc_control">YouTube to XBMC: <span id="play_$pid" class="xbmc_link" onclick="return false;">Play Now</span> | <span id="queue_$qid" class="xbmc_link" onclick="return false;">[+] Add to Queue</span></div>';
 var timer;
 
 this.playVideoOnXBMC = function(vId)
@@ -83,7 +83,11 @@ this.injectLinks = function()
 			if(videoId)
 			{
 				console.log("videoId, "  +videoId);
-				var copyTemp = template;								
+				var copyTemp = template;		
+				if($(this).attr("class") == "video-list-item")
+				{
+					copyTemp = template_list;
+				}						
 				copyTemp = copyTemp.replace("$pid", videoId);
 				copyTemp = copyTemp.replace("$qid", videoId);
 				$(this).prepend(copyTemp);
