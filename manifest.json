@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+
+  "name": "YouTube to XBMC",
+  "description": "Send youtube videos to XBMC media center",
+  "version": "1.0",
+  "permissions": [ "http://*/*", "storage" ],
+  
+  "page_action": {        
+  },
+  
+  "background": {
+    "scripts": ["js/background.js"]
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*"],
+      "css": ["css/inject.css"],      
+      "js": ["js/jquery-1.9.1.min.js", "js/injectXBMC.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  
+  "options_page": "settings.html"
+}

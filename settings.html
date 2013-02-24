@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+	<title>YouTube to XBMC - Settings</title>		
+	<link rel="stylesheet" type="text/css" href="css/style.css"/>	
+	<script src="js/enums.js"></script>
+	<script src="js/settings.js"></script>
+		
+</head>
+<body>
+  	<div>
+		<div class="options_header">
+		YouTube to XBMC - Settings	
+		</div>
+		
+		<div class="hr"></div>
+		
+		<div id="success_status">
+			Connection Success!
+		</div>
+		
+		<div id="fail_status">
+			Connection Failed!
+		</div>
+		
+		<div id="missing_data">
+			Enter connection settings!
+		</div>
+		
+		<div id="unauthorized_data">
+			Unauthorized! Probably username or password is incorrect.
+		</div>
+		
+		<div id="conecting_data">
+			Connecting.. Please wait..
+		</div>
+		
+		<div class="options_body">
+			
+			<div class="options_item">
+				<div class="options_name">Host or IP Address: </div>
+				<div class="options_data"><input type="text" id="host" /></div>
+			</div>
+			
+			<div class="clear"></div>
+			
+			<div class="options_item">
+				<div class="options_name">Port: </div>
+				<div class="options_data"><input type="text" id="port" /></div>
+			</div>
+			
+			<div class="clear"></div>
+			
+			<div class="options_item">
+				<div class="options_name">Username: (optional)</div>
+				<div class="options_data"><input type="text" id="username" /></div>
+			</div>
+			
+			<div class="clear"></div>
+			
+			<div class="options_item">
+				<div class="options_name">Password: (optional)</div>
+				<div class="options_data"><input type="password" id="pwd" /></div>
+			</div>		
+			
+			<div class="clear"></div>
+			
+			<div class="options_item">
+				<div class="options_name"></div>
+				<div class="options_data">
+					<input type="button" value="Save" id="connectButton" />
+					<input type="button" value="Clear" id="clearButton" />
+				</div>
+			</div>
+			
+		</div>		
+	</div>
+	
+</body>
+</html>

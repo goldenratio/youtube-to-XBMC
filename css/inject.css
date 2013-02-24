@@ -1,0 +1,24 @@
+.xbmc_control
+{
+	padding: 5px;
+	margin: 2px;
+	margin-bottom: 5px;
+	background-color: #d7d7d7;	
+	color: #000000;
+	font-size: 12px;
+	border-radius: 5px;
+	display: block;			
+}
+
+span.xbmc_link
+{	    
+	cursor: pointer;
+	cursor: hand;
+	color: #333333;
+
+}
+
+span.xbmc_link:hover
+{
+	color:#438bc5;
+}
