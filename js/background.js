@@ -53,35 +53,66 @@ var Player = function()
 	    {	    	
 	    	console.log("queueVideo video, " + request.videoId);	    	    	    			    
 	    	
-	    	thisObject.addtoPlayList(request.videoId, function(playListresult)
+	    	thisObject.getActivePlayers(function(result)
 	    	{
-	    		console.log("addtoPlayList, " + playListresult);
-	    		if(playListresult == "OK")
+	    		if(result.length <= 0)
 	    		{
-	    			thisObject.getActivePlayers(function(activeResult)
-		    		{
-		    			console.log("active player is found!");
-		    			// check if no video is playing and start the first video in queue
-		    			if(activeResult.length <= 0)
-		    			{							
-		    				console.log("playing queue");
-							thisObject.playCurrentVideoFromList(function(playResult)
-			    			{	    				
-			    				console.log("video play success!");	
-			    				    				
-			    			});	    				
-			    					    				
-		    			}
-		    			  				    				    				    			
-		    		});	    			
+	    			// clear any previous pending play list
+	    			thisObject.clearPlayList(function(clearResult) 
+	    			{	    				
+	    				thisObject.onQueue(request.videoId);	    				
+	    			});
 	    		}
 	    		else
-	    		{
-	    			console.log("Error! Cannot add video to playlist");
+	    		{	    			
+	    			thisObject.onQueue(request.videoId);	    			
 	    		}
-	    		
-	    	});    	    	
+	    			    		
+	    	});
+	    	    	    	
 	    }
+	};
+	
+	this.onQueue = function(videoId)
+	{
+		// first add playlist, if no video is playing then play the video.
+		thisObject.addtoPlayList(videoId, function(playListresult)
+		{
+			console.log("addtoPlayList, " + playListresult);
+			if(playListresult == "OK")
+			{
+				thisObject.getActivePlayers(function(activeResult)
+	    		{
+	    			console.log("active player is found!");
+	    			// check if no video is playing and start the first video in queue
+	    			if(activeResult.length <= 0)
+	    			{							
+	    				console.log("playing queue");
+						thisObject.playCurrentVideoFromList(function(playResult)
+		    			{	    				
+		    				console.log("video play success!");			    				
+		    				    				
+		    			});	    				
+		    					    				
+	    			}
+	    			else
+	    			{
+	    				console.log("play list item trace");
+	    				// trace play list items
+	    				thisObject.getPlayList(function(result)
+	    				{
+	    					console.log("play list items, " + result);
+	    				});
+	    			}
+	    			  				    				    				    			
+	    		});	    			
+			}
+			else
+			{
+				console.log("Error! Cannot add video to playlist");
+			}
+			
+		});
 	};
 	
 	this.getActivePlayers = function(callback)
@@ -102,6 +133,17 @@ var Player = function()
     	};
     	    	    		
     	rpc.sendRequest(thisObject, "Playlist.Add", params, callback);
+	};
+	
+	this.getPlayList = function(callback)
+	{
+		console.log("------ this.getPlayList ---------- ");
+		var params = {  
+    		playlistid: 1   		    		
+    	};
+    	    	    		
+    	rpc.sendRequest(thisObject, "Playlist.GetItems", params, callback);
+		
 	};
 	
 	
@@ -225,7 +267,7 @@ var RPCService = function()
 		var strData = JSON.stringify(data);
 		this.xhr = new XMLHttpRequest();
 		this.xhr.onreadystatechange = thisObject.readResponse;
-		this.xhr.open("POST", this.url, true);		
+		this.xhr.open("POST", this.url, false);		
 		this.xhr.setRequestHeader("Content-type", "application/json");
 		this.xhr.onload = thisObject.onLoad;
 		this.xhr.send(strData);
