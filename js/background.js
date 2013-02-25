@@ -267,7 +267,7 @@ var RPCService = function()
 		var strData = JSON.stringify(data);
 		this.xhr = new XMLHttpRequest();
 		this.xhr.onreadystatechange = thisObject.readResponse;
-		this.xhr.open("POST", this.url, false);		
+		this.xhr.open("POST", this.url, true);		
 		this.xhr.setRequestHeader("Content-type", "application/json");
 		this.xhr.onload = thisObject.onLoad;
 		this.xhr.send(strData);
