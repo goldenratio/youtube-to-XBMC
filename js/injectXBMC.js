@@ -25,13 +25,16 @@ this.queueVideoToXBMC = function(vId)
 
 this.findPropertyFromString = function(str, property)
 {
+	//console.log("findPropertyFromString, str = " + str);
+	//console.log("findPropertyFromString, property = " + property);
 	property = property + "=";
 	var index = str.indexOf('?');
 	str = str.substring(index + 1);
-	console.log("index = " + index);
-	console.log("str = " + str);
+	//console.log("index = " + index);
+	//console.log("str = " + str);
 	
 	var list = str.split('&');
+	//console.log("list.length, " + list.length);
 	for(var i = 0; i < list.length; i++)
 	{
 		if(list[i].search(property) == 0)
@@ -39,11 +42,12 @@ this.findPropertyFromString = function(str, property)
 			return list[i].replace(property, "");
 		}		
 	}
-	return null;
+	return 0;
 }
 
 this.injectLinks = function()
-{
+{	
+	console.log("injectLinks");
 	// (home / subscription on home page), search page, video manager, user page, user browse video, Popular on YouTube, Popular on youtube right side, video list (on video page)
 	$(".feed-item-content, .yt-lockup2-content, .vm-video-info-container, .yt-tile-visible, .channels-content-item, .lohp-category-shelf-item, .lohp-large-shelf-container, .lohp-medium-shelf-content, .lohp-vertical-shelf-item-content, .video-list-item").each(function(index) 
 	{	
@@ -75,12 +79,12 @@ this.injectLinks = function()
 		{			  
 			console.log("videoPathString, " + videoPathString);				
 			videoId = findPropertyFromString(videoPathString, "v");
-			if(!videoId)
+			if(videoId == 0)
 			{
 				videoId = findPropertyFromString(videoPathString, "video_id");
 			}
 			
-			if(videoId)
+			if(videoId != 0)
 			{
 				console.log("videoId, "  +videoId);
 				var copyTemp = template;		
@@ -114,21 +118,24 @@ this.injectLinks = function()
 					}, false);			  	
 				}
 				  
-			}
+			}			
 		}	  
 		  
 	});
 	
 	
-	$(document).bind('DOMSubtreeModified', function()
+	$("#content").bind('DOMNodeInserted', function(event)
 	{
-		clearInterval(timer);
-		timer = setInterval(function(){
-			console.log("load again ..............");
-			$(this).unbind('DOMSubtreeModified');
+		console.log("DOM updated!");
+		var element = event.target;
+		console.log("element, " + element.tagName);
+		
+		clearInterval(timer);		
+		timer = setInterval(function(){			
+			clearInterval(timer);			
+			$("#content").unbind('DOMNodeInserted');
 			injectLinks();			
-		}, 5000)		
-		//console.log("DOMSubtreeModified");
+		}, 2000)				
 	});
 	
 
