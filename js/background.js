@@ -24,7 +24,7 @@ var Player = function()
 	    if (request.message == "playVideo")
 	    {	    	
 	    	console.log("play video, " + request.videoId);	    	
-	    	this.clearPlayList(function(clearResult)
+	    	thisObject.clearPlayList(function(clearResult)
 	    	{
 	    		console.log("clearPlayList, " + clearResult);	
 	    		if(clearResult == "OK")
@@ -53,18 +53,17 @@ var Player = function()
 	    {	    	
 	    	console.log("queueVideo video, " + request.videoId);	    	    	    			    
 	    	
-	    	this.addtoPlayList(request.videoId, function(playListresult)
+	    	thisObject.addtoPlayList(request.videoId, function(playListresult)
 	    	{
 	    		console.log("addtoPlayList, " + playListresult);
 	    		if(playListresult == "OK")
 	    		{
 	    			thisObject.getActivePlayers(function(activeResult)
 		    		{
-		    			console.log("active players result");
+		    			console.log("active player is found!");
 		    			// check if no video is playing and start the first video in queue
 		    			if(activeResult.length <= 0)
-		    			{
-							
+		    			{							
 		    				console.log("playing queue");
 							thisObject.playCurrentVideoFromList(function(playResult)
 			    			{	    				
@@ -94,7 +93,7 @@ var Player = function()
 	
 	this.addtoPlayList = function(videoId, callback)
 	{
-		console.log("------ this.addtoPlayList ----------");
+		console.log("------ this.addtoPlayList ---------- " + videoId);
 		var params = {  
     		playlistid: 1,   		
     		item : {
