@@ -22,7 +22,7 @@
   
 	"content_scripts": [
 		{
-			"matches": ["*://www.youtube.com/*"],
+			"matches": ["http://www.youtube.com/*", "https://www.youtube.com/*"],
 			"css": ["css/inject.css"],      
 			"js": ["js/jquery-1.9.1.min.js", "js/injectXBMC.js"],
 			"run_at": "document_idle"
