@@ -6,17 +6,29 @@
 var Player = function()
 {
 	var thisObject = this;	
+	this.pendingRequest = [];
 	
 	/*
 	 * Invoked when content script sends some message
 	 */
 	this.onMessage = function(request, sender, sendResponse)
-	{			
-	    console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
+	{	
+		if(sender)
+		{
+			console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");			
+		}		
+	    
 	    if(!rpc.url)
 	    {
 	    	console.log("open settings");
 	    	chrome.tabs.create({'url': chrome.extension.getURL("settings.html")}, function () {});
+	    	return;
+	    }
+	    
+	    if(rpc.isPending)
+	    {
+	    	thisObject.pendingRequest.push(request);
+	    	console.log("request queued!");
 	    	return;
 	    }
 	                 
@@ -36,7 +48,8 @@ var Player = function()
 						{
 							thisObject.playCurrentVideoFromList(function(playResult)
 			    			{	    				
-			    				console.log("video play success!");			    				
+			    				console.log("video play success!");	
+			    						    				
 			    				    				
 			    			});	    
 						}
@@ -200,6 +213,13 @@ var Player = function()
 			console.log("sending.. " + obj.result);
 			callback(obj.result);
 		}
+		
+		// check for pending requests
+		if(thisObject.pendingRequest.length > 0)
+		{
+			thisObject.onMessage(thisObject.pendingRequest[0]);
+			thisObject.pendingRequest.shift();
+		}
 										
 	};
 	
@@ -223,6 +243,7 @@ var RPCService = function()
 	this.youTubePath = "plugin://plugin.video.youtube/?action=play_video&videoid=";
 	this.callback;
 	this.context;	
+	this.isPending = false;
 	
 	var thisObject = this;
 	var xhr;
@@ -268,6 +289,7 @@ var RPCService = function()
 		}
 				
 		console.log(data);
+		thisObject.isPending = true;
 		var strData = JSON.stringify(data);
 		xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = thisObject.readResponse;
@@ -279,7 +301,9 @@ var RPCService = function()
 	};
 			
 	this.onLoad = function()
-	{		
+	{	
+		console.log("load data complete");
+		thisObject.isPending = false;	
 		if(this.status == 200)
 		{							
 			if(thisObject.context)
