@@ -321,6 +321,11 @@ var RPCService = function()
 		if(this.readyState == 4)
 		{
 			console.log("status, " + this.status);
+			if(this.status == 0)
+			{
+				thisObject.isPending = fasle;
+			}
+			
 			if(thisObject.context)
 			{
 				thisObject.context.updateResponseStatus(this.status);				
