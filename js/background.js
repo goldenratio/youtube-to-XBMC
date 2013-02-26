@@ -424,8 +424,12 @@ var GdataService = function()
 				console.log(videoList);
 				//{message: "playList", videoId: listId, path: path}
 				for(i = 0; i < videoList.length; i++)
-				{
+				{					
 					var obj = {message: "queueVideo", videoId: videoList[i]};
+					if(i == 0)
+					{
+						obj.message = "playVideo";
+					}
 					player.onMessage(obj); 
 				}
 			}
