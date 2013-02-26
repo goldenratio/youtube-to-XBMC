@@ -214,14 +214,14 @@ var Player = function()
 };
  
 var RPCService = function()
-{
-	this.xhr;
+{	
 	this.url;
 	this.youTubePath = "plugin://plugin.video.youtube/?action=play_video&videoid=";
 	this.callback;
 	this.context;	
 	
 	var thisObject = this;
+	var xhr;
 	
 	this.init = function()
 	{
@@ -265,12 +265,12 @@ var RPCService = function()
 				
 		console.log(data);
 		var strData = JSON.stringify(data);
-		this.xhr = new XMLHttpRequest();
-		this.xhr.onreadystatechange = thisObject.readResponse;
-		this.xhr.open("POST", this.url, true);		
-		this.xhr.setRequestHeader("Content-type", "application/json");
-		this.xhr.onload = thisObject.onLoad;
-		this.xhr.send(strData);
+		xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = thisObject.readResponse;
+		xhr.open("POST", this.url, true);		
+		xhr.setRequestHeader("Content-type", "application/json");
+		xhr.onload = thisObject.onLoad;
+		xhr.send(strData);
 				
 	};
 			

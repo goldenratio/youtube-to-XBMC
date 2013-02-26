@@ -4,6 +4,7 @@
  */
 
 var pathName = window.location.pathname;
+console.log("pathName, " + pathName);
 var template = '<div class="xbmc_control">YouTube to XBMC: <a href="#" id="play_$pid" onclick="return false;">Play Now</a> | <a href="#" id="queue_$qid" onclick="return false;">[+] Add to Queue</a></div>';
 var template_list = '<div class="xbmc_control">YouTube to XBMC: <span id="play_$pid" class="xbmc_link" onclick="return false;">Play Now</span> | <span id="queue_$qid" class="xbmc_link" onclick="return false;">[+] Add to Queue</span></div>';
 var timer;
@@ -48,8 +49,8 @@ this.findPropertyFromString = function(str, property)
 this.injectLinks = function()
 {	
 	console.log("injectLinks");
-	// (home / subscription on home page), search page, video manager, user page, user browse video, Popular on YouTube, Popular on youtube right side, video list (on video page)
-	$(".feed-item-content, .yt-lockup2-content, .vm-video-info-container, .yt-tile-visible, .channels-content-item, .lohp-category-shelf-item, .lohp-large-shelf-container, .lohp-medium-shelf-content, .lohp-vertical-shelf-item-content, .video-list-item").each(function(index) 
+	// (home / subscription on home page), search page, video manager, user page, user browse video, Popular on YouTube, Popular on youtube right side, video list (on video page), play list page
+	$(".feed-item-content, .yt-lockup2-content, .vm-video-info-container, .yt-tile-visible, .channels-content-item, .lohp-category-shelf-item, .lohp-large-shelf-container, .lohp-medium-shelf-content, .lohp-vertical-shelf-item-content, .video-list-item, .playlist-video-item").each(function(index) 
 	{	
 		var alreadyAdded = false;
 		$(this).find(".xbmc_control").each(function(xIndex)
@@ -88,7 +89,7 @@ this.injectLinks = function()
 			{
 				console.log("videoId, "  +videoId);
 				var copyTemp = template;		
-				if($(this).attr("class") == "video-list-item")
+				if($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
 				{
 					copyTemp = template_list;
 				}						
@@ -182,9 +183,48 @@ if(pathName == "/watch")
 			}, false);			  	
 		}		
 	}
+	
+	injectLinks();
 }
- 
-injectLinks();
+else if(pathName.indexOf("/embed") == 0)
+{		
+	var videoId = pathName.replace("/embed/", "");
+	console.log("videoId, " + videoId);
+	
+	var copyTemp = template_list.replace("$pid", videoId);
+	copyTemp = copyTemp.replace("$qid", videoId);
+		
+	$(".player-actions-container").prepend(copyTemp);
+	
+	var playStr = "play_" + videoId.toString();
+	var playVideo = document.getElementById(playStr);
+	if(playVideo)
+	{
+		console.log("playStr, " + playStr);
+		playVideo.addEventListener("click", function() {
+			console.log("video link clicked");
+			playVideoOnXBMC(videoId.toString());					
+		}, false);			  	
+	}
+	
+	var queueStr = "queue_" + videoId.toString();
+	var queueVideo = document.getElementById(queueStr);
+	if(queueVideo)
+	{
+		console.log("queueStr, " + queueStr);
+		queueVideo.addEventListener("click", function() {
+			console.log("queue video");
+			queueVideoToXBMC(videoId.toString());					
+		}, false);			  	
+	}
+	
+}
+else
+{
+	injectLinks();
+}
+  
+
 
 
 
