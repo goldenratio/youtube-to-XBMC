@@ -23,24 +23,25 @@ var Player = function()
 	    var params;   
 	    if (request.message == "playVideo")
 	    {	    	
-	    	console.log("play video, " + request.videoId);	    	
+	    	console.log("play video, " + request.videoId);
+	    	// Playlist.Clear, Playlist.Add(file), Player.Open(playlist)	    	
 	    	thisObject.clearPlayList(function(clearResult)
 	    	{
 	    		console.log("clearPlayList, " + clearResult);	
 	    		if(clearResult == "OK")
 	    		{
-					thisObject.playCurrentFile(request.videoId, function(playResult)
-			    	{
-			    		if(playResult == "OK")
-			    		{							
-			    			console.log("video play success!");			    			
-			    		}
-			    		else
-			    		{
-			    			console.log("Error! Cannot play video");
-			    		}
-			    		
-			    	});	    			
+	    			thisObject.addtoPlayList(request.videoId, function(listResult)
+					{
+						if(listResult == "OK")
+						{
+							thisObject.playCurrentVideoFromList(function(playResult)
+			    			{	    				
+			    				console.log("video play success!");			    				
+			    				    				
+			    			});	    
+						}
+					});
+						    			
 	    		}  
 	    		else
 	    		{
@@ -52,6 +53,8 @@ var Player = function()
 	    else if (request.message == "queueVideo")
 	    {	    	
 	    	console.log("queueVideo video, " + request.videoId);	    	    	    			    
+	    	// Player.GetActivePlayers (if empty), Playlist.Clear, Playlist.Add(file), Player.GetActivePlayers (if empty), Player.Open(playlist)
+	    	// Player.GetActivePlayers (if playing), Playlist.Add(file), Player.GetActivePlayers (if playing), do nothing
 	    	
 	    	thisObject.getActivePlayers(function(result)
 	    	{
