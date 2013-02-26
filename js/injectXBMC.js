@@ -6,7 +6,8 @@
 var pathName = window.location.pathname;
 console.log("pathName, " + pathName);
 var template = '<div class="xbmc_control">YouTube to XBMC: <a href="#" id="play_$pid" onclick="return false;">Play Now</a> | <a href="#" id="queue_$qid" onclick="return false;">[+] Add to Queue</a></div>';
-var template_list = '<div class="xbmc_control">YouTube to XBMC: <span id="play_$pid" class="xbmc_link" onclick="return false;">Play Now</span> | <span id="queue_$qid" class="xbmc_link" onclick="return false;">[+] Add to Queue</span></div>';
+var template_sidebar = '<div class="xbmc_control">YouTube to XBMC: <span id="play_$pid" class="xbmc_link" onclick="return false;">Play Now</span> | <span id="queue_$qid" class="xbmc_link" onclick="return false;">[+] Add to Queue</span></div>';
+var template_playlist = '<div class="xbmc_control">YouTube to XBMC: <a href="#" id="list_$lid" onclick="return false;">Play All</a></div>';
 var timer;
 
 this.playVideoOnXBMC = function(vId)
@@ -22,7 +23,12 @@ this.queueVideoToXBMC = function(vId)
 		console.log("video sent!");
 	});
 };
-
+this.playListOnXBMC = function(listId, path)
+{
+	chrome.extension.sendMessage({message: "playList", videoId: listId, path: path}, function(response) {
+		console.log("list sent!");
+	});	
+};
 
 this.findPropertyFromString = function(str, property)
 {
@@ -67,6 +73,7 @@ this.injectLinks = function()
 		
 		console.log(index);
 		var videoPathString;
+		var listId;
 		var videoId;
 		// (home / subscription on home page), search page, video manager, (user page / user browse video / Popular on YouTube) 
 		$(this).find(".feed-video-title, .yt-uix-tile-link, .vm-video-title-content, .yt-uix-sessionlink").each(function(vIndex)
@@ -78,48 +85,72 @@ this.injectLinks = function()
 		  
 		if(videoPathString)
 		{			  
-			console.log("videoPathString, " + videoPathString);				
-			videoId = findPropertyFromString(videoPathString, "v");
-			if(videoId == 0)
+			console.log("videoPathString, " + videoPathString);
+			listId = findPropertyFromString(videoPathString, "list");
+			if(listId)
 			{
-				videoId = findPropertyFromString(videoPathString, "video_id");
-			}
-			
-			if(videoId != 0)
-			{
-				console.log("videoId, "  +videoId);
-				var copyTemp = template;		
-				if($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
-				{
-					copyTemp = template_list;
-				}						
-				copyTemp = copyTemp.replace("$pid", videoId);
-				copyTemp = copyTemp.replace("$qid", videoId);
+				// it is play list
+				var copyTemp = template_playlist;
+				copyTemp = copyTemp.replace("$lid", listId);				
 				$(this).prepend(copyTemp);
-				  
-				var playStr = "play_" + videoId.toString();
-				var playVideo = document.getElementById(playStr);
-				if(playVideo)
+				
+				var listStr = "list_" + listId.toString();
+				var playList = document.getElementById(listStr);
+				if(playList)
 				{
-					console.log("playStr, " + playStr);
-					playVideo.addEventListener("click", function() {
-						console.log("video link clicked");
-						playVideoOnXBMC(videoId.toString());					
+					console.log("listStr, " + listStr);
+					playList.addEventListener("click", function() {
+						console.log("playList link clicked");
+						playListOnXBMC(listId.toString(), videoPathString);					
 					}, false);			  	
+				}
+			}
+			else
+			{
+				// just a single video
+				videoId = findPropertyFromString(videoPathString, "v");
+				if(videoId == 0)
+				{
+					videoId = findPropertyFromString(videoPathString, "video_id");
 				}
 				
-				var queueStr = "queue_" + videoId.toString();
-				var queueVideo = document.getElementById(queueStr);
-				if(queueVideo)
+				if(videoId != 0)
 				{
-					console.log("queueStr, " + queueStr);
-					queueVideo.addEventListener("click", function() {
-						console.log("queue video");
-						queueVideoToXBMC(videoId.toString());					
-					}, false);			  	
+					console.log("videoId, "  +videoId);
+					var copyTemp = template;		
+					if($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
+					{
+						copyTemp = template_sidebar;
+					}						
+					copyTemp = copyTemp.replace("$pid", videoId);
+					copyTemp = copyTemp.replace("$qid", videoId);
+					$(this).prepend(copyTemp);
+					  
+					var playStr = "play_" + videoId.toString();
+					var playVideo = document.getElementById(playStr);
+					if(playVideo)
+					{
+						console.log("playStr, " + playStr);
+						playVideo.addEventListener("click", function() {
+							console.log("video link clicked");
+							playVideoOnXBMC(videoId.toString());					
+						}, false);			  	
+					}
+					
+					var queueStr = "queue_" + videoId.toString();
+					var queueVideo = document.getElementById(queueStr);
+					if(queueVideo)
+					{
+						console.log("queueStr, " + queueStr);
+						queueVideo.addEventListener("click", function() {
+							console.log("queue video");
+							queueVideoToXBMC(videoId.toString());					
+						}, false);			  	
+					}
+					  
 				}
-				  
-			}			
+			} 				
+						
 		}	  
 		  
 	});
@@ -152,6 +183,7 @@ this.getURLParameter = function(url, name) {
 
 if(pathName == "/watch")
 {
+	console.log("window.location, " + window.location);
 	var mainVideoId = getURLParameter(window.location, "v");
 	//alert("mainVideoId, " + mainVideoId);
 	
@@ -191,7 +223,7 @@ else if(pathName.indexOf("/embed") == 0)
 	var videoId = pathName.replace("/embed/", "");
 	console.log("videoId, " + videoId);
 	
-	var copyTemp = template_list.replace("$pid", videoId);
+	var copyTemp = template_sidebar.replace("$pid", videoId);
 	copyTemp = copyTemp.replace("$qid", videoId);
 		
 	$(".player-actions-container").prepend(copyTemp);

@@ -87,6 +87,11 @@ var Player = function()
 	    	});
 	    	    	    	
 	    }
+	    else if (request.message == "playList")
+	    {
+	    	console.log("playList, " + request.videoId + ", path = " + request.path);
+	    	gService.loadFeed(request.videoId);
+	    }
 	};
 	
 	this.onQueue = function(videoId)
@@ -336,9 +341,119 @@ var RPCService = function()
 	};
 };
 
+var GdataService = function()
+{
+	this.feedPath = "http://gdata.youtube.com/feeds/api/playlists/$list_id/?alt=json";
+	this.isPending = false;
+	this.context;
+	var xhr;
+	var thisObject = this;
+	
+	this.loadFeed = function(playlistId)
+	{
+		var path = thisObject.feedPath.replace("$list_id", playlistId);		
+		thisObject.isPending = true;
+		
+		xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = thisObject.readResponse;
+		xhr.open("GET", path, true);		
+		xhr.setRequestHeader("Content-type", "application/json");
+		xhr.onload = thisObject.onLoad;
+		xhr.send("");
+	};
+	
+	this.findPropertyFromString = function(str, property)
+	{
+		//console.log("findPropertyFromString, str = " + str);
+		//console.log("findPropertyFromString, property = " + property);
+		property = property + "=";
+		var index = str.indexOf('?');
+		str = str.substring(index + 1);
+		//console.log("index = " + index);
+		//console.log("str = " + str);
+		
+		var list = str.split('&');
+		//console.log("list.length, " + list.length);
+		for(var i = 0; i < list.length; i++)
+		{
+			if(list[i].search(property) == 0)
+			{
+				return list[i].replace(property, "");
+			}		
+		}
+		return 0;
+	}
+
+	
+	this.onLoad = function()
+	{	
+		console.log("feed is loaded!");
+		thisObject.isPending = false;	
+		if(this.status == 200)
+		{							
+			// parse the feed	
+			var videoList = [];		
+			console.log("parse!");	
+			var obj = JSON.parse(this.responseText);
+			console.log(JSON.stringify(obj));				
+			console.log("total entries, " + obj.feed.entry.length);
+			var i;
+			for(i = 0; i < obj.feed.entry.length; i++)
+			{
+				var link = obj.feed.entry[i].link;				
+				for(var j = 0; j < link.length; j++)
+				{
+					if(link[j].type == "text/html")
+					{
+						console.log("link, " + link[j].href);
+						var videoId = thisObject.findPropertyFromString(link[j].href, "v");
+						console.log("video id, " + videoId);
+						if(videoId != 0)
+						{
+							videoList.push(videoId);
+						}
+						break;
+					}
+					
+				}
+			}
+			
+			if(videoList.length > 0)
+			{
+				// send this video list
+				console.log(videoList);
+				//{message: "playList", videoId: listId, path: path}
+				for(i = 0; i < videoList.length; i++)
+				{
+					var obj = {message: "queueVideo", videoId: videoList[i]};
+					player.onMessage(obj); 
+				}
+			}
+			
+		}
+		
+	};
+	
+	this.readResponse = function()
+	{		
+		console.log("this.readyState, " + this.readyState);
+		if(this.readyState == 4)
+		{
+			console.log("status, " + this.status);
+			if(this.status == 0)
+			{
+				thisObject.isPending = fasle;
+			}
+							
+		}
+		
+	};
+};
+
 //////////////////////////////////////////////////////////////////////
 
 var player = new Player();
+var gService = new GdataService();
 var rpc = new RPCService();
 rpc.init();
 
