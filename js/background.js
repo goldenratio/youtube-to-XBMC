@@ -208,6 +208,7 @@ var Player = function()
 		if(status == 0)
 		{
 			console.log("Error! Cannot connect to XBMC");
+			chrome.tabs.create({'url': chrome.extension.getURL("settings.html")}, function () {});
 		}
 		
 	};
