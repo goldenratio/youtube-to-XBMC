@@ -25,7 +25,7 @@ var Player = function()
 	    	return;
 	    }
 	    
-	    if(rpc.isPending)
+	    if(rpc.isPending || gService.isPending)
 	    {
 	    	thisObject.pendingRequest.push(request);
 	    	console.log("request queued!");
@@ -341,7 +341,7 @@ var RPCService = function()
 	};
 };
 
-var GdataService = function()
+var GDataService = function()
 {
 	this.feedPath = "http://gdata.youtube.com/feeds/api/playlists/$list_id/?alt=json";
 	this.isPending = false;
@@ -447,6 +447,7 @@ var GdataService = function()
 			if(this.status == 0)
 			{
 				thisObject.isPending = false;
+				alert("Error getting playlist data from Google Data!");
 			}
 							
 		}
@@ -457,7 +458,7 @@ var GdataService = function()
 //////////////////////////////////////////////////////////////////////
 
 var player = new Player();
-var gService = new GdataService();
+var gService = new GDataService();
 var rpc = new RPCService();
 rpc.init();
 
