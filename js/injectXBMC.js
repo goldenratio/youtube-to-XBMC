@@ -11,6 +11,8 @@ var template_playnow_sidebar = '<span rel="$pid" class="playNow xbmc_link" oncli
 var template_playall = '<a href="#" rel="$lid" class="playlist" onclick="return false;">Play All</a> |';
 var timer;
 
+
+
 this.playVideoOnXBMC = function(vId)
 {
 	chrome.extension.sendMessage({message: "playVideo", videoId: vId}, function(response) {
@@ -144,13 +146,13 @@ this.injectLinks = function()
 			}
 			
 			listId = 0;
-			videoId = 0;				
+			videoId = 0;
+										
 						
 		}	  
 		  
-	});
-	
-	
+	});		
+		
 	$("#content").bind('DOMNodeInserted', function(event)
 	{
 		console.log("DOM updated!");
@@ -174,7 +176,32 @@ this.getURLParameter = function(url, name) {
     );
 };
 
+this.initListeners = function()
+{
+	// click event listeners			
+	$(document).on('click', '.playlist', function(event)
+	{
+		console.log("playlist, " + $(this).attr("rel"));
+		playListOnXBMC($(this).attr("rel"));		
+	});
+	
+	$(document).on('click', '.playNow', function(event)	
+	{
+		console.log("play single video, " + $(this).attr("rel"));
+		playVideoOnXBMC($(this).attr("rel"));	
+		
+	});
+	
+	$(document).on('click', '.queue', function(event)	
+	{
+		console.log("queue single video, " + $(this).attr("rel"));
+		queueVideoToXBMC($(this).attr("rel"));
+	});	
+}
+
 /////////////
+
+initListeners();
 
 if(pathName == "/watch")
 {
@@ -227,35 +254,15 @@ else if(pathName.indexOf("/embed") == 0)
 	mainTemplate = mainTemplate.replace("$play_all", "");
 	mainTemplate = mainTemplate.replace("$play_now", copyTemp);
 		
-	$(".player-actions-container").prepend(mainTemplate);	
+	$(".player-actions-container").prepend(mainTemplate);
+	
+	
 	
 }
 else
 {
 	injectLinks();
 }
-
-// click event listeners
-$(".playlist").click(function()
-{
-	console.log("playlist, " + $(this).attr("rel"));
-	playListOnXBMC($(this).attr("rel"));
-});
-
-$(".playNow").click(function()
-{
-	console.log("play single video, " + $(this).attr("rel"));
-	playVideoOnXBMC($(this).attr("rel"));	
-	
-});
-
-$(".queue").click(function()
-{
-	console.log("queue single video, " + $(this).attr("rel"));
-	queueVideoToXBMC($(this).attr("rel"));
-});
-  
-
 
 
 
