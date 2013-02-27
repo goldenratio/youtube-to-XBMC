@@ -9,8 +9,10 @@ Adds "Play Now" and "Add to Queue" link to all youtube video content.
 
 **Features:**
 -------------
-1. Adds "Play Now"and "Add to Queue" link to all contents in home page, video manager page, search page, popular video and the main video page.
-2. Performs connection ping test when host is configured.
+1. "Play Now" and "Add to Queue" links are placed conveniently to contents in homepage, search pages and channel pages. 
+2. Performs connection test when host is configured.
+3. YouTube videos that are placed in other websites can also be shared to XBMC (only iframe format). Click on share icon to see the controls
+4. Supports playlist.
 
 
 **How To Load the Extension**
