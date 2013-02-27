@@ -6,9 +6,9 @@
 var pathName = window.location.pathname;
 console.log("pathName, " + pathName);
 var template_main = '<div class="xbmc_control">YouTube to XBMC: $play_all $play_now</div>';
-var template_playnow = '<a href="#" id="play_$pid" onclick="return false;">Play Now</a> | <a href="#" id="queue_$qid" onclick="return false;">[+] Add to Queue</a>';
-var template_playnow_sidebar = '<span id="play_$pid" class="xbmc_link" onclick="return false;">Play Now</span> | <span id="queue_$qid" class="xbmc_link" onclick="return false;">[+] Add to Queue</span>';
-var template_playall = '<a href="#" id="list_$lid" onclick="return false;">Play All</a> |';
+var template_playnow = '<a href="#" rel="$pid" class="playNow" onclick="return false;">Play Now</a> | <a href="#" rel="$qid" class="queue" onclick="return false;">[+] Add to Queue</a>';
+var template_playnow_sidebar = '<span rel="$pid" class="playNow xbmc_link" onclick="return false;">Play Now</span> | <span rel="$qid" class="queue xbmc_link" onclick="return false;">[+] Add to Queue</span>';
+var template_playall = '<a href="#" rel="$lid" class="playlist" onclick="return false;">Play All</a> |';
 var timer;
 
 this.playVideoOnXBMC = function(vId)
@@ -24,9 +24,9 @@ this.queueVideoToXBMC = function(vId)
 		console.log("video sent!");
 	});
 };
-this.playListOnXBMC = function(listId, path)
+this.playListOnXBMC = function(listId)
 {
-	chrome.extension.sendMessage({message: "playList", videoId: listId, path: path}, function(response) {
+	chrome.extension.sendMessage({message: "playList", videoId: listId}, function(response) {
 		console.log("list sent!");
 	});	
 };
@@ -140,42 +140,11 @@ this.injectLinks = function()
 			
 			if(listId != 0 || videoId !=0)
 			{
-				$(this).prepend(mainTemplate);				
-			
-				// add click events
-				var playVideo = document.getElementById(playStr);	
-				console.log(playVideo);			
-				if(playVideo)
-				{
-					//console.log("playStr, " + playStr);
-					playVideo.addEventListener("click", function() {
-						console.log("video link clicked");
-						playVideoOnXBMC(videoId.toString());					
-					}, false);			  	
-				}
-				
-				var queueVideo = document.getElementById(queueStr);
-				if(queueVideo)
-				{
-					//console.log("queueStr, " + queueStr);
-					queueVideo.addEventListener("click", function() {
-						console.log("queue video");
-						queueVideoToXBMC(videoId.toString());					
-					}, false);			  	
-				} 
-				
-				var playList = document.getElementById(listStr);
-				if(playList)
-				{
-					//console.log("listStr, " + listStr);
-					playList.addEventListener("click", function() {
-						console.log("playList link clicked");
-						playListOnXBMC(listId.toString(), videoPathString);					
-					}, false);			  	
-				}
+				$(this).prepend(mainTemplate);								
 			}
 			
-							
+			listId = 0;
+			videoId = 0;				
 						
 		}	  
 		  
@@ -221,32 +190,11 @@ if(pathName == "/watch")
 		var mainTemplate = template_main;
 		mainTemplate = mainTemplate.replace("$play_all", "");
 		mainTemplate = mainTemplate.replace("$play_now", copyTemp);
-		$("#watch7-headline").prepend(mainTemplate);
-		
-		var playStr = "play_" + mainVideoId.toString();
-		var playVideo = document.getElementById(playStr);
-		if(playVideo)
-		{
-			console.log("playStr, " + playStr);
-			playVideo.addEventListener("click", function() {
-				console.log("video link clicked");
-				playVideoOnXBMC(mainVideoId.toString());					
-			}, false);			  	
-		}
-		
-		var queueStr = "queue_" + mainVideoId.toString();
-		var queueVideo = document.getElementById(queueStr);
-		if(queueVideo)
-		{
-			console.log("queueStr, " + queueStr);
-			queueVideo.addEventListener("click", function() {
-				console.log("queue video");
-				queueVideoToXBMC(mainVideoId.toString());					
-			}, false);			  	
-		}		
+		$("#watch7-headline").prepend(mainTemplate);			
 	}
 	
 	injectLinks();
+	
 }
 else if(pathName.indexOf("/embed") == 0)
 {		
@@ -260,35 +208,33 @@ else if(pathName.indexOf("/embed") == 0)
 	mainTemplate = mainTemplate.replace("$play_all", "");
 	mainTemplate = mainTemplate.replace("$play_now", copyTemp);
 		
-	$(".player-actions-container").prepend(mainTemplate);
-	
-	var playStr = "play_" + videoId.toString();
-	var playVideo = document.getElementById(playStr);
-	if(playVideo)
-	{
-		console.log("playStr, " + playStr);
-		playVideo.addEventListener("click", function() {
-			console.log("video link clicked");
-			playVideoOnXBMC(videoId.toString());					
-		}, false);			  	
-	}
-	
-	var queueStr = "queue_" + videoId.toString();
-	var queueVideo = document.getElementById(queueStr);
-	if(queueVideo)
-	{
-		console.log("queueStr, " + queueStr);
-		queueVideo.addEventListener("click", function() {
-			console.log("queue video");
-			queueVideoToXBMC(videoId.toString());					
-		}, false);			  	
-	}
+	$(".player-actions-container").prepend(mainTemplate);	
 	
 }
 else
 {
 	injectLinks();
 }
+
+// click event listeners
+$(".playlist").click(function()
+{
+	console.log("playlist, " + $(this).attr("rel"));
+	playListOnXBMC($(this).attr("rel"));
+});
+
+$(".playNow").click(function()
+{
+	console.log("play single video, " + $(this).attr("rel"));
+	playVideoOnXBMC($(this).attr("rel"));	
+	
+});
+
+$(".queue").click(function()
+{
+	console.log("queue single video, " + $(this).attr("rel"));
+	queueVideoToXBMC($(this).attr("rel"));
+});
   
 
 

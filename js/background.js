@@ -89,7 +89,7 @@ var Player = function()
 	    }
 	    else if (request.message == "playList")
 	    {
-	    	console.log("playList, " + request.videoId + ", path = " + request.path);
+	    	console.log("playList, " + request.videoId);
 	    	gService.loadFeed(request.videoId);
 	    }
 	};
@@ -467,5 +467,9 @@ rpc.init();
  */
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse)
 {
-	player.onMessage(request, sender, sendResponse); 
+	if(player)
+	{
+		player.onMessage(request, sender, sendResponse);		
+	}
+	 
 });
