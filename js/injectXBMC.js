@@ -5,9 +5,10 @@
 
 var pathName = window.location.pathname;
 console.log("pathName, " + pathName);
-var template = '<div class="xbmc_control">YouTube to XBMC: <a href="#" id="play_$pid" onclick="return false;">Play Now</a> | <a href="#" id="queue_$qid" onclick="return false;">[+] Add to Queue</a></div>';
-var template_sidebar = '<div class="xbmc_control">YouTube to XBMC: <span id="play_$pid" class="xbmc_link" onclick="return false;">Play Now</span> | <span id="queue_$qid" class="xbmc_link" onclick="return false;">[+] Add to Queue</span></div>';
-var template_playlist = '<div class="xbmc_control">YouTube to XBMC: <a href="#" id="list_$lid" onclick="return false;">Play All</a></div>';
+var template_main = '<div class="xbmc_control">YouTube to XBMC: $play_all $play_now</div>';
+var template = '<a href="#" id="play_$pid" onclick="return false;">Play Now</a> | <a href="#" id="queue_$qid" onclick="return false;">[+] Add to Queue</a>';
+var template_sidebar = '<span id="play_$pid" class="xbmc_link" onclick="return false;">Play Now</span> | <span id="queue_$qid" class="xbmc_link" onclick="return false;">[+] Add to Queue</span>';
+var template_playlist = '<a href="#" id="list_$lid" onclick="return false;">Play All</a> |';
 var timer;
 
 this.playVideoOnXBMC = function(vId)
@@ -87,69 +88,89 @@ this.injectLinks = function()
 		{			  
 			console.log("videoPathString, " + videoPathString);
 			listId = findPropertyFromString(videoPathString, "list");
+			var mainTemplate = template_main;
+			var listTemp;
+			var listStr;
 			if(listId)
 			{
 				// it is play list
-				var copyTemp = template_playlist;
-				copyTemp = copyTemp.replace("$lid", listId);				
-				$(this).prepend(copyTemp);
+				listTemp = template_playlist;
+				listTemp = listTemp.replace("$lid", listId);
 				
-				var listStr = "list_" + listId.toString();
-				var playList = document.getElementById(listStr);
-				if(playList)
-				{
-					console.log("listStr, " + listStr);
-					playList.addEventListener("click", function() {
-						console.log("playList link clicked");
-						playListOnXBMC(listId.toString(), videoPathString);					
-					}, false);			  	
-				}
+				mainTemplate = mainTemplate.replace("$play_all", listTemp);				
+				//$(this).prepend(copyTemp);
+				
+				listStr = "list_" + listId.toString();				
 			}
 			else
 			{
-				// just a single video
-				videoId = findPropertyFromString(videoPathString, "v");
-				if(videoId == 0)
+				mainTemplate = mainTemplate.replace("$play_all", "");
+			}
+			
+			// just a single video
+			videoId = findPropertyFromString(videoPathString, "v");
+			if(videoId == 0)
+			{
+				videoId = findPropertyFromString(videoPathString, "video_id");
+			}
+			
+			var copyTemp = template;
+			var playStr;
+			var queueStr;
+			if(videoId != 0)
+			{
+				console.log("videoId, "  +videoId);						
+				if($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
 				{
-					videoId = findPropertyFromString(videoPathString, "video_id");
-				}
+					copyTemp = template_sidebar;
+				}						
+				copyTemp = copyTemp.replace("$pid", videoId);
+				copyTemp = copyTemp.replace("$qid", videoId);
 				
-				if(videoId != 0)
-				{
-					console.log("videoId, "  +videoId);
-					var copyTemp = template;		
-					if($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
-					{
-						copyTemp = template_sidebar;
-					}						
-					copyTemp = copyTemp.replace("$pid", videoId);
-					copyTemp = copyTemp.replace("$qid", videoId);
-					$(this).prepend(copyTemp);
-					  
-					var playStr = "play_" + videoId.toString();
-					var playVideo = document.getElementById(playStr);
-					if(playVideo)
-					{
-						console.log("playStr, " + playStr);
-						playVideo.addEventListener("click", function() {
-							console.log("video link clicked");
-							playVideoOnXBMC(videoId.toString());					
-						}, false);			  	
-					}
-					
-					var queueStr = "queue_" + videoId.toString();
-					var queueVideo = document.getElementById(queueStr);
-					if(queueVideo)
-					{
-						console.log("queueStr, " + queueStr);
-						queueVideo.addEventListener("click", function() {
-							console.log("queue video");
-							queueVideoToXBMC(videoId.toString());					
-						}, false);			  	
-					}
-					  
-				}
-			} 				
+				mainTemplate= mainTemplate.replace("$play_now", copyTemp);
+				//$(this).prepend(copyTemp);
+				  
+				playStr = "play_" + videoId.toString();
+				queueStr = "queue_" + videoId.toString();								  
+			}
+			else
+			{
+				mainTemplate= mainTemplate.replace("$play_now", "");
+			}
+			
+			$(this).prepend(mainTemplate);				
+			
+			// add click events
+			var playVideo = document.getElementById(playStr);	
+			console.log(playVideo);			
+			if(playVideo)
+			{
+				//console.log("playStr, " + playStr);
+				playVideo.addEventListener("click", function() {
+					console.log("video link clicked");
+					playVideoOnXBMC(videoId.toString());					
+				}, false);			  	
+			}
+			
+			var queueVideo = document.getElementById(queueStr);
+			if(queueVideo)
+			{
+				//console.log("queueStr, " + queueStr);
+				queueVideo.addEventListener("click", function() {
+					console.log("queue video");
+					queueVideoToXBMC(videoId.toString());					
+				}, false);			  	
+			} 
+			
+			var playList = document.getElementById(listStr);
+			if(playList)
+			{
+				//console.log("listStr, " + listStr);
+				playList.addEventListener("click", function() {
+					console.log("playList link clicked");
+					playListOnXBMC(listId.toString(), videoPathString);					
+				}, false);			  	
+			}				
 						
 		}	  
 		  
