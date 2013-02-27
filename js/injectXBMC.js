@@ -106,6 +106,7 @@ this.injectLinks = function()
 			}
 			else
 			{
+				mainTemplate = mainTemplate.replace("$sep", "");
 				mainTemplate = mainTemplate.replace("$play_all", "");				
 			}
 			
@@ -138,7 +139,7 @@ this.injectLinks = function()
 			}
 			else
 			{
-				mainTemplate = mainTemplate.replace("$sep", "");
+				mainTemplate = mainTemplate.replace("$sep", "");				
 				mainTemplate = mainTemplate.replace("$play_now", "");
 			}
 						
