@@ -182,13 +182,15 @@ this.initListeners = function()
 	$(document).on('click', '.playlist', function(event)
 	{
 		console.log("playlist, " + $(this).attr("rel"));
-		playListOnXBMC($(this).attr("rel"));		
+		playListOnXBMC($(this).attr("rel"));
+		event.preventDefault();		
 	});
 	
 	$(document).on('click', '.playNow', function(event)	
 	{
 		console.log("play single video, " + $(this).attr("rel"));
-		playVideoOnXBMC($(this).attr("rel"));	
+		playVideoOnXBMC($(this).attr("rel"));
+		event.preventDefault();	
 		
 	});
 	
@@ -196,6 +198,7 @@ this.initListeners = function()
 	{
 		console.log("queue single video, " + $(this).attr("rel"));
 		queueVideoToXBMC($(this).attr("rel"));
+		event.preventDefault();
 	});	
 }
 

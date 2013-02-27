@@ -353,7 +353,7 @@ var GDataService = function()
 	{
 		if(!playlistId)
 		{
-			console.log("playlist id can nto be null");
+			console.log("playlist id can not be null");
 			return;
 		}
 		var path = thisObject.feedPath.replace("$list_id", playlistId);		
