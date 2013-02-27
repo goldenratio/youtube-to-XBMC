@@ -5,10 +5,10 @@
 
 var pathName = window.location.pathname;
 console.log("pathName, " + pathName);
-var template_main = '<div class="xbmc_control">YouTube to XBMC: $play_all $play_now</div>';
+var template_main = '<div class="xbmc_control">YouTube to XBMC: $play_all $sep $play_now</div>';
 var template_playnow = '<a href="#" rel="$pid" class="playNow" onclick="return false;">Play Now</a> | <a href="#" rel="$qid" class="queue" onclick="return false;">[+] Add to Queue</a>';
 var template_playnow_sidebar = '<span rel="$pid" class="playNow xbmc_link" onclick="return false;">Play Now</span> | <span rel="$qid" class="queue xbmc_link" onclick="return false;">[+] Add to Queue</span>';
-var template_playall = '<a href="#" rel="$lid" class="playlist" onclick="return false;">Play All</a> |';
+var template_playall = '<a href="#" rel="$lid" class="playlist" onclick="return false;">Play All</a>';
 var timer;
 
 
@@ -85,7 +85,7 @@ this.injectLinks = function()
 			videoPathString = $(this).attr("href");
 			return false;	  	
 		});
-		  
+		  		
 		if(videoPathString)
 		{			  
 			console.log("videoPathString, " + videoPathString);
@@ -106,7 +106,7 @@ this.injectLinks = function()
 			}
 			else
 			{
-				mainTemplate = mainTemplate.replace("$play_all", "");
+				mainTemplate = mainTemplate.replace("$play_all", "");				
 			}
 			
 			// just a single video
@@ -129,7 +129,8 @@ this.injectLinks = function()
 				copyTemp = copyTemp.replace("$pid", videoId);
 				copyTemp = copyTemp.replace("$qid", videoId);
 				
-				mainTemplate= mainTemplate.replace("$play_now", copyTemp);
+				mainTemplate = mainTemplate.replace("$play_now", copyTemp);
+				mainTemplate = mainTemplate.replace("$sep", "|");
 				//$(this).prepend(copyTemp);
 				  
 				playStr = "play_" + videoId.toString();
@@ -137,9 +138,10 @@ this.injectLinks = function()
 			}
 			else
 			{
-				mainTemplate= mainTemplate.replace("$play_now", "");
+				mainTemplate = mainTemplate.replace("$sep", "");
+				mainTemplate = mainTemplate.replace("$play_now", "");
 			}
-			
+						
 			if(listId != 0 || videoId !=0)
 			{
 				$(this).prepend(mainTemplate);								
@@ -255,12 +257,11 @@ else if(pathName.indexOf("/embed") == 0)
 		
 	var mainTemplate = template_main;
 	mainTemplate = mainTemplate.replace("$play_all", "");
+	mainTemplate = mainTemplate.replace("$sep", "");
 	mainTemplate = mainTemplate.replace("$play_now", copyTemp);
 		
 	$(".player-actions-container").prepend(mainTemplate);
-	
-	
-	
+			
 }
 else
 {
