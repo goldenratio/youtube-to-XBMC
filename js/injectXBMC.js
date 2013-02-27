@@ -6,9 +6,9 @@
 var pathName = window.location.pathname;
 console.log("pathName, " + pathName);
 var template_main = '<div class="xbmc_control">YouTube to XBMC: $play_all $play_now</div>';
-var template = '<a href="#" id="play_$pid" onclick="return false;">Play Now</a> | <a href="#" id="queue_$qid" onclick="return false;">[+] Add to Queue</a>';
-var template_sidebar = '<span id="play_$pid" class="xbmc_link" onclick="return false;">Play Now</span> | <span id="queue_$qid" class="xbmc_link" onclick="return false;">[+] Add to Queue</span>';
-var template_playlist = '<a href="#" id="list_$lid" onclick="return false;">Play All</a> |';
+var template_playnow = '<a href="#" id="play_$pid" onclick="return false;">Play Now</a> | <a href="#" id="queue_$qid" onclick="return false;">[+] Add to Queue</a>';
+var template_playnow_sidebar = '<span id="play_$pid" class="xbmc_link" onclick="return false;">Play Now</span> | <span id="queue_$qid" class="xbmc_link" onclick="return false;">[+] Add to Queue</span>';
+var template_playall = '<a href="#" id="list_$lid" onclick="return false;">Play All</a> |';
 var timer;
 
 this.playVideoOnXBMC = function(vId)
@@ -94,7 +94,7 @@ this.injectLinks = function()
 			if(listId)
 			{
 				// it is play list
-				listTemp = template_playlist;
+				listTemp = template_playall;
 				listTemp = listTemp.replace("$lid", listId);
 				
 				mainTemplate = mainTemplate.replace("$play_all", listTemp);				
@@ -114,7 +114,7 @@ this.injectLinks = function()
 				videoId = findPropertyFromString(videoPathString, "video_id");
 			}
 			
-			var copyTemp = template;
+			var copyTemp = template_playnow;
 			var playStr;
 			var queueStr;
 			if(videoId != 0)
@@ -122,7 +122,7 @@ this.injectLinks = function()
 				console.log("videoId, "  +videoId);						
 				if($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
 				{
-					copyTemp = template_sidebar;
+					copyTemp = template_playnow_sidebar;
 				}						
 				copyTemp = copyTemp.replace("$pid", videoId);
 				copyTemp = copyTemp.replace("$qid", videoId);
@@ -215,9 +215,13 @@ if(pathName == "/watch")
 	
 	if(mainVideoId)
 	{
-		var copyTemp = template.replace("$pid", mainVideoId);
+		var copyTemp = template_playnow.replace("$pid", mainVideoId);
 		copyTemp = copyTemp.replace("$qid", mainVideoId);
-		$("#watch7-headline").prepend(copyTemp);
+		
+		var mainTemplate = template_main;
+		mainTemplate = mainTemplate.replace("$play_all", "");
+		mainTemplate = mainTemplate.replace("$play_now", copyTemp);
+		$("#watch7-headline").prepend(mainTemplate);
 		
 		var playStr = "play_" + mainVideoId.toString();
 		var playVideo = document.getElementById(playStr);
@@ -249,10 +253,14 @@ else if(pathName.indexOf("/embed") == 0)
 	var videoId = pathName.replace("/embed/", "");
 	console.log("videoId, " + videoId);
 	
-	var copyTemp = template_sidebar.replace("$pid", videoId);
+	var copyTemp = template_playnow_sidebar.replace("$pid", videoId);
 	copyTemp = copyTemp.replace("$qid", videoId);
 		
-	$(".player-actions-container").prepend(copyTemp);
+	var mainTemplate = template_main;
+	mainTemplate = mainTemplate.replace("$play_all", "");
+	mainTemplate = mainTemplate.replace("$play_now", copyTemp);
+		
+	$(".player-actions-container").prepend(mainTemplate);
 	
 	var playStr = "play_" + videoId.toString();
 	var playVideo = document.getElementById(playStr);
