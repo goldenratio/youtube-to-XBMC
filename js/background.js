@@ -351,6 +351,11 @@ var GDataService = function()
 	
 	this.loadFeed = function(playlistId)
 	{
+		if(!playlistId)
+		{
+			console.log("playlist id can nto be null");
+			return;
+		}
 		var path = thisObject.feedPath.replace("$list_id", playlistId);		
 		thisObject.isPending = true;
 		

@@ -179,20 +179,39 @@ this.getURLParameter = function(url, name) {
 if(pathName == "/watch")
 {
 	console.log("window.location, " + window.location);
-	var mainVideoId = getURLParameter(window.location, "v");
+	var loc = window.location.toString();
+	var mainVideoId = findPropertyFromString(loc, "v");
 	//alert("mainVideoId, " + mainVideoId);
-	
-	if(mainVideoId)
+	var mainTemplate = template_main;	
+	if(mainVideoId != 0)
 	{
 		var copyTemp = template_playnow.replace("$pid", mainVideoId);
 		copyTemp = copyTemp.replace("$qid", mainVideoId);
-		
-		var mainTemplate = template_main;
-		mainTemplate = mainTemplate.replace("$play_all", "");
+						
 		mainTemplate = mainTemplate.replace("$play_now", copyTemp);
-		$("#watch7-headline").prepend(mainTemplate);			
+					
+	}
+	else
+	{
+		mainTemplate = mainTemplate.replace("$play_now", "");
 	}
 	
+	var listId = findPropertyFromString(loc, "list");
+	if(listId != 0)
+	{
+		copyTemp = template_playall.replace("$lid", mainVideoId);										
+		mainTemplate = mainTemplate.replace("$play_all", copyTemp);
+	}
+	else
+	{
+		mainTemplate = mainTemplate.replace("$play_all", "");
+	}
+	
+	if(listId != 0 || videoId !=0)
+	{
+		$("#watch7-headline").prepend(mainTemplate);		
+	}
+		
 	injectLinks();
 	
 }
