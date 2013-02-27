@@ -138,39 +138,44 @@ this.injectLinks = function()
 				mainTemplate= mainTemplate.replace("$play_now", "");
 			}
 			
-			$(this).prepend(mainTemplate);				
-			
-			// add click events
-			var playVideo = document.getElementById(playStr);	
-			console.log(playVideo);			
-			if(playVideo)
+			if(listId != 0 || videoId !=0)
 			{
-				//console.log("playStr, " + playStr);
-				playVideo.addEventListener("click", function() {
-					console.log("video link clicked");
-					playVideoOnXBMC(videoId.toString());					
-				}, false);			  	
+				$(this).prepend(mainTemplate);				
+			
+				// add click events
+				var playVideo = document.getElementById(playStr);	
+				console.log(playVideo);			
+				if(playVideo)
+				{
+					//console.log("playStr, " + playStr);
+					playVideo.addEventListener("click", function() {
+						console.log("video link clicked");
+						playVideoOnXBMC(videoId.toString());					
+					}, false);			  	
+				}
+				
+				var queueVideo = document.getElementById(queueStr);
+				if(queueVideo)
+				{
+					//console.log("queueStr, " + queueStr);
+					queueVideo.addEventListener("click", function() {
+						console.log("queue video");
+						queueVideoToXBMC(videoId.toString());					
+					}, false);			  	
+				} 
+				
+				var playList = document.getElementById(listStr);
+				if(playList)
+				{
+					//console.log("listStr, " + listStr);
+					playList.addEventListener("click", function() {
+						console.log("playList link clicked");
+						playListOnXBMC(listId.toString(), videoPathString);					
+					}, false);			  	
+				}
 			}
 			
-			var queueVideo = document.getElementById(queueStr);
-			if(queueVideo)
-			{
-				//console.log("queueStr, " + queueStr);
-				queueVideo.addEventListener("click", function() {
-					console.log("queue video");
-					queueVideoToXBMC(videoId.toString());					
-				}, false);			  	
-			} 
-			
-			var playList = document.getElementById(listStr);
-			if(playList)
-			{
-				//console.log("listStr, " + listStr);
-				playList.addEventListener("click", function() {
-					console.log("playList link clicked");
-					playListOnXBMC(listId.toString(), videoPathString);					
-				}, false);			  	
-			}				
+							
 						
 		}	  
 		  
