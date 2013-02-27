@@ -1,6 +1,5 @@
 youtube-to-XBMC media center (Chrome Extension)
 ===============================================
-also supports RaspBMC
 
 YouTube to XBMC is available in Chrome Web Store, https://chrome.google.com/webstore/detail/youtube-to-xbmc/gbghegmimhjemkhpimohkdopkeahldbh
 
