@@ -113,7 +113,7 @@ this.injectLinks = function()
 				copyTemp = copyTemp.replace("$qid", videoId);
 				
 				mainTemplate = mainTemplate.replace("$play_now", copyTemp);
-				mainTemplate = mainTemplate.replace("$sep", "|");
+				//mainTemplate = mainTemplate.replace("$sep", "|");
 				//$(this).prepend(copyTemp);
 				  
 				playStr = "play_" + videoId.toString();
@@ -121,7 +121,7 @@ this.injectLinks = function()
 			}
 			else
 			{
-				mainTemplate = mainTemplate.replace("$sep", "");				
+				//mainTemplate = mainTemplate.replace("$sep", "");				
 				mainTemplate = mainTemplate.replace("$play_now", "");
 			}
 			
@@ -138,11 +138,18 @@ this.injectLinks = function()
 				// it is play list
 				if(videoId != 0)
 				{
+					// there is video too
 					listId = listId + " " + videoId;	
+					mainTemplate = mainTemplate.replace("$sep", "|");
 				}				
+				else
+				{
+					// just play list
+					mainTemplate = mainTemplate.replace("$sep", "");
+				}
 				listTemp = listTemp.replace("$lid", listId);
 				
-				mainTemplate = mainTemplate.replace("$play_all", listTemp);				
+				mainTemplate = mainTemplate.replace("$play_all", listTemp);								
 				//$(this).prepend(copyTemp);
 				
 				listStr = "list_" + listId.toString();				
