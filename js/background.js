@@ -89,8 +89,8 @@ var Player = function()
 	    }
 	    else if (request.message == "playList")
 	    {
-	    	console.log("playList, " + request.videoId);
-	    	gService.loadFeed(request.videoId);
+	    	console.log("playList, " + request.listId + ", videoId = " + request.videoId);
+	    	gService.loadFeed(request.listId, request.videoId);
 	    }
 	};
 	
@@ -345,16 +345,21 @@ var GDataService = function()
 {
 	this.feedPath = "http://gdata.youtube.com/feeds/api/playlists/$list_id/?alt=json";
 	this.isPending = false;
+	this.selectedVideoId;
 	this.context;
 	var xhr;
 	var thisObject = this;
 	
-	this.loadFeed = function(playlistId)
+	this.loadFeed = function(playlistId, defaultVideoId)
 	{
 		if(!playlistId)
 		{
 			console.log("playlist id can not be null");
 			return;
+		}
+		if(defaultVideoId)
+		{
+			thisObject.selectedVideoId = defaultVideoId;
 		}
 		var path = thisObject.feedPath.replace("$list_id", playlistId);		
 		thisObject.isPending = true;
@@ -427,6 +432,24 @@ var GDataService = function()
 			{
 				// send this video list
 				console.log(videoList);
+				console.log("thisObject.selectedVideoId, " + thisObject.selectedVideoId);
+				if(thisObject.selectedVideoId)
+				{
+					var index = videoList.indexOf(thisObject.selectedVideoId);
+					console.log("index, " + index); 
+					if(index >= 0)
+					{
+						console.log("videoList = " + videoList);
+						console.log("---------------------------------------");
+						console.log("found first video, " + thisObject.selectedVideoId);
+						var copyList = videoList.splice(index, videoList.length);
+						console.log("copy = " + copyList);
+						console.log("videoList = " + videoList);
+						videoList = copyList.concat(videoList);
+						console.log("---------------------------------------");
+						console.log("videoList = " + videoList);
+					}
+				}
 				//{message: "playList", videoId: listId, path: path}
 				for(i = 0; i < videoList.length; i++)
 				{					

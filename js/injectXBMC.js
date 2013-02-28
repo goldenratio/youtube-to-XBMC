@@ -6,9 +6,10 @@
 var pathName = window.location.pathname;
 console.log("pathName, " + pathName);
 var template_main = '<div class="xbmc_control">YouTube to XBMC: $play_all $sep $play_now</div>';
-var template_playnow = '<a href="#" rel="$pid" class="playNow" onclick="return false;">Play Now</a> | <a href="#" rel="$qid" class="queue" onclick="return false;">[+] Add to Queue</a>';
-var template_playnow_sidebar = '<span rel="$pid" class="playNow xbmc_link" onclick="return false;">Play Now</span> | <span rel="$qid" class="queue xbmc_link" onclick="return false;">[+] Add to Queue</span>';
-var template_playall = '<a href="#" rel="$lid" class="playlist" onclick="return false;">Play All</a>';
+var template_playnow = '<a href="#" rel="$pid" class="xbmc_playNow" onclick="return false;">Play Now</a> | <a href="#" rel="$qid" class="xbmc_queue" onclick="return false;">[+] Add to Queue</a>';
+var template_playnow_sidebar = '<span rel="$pid" class="xbmc_playNow xbmc_link" onclick="return false;">Play Now</span> | <span rel="$qid" class="xbmc_queue xbmc_link" onclick="return false;">[+] Add to Queue</span>';
+var template_playall = '<a href="#" rel="$lid" class="xbmc_playlist" onclick="return false;">Play All</a>';
+var template_playall_sidebar = '<span rel="$lid" class="xbmc_playlist xbmc_link" onclick="return false;">Play All</span>';
 var timer;
 
 
@@ -26,9 +27,9 @@ this.queueVideoToXBMC = function(vId)
 		console.log("video sent!");
 	});
 };
-this.playListOnXBMC = function(listId)
+this.playListOnXBMC = function(listId, videoId)
 {
-	chrome.extension.sendMessage({message: "playList", videoId: listId}, function(response) {
+	chrome.extension.sendMessage({message: "playList", listId: listId, videoId: videoId}, function(response) {
 		console.log("list sent!");
 	});	
 };
@@ -89,26 +90,7 @@ this.injectLinks = function()
 		if(videoPathString)
 		{			  
 			console.log("videoPathString, " + videoPathString);
-			listId = findPropertyFromString(videoPathString, "list");
-			var mainTemplate = template_main;
-			var listTemp;
-			var listStr;
-			if(listId)
-			{
-				// it is play list
-				listTemp = template_playall;
-				listTemp = listTemp.replace("$lid", listId);
-				
-				mainTemplate = mainTemplate.replace("$play_all", listTemp);				
-				//$(this).prepend(copyTemp);
-				
-				listStr = "list_" + listId.toString();				
-			}
-			else
-			{
-				mainTemplate = mainTemplate.replace("$sep", "");
-				mainTemplate = mainTemplate.replace("$play_all", "");				
-			}
+			var mainTemplate = template_main;			
 			
 			// just a single video
 			videoId = findPropertyFromString(videoPathString, "v");
@@ -142,7 +124,37 @@ this.injectLinks = function()
 				mainTemplate = mainTemplate.replace("$sep", "");				
 				mainTemplate = mainTemplate.replace("$play_now", "");
 			}
-						
+			
+			// find play list id
+			listId = findPropertyFromString(videoPathString, "list");			
+			var listTemp = template_playall;
+			var listStr;
+			if(listId)
+			{
+				if($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
+				{
+					listTemp = template_playall_sidebar;
+				}
+				// it is play list
+				if(videoId != 0)
+				{
+					listId = listId + " " + videoId;	
+				}				
+				listTemp = listTemp.replace("$lid", listId);
+				
+				mainTemplate = mainTemplate.replace("$play_all", listTemp);				
+				//$(this).prepend(copyTemp);
+				
+				listStr = "list_" + listId.toString();				
+			}
+			else
+			{
+				mainTemplate = mainTemplate.replace("$sep", "");
+				mainTemplate = mainTemplate.replace("$play_all", "");				
+			}
+			
+			
+			//////
 			if(listId != 0 || videoId !=0)
 			{
 				$(this).prepend(mainTemplate);								
@@ -182,14 +194,24 @@ this.getURLParameter = function(url, name) {
 this.initListeners = function()
 {
 	// click event listeners			
-	$(document).on('click', '.playlist', function(event)
+	$(document).on('click', '.xbmc_playlist', function(event)
 	{
 		console.log("playlist, " + $(this).attr("rel"));
-		playListOnXBMC($(this).attr("rel"));
-		event.preventDefault();		
+		var listId = $(this).attr("rel");
+		
+		if(listId)
+		{
+			var listData = listId.split(" ");	
+		
+			//console.log(listData[0]);
+			//console.log(listData[1]);
+			playListOnXBMC(listData[0], listData[1]);
+			event.preventDefault();	
+		}							
+				
 	});
 	
-	$(document).on('click', '.playNow', function(event)	
+	$(document).on('click', '.xbmc_playNow', function(event)	
 	{
 		console.log("play single video, " + $(this).attr("rel"));
 		playVideoOnXBMC($(this).attr("rel"));
@@ -197,7 +219,7 @@ this.initListeners = function()
 		
 	});
 	
-	$(document).on('click', '.queue', function(event)	
+	$(document).on('click', '.xbmc_queue', function(event)	
 	{
 		console.log("queue single video, " + $(this).attr("rel"));
 		queueVideoToXBMC($(this).attr("rel"));
@@ -234,9 +256,11 @@ if(pathName == "/watch")
 	{
 		copyTemp = template_playall.replace("$lid", mainVideoId);										
 		mainTemplate = mainTemplate.replace("$play_all", copyTemp);
+		mainTemplate = mainTemplate.replace("$sep", "|");
 	}
 	else
 	{
+		mainTemplate = mainTemplate.replace("$sep", "");
 		mainTemplate = mainTemplate.replace("$play_all", "");
 	}
 	
