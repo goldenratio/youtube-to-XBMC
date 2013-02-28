@@ -261,7 +261,11 @@ if(pathName == "/watch")
 	var listId = findPropertyFromString(loc, "list");
 	if(listId != 0)
 	{
-		copyTemp = template_playall.replace("$lid", mainVideoId);										
+		if(mainVideoId != 0)
+		{
+			listId = listId + " " + mainVideoId;
+		}
+		copyTemp = template_playall.replace("$lid", listId);										
 		mainTemplate = mainTemplate.replace("$play_all", copyTemp);
 		mainTemplate = mainTemplate.replace("$sep", "|");
 	}
