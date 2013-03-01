@@ -328,7 +328,7 @@ var RPCService = function()
 			console.log("status, " + this.status);
 			if(this.status == 0)
 			{
-				thisObject.isPending = fasle;
+				thisObject.isPending = false;
 			}
 			
 			if(thisObject.context)
