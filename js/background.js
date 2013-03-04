@@ -270,14 +270,14 @@ var RPCService = function()
 	this.setURL = function(xbmcURL)
 	{
 		//console.log("xbmc URL, " + xbmcURL);
-		this.url = xbmcURL;				
+		thisObject.url = xbmcURL;
 	};
 	
 	this.sendRequest = function(context, method, params, callback)
 	{		
 		console.log("send request");		
-		this.callback = callback;
-		this.context = context;
+		thisObject.callback = callback;
+		thisObject.context = context;
 		var data = { jsonrpc: "2.0", method: method, id: 1 };
 		
 		if(params)
