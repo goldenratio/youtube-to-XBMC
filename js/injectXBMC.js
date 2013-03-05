@@ -297,7 +297,26 @@ else if(pathName.indexOf("/embed") == 0)
 	mainTemplate = mainTemplate.replace("$play_now", copyTemp);
 		
 	$(".player-actions-container").prepend(mainTemplate);
-			
+
+}
+else if(pathName == "/share_popup")
+{
+    var loc = window.location.toString();
+    var mainVideoId = findPropertyFromString(loc, "v");
+
+    var mainTemplate = template_main;
+    if(mainVideoId != 0)
+    {
+        var copyTemp = template_playnow.replace("$pid", mainVideoId);
+        copyTemp = copyTemp.replace("$qid", mainVideoId);
+        mainTemplate = mainTemplate.replace("$play_now", copyTemp);
+
+        mainTemplate = mainTemplate.replace("$sep", "");
+        mainTemplate = mainTemplate.replace("$play_all", "");
+
+        $("#page").prepend(mainTemplate);
+    }
+
 }
 else
 {
