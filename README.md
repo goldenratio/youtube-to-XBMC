@@ -10,7 +10,7 @@ Adds "Play Now" and "Add to Queue" link to all youtube video content.
 -------------
 1. "Play Now" and "Add to Queue" links are placed conveniently to contents in homepage, search pages and channel pages. 
 2. Performs connection test when host is configured.
-3. YouTube videos that are placed in other websites can also be shared to XBMC (only iframe format). Click on share icon to see the controls
+3. YouTube videos that are placed in other websites can also be shared to XBMC. Click on share icon to see the controls.
 4. Supports playlist.
 
 
