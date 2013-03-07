@@ -27,12 +27,12 @@ var Player = function()
 	    
 	    if(rpc.isPending || gService.isPending)
 	    {
-	    	thisObject.pendingRequest.push(request);
+            var requestData = {request: request, callback: sendResponse};
+	    	thisObject.pendingRequest.push(requestData);
 	    	console.log("request queued!");
 	    	return;
 	    }
-	                 
-	    var params;   
+
 	    if (request.message == "playVideo")
 	    {	    	
 	    	console.log("play video, " + request.videoId);
@@ -40,17 +40,19 @@ var Player = function()
 	    	thisObject.clearPlayList(function(clearResult)
 	    	{
 	    		console.log("clearPlayList, " + clearResult);	
-	    		if(clearResult == "OK")
+	    		if(clearResult == ResultData.OK)
 	    		{
 	    			thisObject.addtoPlayList(request.videoId, function(listResult)
 					{
-						if(listResult == "OK")
+						if(listResult == ResultData.OK)
 						{
 							thisObject.playCurrentVideoFromList(function(playResult)
 			    			{	    				
-			    				console.log("video play success!");	
-			    						    				
-			    				    				
+			    				console.log("video play success!");
+
+                                if(sendResponse)
+                                    sendResponse(ResultData.OK);
+
 			    			});	    
 						}
 					});
@@ -59,6 +61,10 @@ var Player = function()
 	    		else
 	    		{
 	    			console.log("Error! Cannot clear play list");
+
+                    if(sendResponse)
+                        sendResponse(ResultData.ERROR);
+
 	    		} 			    	
 	    		
 	    	});
@@ -76,12 +82,20 @@ var Player = function()
 	    			// clear any previous pending play list
 	    			thisObject.clearPlayList(function(clearResult) 
 	    			{	    				
-	    				thisObject.onQueue(request.videoId);	    				
+	    				thisObject.onQueue(request.videoId, function(response)
+                        {
+                            if(sendResponse)
+                                sendResponse(response);
+                        });
 	    			});
 	    		}
 	    		else
-	    		{	    			
-	    			thisObject.onQueue(request.videoId);	    			
+	    		{
+                    thisObject.onQueue(request.videoId, function(response)
+                    {
+                        if(sendResponse)
+                            sendResponse(response);
+                    });
 	    		}
 	    			    		
 	    	});
@@ -94,14 +108,20 @@ var Player = function()
 	    }
 	};
 	
-	this.onQueue = function(videoId)
+	this.onQueue = function(videoId, callback)
 	{
 		// first add playlist, if no video is playing then play the video.
-		thisObject.addtoPlayList(videoId, function(playListresult)
+		thisObject.addtoPlayList(videoId, function(playListResult)
 		{
-			console.log("addtoPlayList, " + playListresult);
-			if(playListresult == "OK")
+			console.log("addtoPlayList, " + playListResult);
+			if(playListResult == ResultData.OK)
 			{
+                if(callback)
+                {
+                    callback(ResultData.OK);
+                }
+
+
 				thisObject.getActivePlayers(function(activeResult)
 	    		{
 	    			console.log("active player is found!");
@@ -111,7 +131,7 @@ var Player = function()
 	    				console.log("playing queue");
 						thisObject.playCurrentVideoFromList(function(playResult)
 		    			{	    				
-		    				console.log("video play success!");			    				
+		    				console.log("video play success!");
 		    				    				
 		    			});	    				
 		    					    				
@@ -131,6 +151,10 @@ var Player = function()
 			else
 			{
 				console.log("Error! Cannot add video to playlist");
+                if(callback)
+                {
+                    callback(ResultData.ERROR);
+                }
 			}
 			
 		});
@@ -222,7 +246,7 @@ var Player = function()
 		// check for pending requests
 		if(thisObject.pendingRequest.length > 0)
 		{
-			thisObject.onMessage(thisObject.pendingRequest[0]);
+			thisObject.onMessage(thisObject.pendingRequest[0].request, thisObject.pendingRequest[0].callback);
 			thisObject.pendingRequest.shift();
 		}
 										
@@ -497,7 +521,10 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse)
 {
 	if(player)
 	{
-		player.onMessage(request, sender, sendResponse);		
+		player.onMessage(request, sender, sendResponse);
+
 	}
+
+    return true;
 	 
 });

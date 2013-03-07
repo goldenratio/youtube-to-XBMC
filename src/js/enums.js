@@ -26,3 +26,9 @@ var ButtonData = new function()
 	this.CONNECT = "connectButton";	
 	this.CLEAR = "clearButton";	
 };
+
+var ResultData = new function()
+{
+    this.OK = "OK";
+    this.ERROR = "ERROR";
+};

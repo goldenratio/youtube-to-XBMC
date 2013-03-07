@@ -3,7 +3,7 @@
 	
 	"name": "YouTube to XBMC",
 	"description": "Send youtube videos to XBMC media center",
-	"version": "2.6.6",
+	"version": "2.6.7",
 	"permissions": [ "http://*/*", "storage" ],	
   
 	"icons": { 
@@ -13,14 +13,14 @@
 	},
   
 	"background": {
-		"scripts": ["js/background.js"]
+		"scripts": ["js/enums.js", "js/background.js"]
 	},
   
 	"content_scripts": [
 		{
 			"matches": ["http://www.youtube.com/*", "https://www.youtube.com/*"],
-			"css": ["css/inject.css"],      
-			"js": ["js/jquery-1.9.1.min.js", "js/injectXBMC.js"],
+			"css": ["css/toastr.css", "css/inject.css"],
+			"js": ["js/jquery-1.9.1.min.js", "js/toastr.js", "js/enums.js", "js/injectXBMC.js"],
 			"run_at": "document_idle",
 			"all_frames": true
 		}

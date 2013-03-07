@@ -4,7 +4,6 @@
  */
 
 var pathName = window.location.pathname;
-console.log("pathName, " + pathName);
 var template_main = '<div class="xbmc_control">YouTube to XBMC: $play_all $sep $play_now</div>';
 var template_playnow = '<a href="#" rel="$pid" class="xbmc_playNow" onclick="return false;">Play Now</a> | <a href="#" rel="$qid" class="xbmc_queue" onclick="return false;">[+] Add to Queue</a>';
 var template_playnow_sidebar = '<span rel="$pid" class="xbmc_playNow xbmc_link" onclick="return false;">Play Now</span> | <span rel="$qid" class="xbmc_queue xbmc_link" onclick="return false;">[+] Add to Queue</span>';
@@ -12,121 +11,136 @@ var template_playall = '<a href="#" rel="$lid" class="xbmc_playlist" onclick="re
 var template_playall_sidebar = '<span rel="$lid" class="xbmc_playlist xbmc_link" onclick="return false;">Play All</span>';
 var timer;
 
+console.log("pathName, " + pathName);
 
-
-this.playVideoOnXBMC = function(vId)
+var RpcService = function()
 {
-	chrome.extension.sendMessage({message: "playVideo", videoId: vId}, function(response) {
-		console.log("video sent!");
-	});
+    this.playVideoOnXBMC = function(vId)
+    {
+        chrome.extension.sendMessage({message: "playVideo", videoId: vId}, function(response) {
+            console.log("video sent!");
+        });
+    };
+
+    this.queueVideoToXBMC = function(vId)
+    {
+        chrome.extension.sendMessage({message: "queueVideo", videoId: vId}, function(response) {
+            console.log("inject script >> video sent! " + response);
+            if(response == ResultData.OK)
+            {
+                toastr.success("Added to Queue!");
+            }
+            else
+            {
+                toastr.error("Error! Can't Add to Queue!");
+            }
+        });
+    };
+    this.playListOnXBMC = function(listId, videoId)
+    {
+        chrome.extension.sendMessage({message: "playList", listId: listId, videoId: videoId}, function(response) {
+            console.log("list sent!");
+        });
+    };
 };
 
-this.queueVideoToXBMC = function(vId)
+var Utils = new function()
 {
-	chrome.extension.sendMessage({message: "queueVideo", videoId: vId}, function(response) {
-		console.log("video sent!");
-	});
-};
-this.playListOnXBMC = function(listId, videoId)
-{
-	chrome.extension.sendMessage({message: "playList", listId: listId, videoId: videoId}, function(response) {
-		console.log("list sent!");
-	});	
+    this.findPropertyFromString = function(str, property)
+    {
+        //console.log("findPropertyFromString, str = " + str);
+        //console.log("findPropertyFromString, property = " + property);
+        property = property + "=";
+        var index = str.indexOf('?');
+        str = str.substring(index + 1);
+        //console.log("index = " + index);
+        //console.log("str = " + str);
+
+        var list = str.split('&');
+        //console.log("list.length, " + list.length);
+        for(var i = 0; i < list.length; i++)
+        {
+            if(list[i].search(property) == 0)
+            {
+                return list[i].replace(property, "");
+            }
+        }
+        return 0;
+    }
 };
 
-this.findPropertyFromString = function(str, property)
-{
-	//console.log("findPropertyFromString, str = " + str);
-	//console.log("findPropertyFromString, property = " + property);
-	property = property + "=";
-	var index = str.indexOf('?');
-	str = str.substring(index + 1);
-	//console.log("index = " + index);
-	//console.log("str = " + str);
-	
-	var list = str.split('&');
-	//console.log("list.length, " + list.length);
-	for(var i = 0; i < list.length; i++)
-	{
-		if(list[i].search(property) == 0)
-		{
-			return list[i].replace(property, "");
-		}		
-	}
-	return 0;
-}
 
 this.injectLinks = function()
-{	
+{
 	console.log("injectLinks");
 	// (home / subscription on home page), search page, video manager, user page, user browse video, Popular on YouTube, Popular on youtube right side, video list (on video page), play list page
-	$(".feed-item-content, .yt-lockup2-content, .vm-video-info-container, .yt-tile-visible, .channels-content-item, .lohp-category-shelf-item, .lohp-large-shelf-container, .lohp-medium-shelf-content, .lohp-vertical-shelf-item-content, .video-list-item, .playlist-video-item, .yt-lockup-content").each(function(index) 
-	{	
+	$(".feed-item-content, .yt-lockup2-content, .vm-video-info-container, .yt-tile-visible, .channels-content-item, .lohp-category-shelf-item, .lohp-large-shelf-container, .lohp-medium-shelf-content, .lohp-vertical-shelf-item-content, .video-list-item, .playlist-video-item, .yt-lockup-content").each(function(index)
+	{
 		var alreadyAdded = false;
 		$(this).find(".xbmc_control").each(function(xIndex)
 		{
 			alreadyAdded = true;
 			return false;
-			
-		});			
-		
+
+		});
+
 		if(alreadyAdded)
 		{
 			return; // continue
 		}
-		
+
 		console.log(index);
 		var videoPathString;
 		var listId;
 		var videoId;
-		// (home / subscription on home page), search page, video manager, (user page / user browse video / Popular on YouTube) 
+		// (home / subscription on home page), search page, video manager, (user page / user browse video / Popular on YouTube)
 		$(this).find(".feed-video-title, .yt-uix-tile-link, .vm-video-title-content, .yt-uix-sessionlink").each(function(vIndex)
 		{
 			//console.log("video link, " + vIndex + ", " + $(this).attr("href"));
 			videoPathString = $(this).attr("href");
-			return false;	  	
+			return false;
 		});
-		  		
+
 		if(videoPathString)
-		{			  
+		{
 			console.log("videoPathString, " + videoPathString);
-			var mainTemplate = template_main;			
-			
+			var mainTemplate = template_main;
+
 			// just a single video
-			videoId = findPropertyFromString(videoPathString, "v");
+			videoId = Utils.findPropertyFromString(videoPathString, "v");
 			if(videoId == 0)
 			{
-				videoId = findPropertyFromString(videoPathString, "video_id");
+				videoId = Utils.findPropertyFromString(videoPathString, "video_id");
 			}
-			
+
 			var copyTemp = template_playnow;
 			var playStr;
 			var queueStr;
 			if(videoId != 0)
 			{
-				console.log("videoId, "  +videoId);						
+				console.log("videoId, "  +videoId);
 				if($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
 				{
 					copyTemp = template_playnow_sidebar;
-				}						
+				}
 				copyTemp = copyTemp.replace("$pid", videoId);
 				copyTemp = copyTemp.replace("$qid", videoId);
-				
+
 				mainTemplate = mainTemplate.replace("$play_now", copyTemp);
 				//mainTemplate = mainTemplate.replace("$sep", "|");
 				//$(this).prepend(copyTemp);
-				  
+
 				playStr = "play_" + videoId.toString();
-				queueStr = "queue_" + videoId.toString();								  
+				queueStr = "queue_" + videoId.toString();
 			}
 			else
 			{
-				//mainTemplate = mainTemplate.replace("$sep", "");				
+				//mainTemplate = mainTemplate.replace("$sep", "");
 				mainTemplate = mainTemplate.replace("$play_now", "");
 			}
-			
+
 			// find play list id
-			listId = findPropertyFromString(videoPathString, "list");			
+			listId = Utils.findPropertyFromString(videoPathString, "list");
 			var listTemp = template_playall;
 			var listStr;
 			if(listId)
@@ -139,110 +153,107 @@ this.injectLinks = function()
 				if(videoId != 0)
 				{
 					// there is video too
-					listId = listId + " " + videoId;	
+					listId = listId + " " + videoId;
 					mainTemplate = mainTemplate.replace("$sep", "|");
-				}				
+				}
 				else
 				{
 					// just play list
 					mainTemplate = mainTemplate.replace("$sep", "");
 				}
 				listTemp = listTemp.replace("$lid", listId);
-				
-				mainTemplate = mainTemplate.replace("$play_all", listTemp);								
+
+				mainTemplate = mainTemplate.replace("$play_all", listTemp);
 				//$(this).prepend(copyTemp);
-				
-				listStr = "list_" + listId.toString();				
+
+				listStr = "list_" + listId.toString();
 			}
 			else
 			{
 				mainTemplate = mainTemplate.replace("$sep", "");
-				mainTemplate = mainTemplate.replace("$play_all", "");				
+				mainTemplate = mainTemplate.replace("$play_all", "");
 			}
-			
-			
+
+
 			//////
 			if(listId != 0 || videoId !=0)
 			{
-				$(this).prepend(mainTemplate);								
+				$(this).prepend(mainTemplate);
 			}
-			
+
 			listId = 0;
 			videoId = 0;
-										
-						
-		}	  
-		  
-	});		
-		
+
+
+		}
+
+	});
+
 	$("#content").bind('DOMNodeInserted', function(event)
 	{
 		console.log("DOM updated!");
 		var element = event.target;
 		console.log("element, " + element.tagName);
-		
-		clearInterval(timer);		
-		timer = setInterval(function(){			
-			clearInterval(timer);			
+
+		clearInterval(timer);
+		timer = setInterval(function(){
+			clearInterval(timer);
 			$("#content").unbind('DOMNodeInserted');
-			injectLinks();			
-		}, 2000)				
+			injectLinks();
+		}, 2000)
 	});
-	
+
 
 };
 
-this.getURLParameter = function(url, name) {
-    return decodeURI(
-        (RegExp(name + '=' + '(.+?)(&|$)').exec(url.search)||[,null])[1]
-    );
-};
 
 this.initListeners = function()
 {
-	// click event listeners			
+	// click event listeners
 	$(document).on('click', '.xbmc_playlist', function(event)
 	{
 		console.log("playlist, " + $(this).attr("rel"));
 		var listId = $(this).attr("rel");
-		
+
 		if(listId)
 		{
-			var listData = listId.split(" ");	
-		
+			var listData = listId.split(" ");
+
 			//console.log(listData[0]);
 			//console.log(listData[1]);
-			playListOnXBMC(listData[0], listData[1]);
-			event.preventDefault();	
-		}							
-				
+			rpc.playListOnXBMC(listData[0], listData[1]);
+			event.preventDefault();
+		}
+
 	});
-	
-	$(document).on('click', '.xbmc_playNow', function(event)	
+
+	$(document).on('click', '.xbmc_playNow', function(event)
 	{
 		console.log("play single video, " + $(this).attr("rel"));
-		playVideoOnXBMC($(this).attr("rel"));
-		event.preventDefault();	
-		
+		rpc.playVideoOnXBMC($(this).attr("rel"));
+		event.preventDefault();
+
 	});
-	
-	$(document).on('click', '.xbmc_queue', function(event)	
+
+	$(document).on('click', '.xbmc_queue', function(event)
 	{
 		console.log("queue single video, " + $(this).attr("rel"));
-		queueVideoToXBMC($(this).attr("rel"));
+		rpc.queueVideoToXBMC($(this).attr("rel"));
 		event.preventDefault();
-	});	
+	});
 }
 
-/////////////
+/////////////////////////////
 
-initListeners();
+var rpc = new RpcService();
+this.initListeners();
 
+////////////////////////////
 if(pathName == "/watch")
 {
 	console.log("window.location, " + window.location);
 	var loc = window.location.toString();
-	var mainVideoId = findPropertyFromString(loc, "v");
+	var mainVideoId = Utils.findPropertyFromString(loc, "v");
 	//alert("mainVideoId, " + mainVideoId);
 	var mainTemplate = template_main;	
 	if(mainVideoId != 0)
@@ -258,7 +269,7 @@ if(pathName == "/watch")
 		mainTemplate = mainTemplate.replace("$play_now", "");
 	}
 	
-	var listId = findPropertyFromString(loc, "list");
+	var listId = Utils.findPropertyFromString(loc, "list");
 	if(listId != 0)
 	{
 		if(mainVideoId != 0)
@@ -302,7 +313,7 @@ else if(pathName.indexOf("/embed") == 0)
 else if(pathName == "/share_popup")
 {
     var loc = window.location.toString();
-    var mainVideoId = findPropertyFromString(loc, "v");
+    var mainVideoId = Utils.findPropertyFromString(loc, "v");
 
     var mainTemplate = template_main;
     if(mainVideoId != 0)
