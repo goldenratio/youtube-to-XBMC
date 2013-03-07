@@ -18,7 +18,7 @@ var RpcService = function()
     this.playVideoOnXBMC = function(vId)
     {
         chrome.extension.sendMessage({message: "playVideo", videoId: vId}, function(response) {
-            console.log("video sent!");
+            console.log("video sent! " + response);
         });
     };
 
@@ -39,7 +39,7 @@ var RpcService = function()
     this.playListOnXBMC = function(listId, videoId)
     {
         chrome.extension.sendMessage({message: "playList", listId: listId, videoId: videoId}, function(response) {
-            console.log("list sent!");
+            console.log("list sent! " + response);
         });
     };
 };
@@ -114,8 +114,6 @@ this.injectLinks = function()
 			}
 
 			var copyTemp = template_playnow;
-			var playStr;
-			var queueStr;
 			if(videoId != 0)
 			{
 				console.log("videoId, "  +videoId);
@@ -129,9 +127,6 @@ this.injectLinks = function()
 				mainTemplate = mainTemplate.replace("$play_now", copyTemp);
 				//mainTemplate = mainTemplate.replace("$sep", "|");
 				//$(this).prepend(copyTemp);
-
-				playStr = "play_" + videoId.toString();
-				queueStr = "queue_" + videoId.toString();
 			}
 			else
 			{
@@ -142,7 +137,6 @@ this.injectLinks = function()
 			// find play list id
 			listId = Utils.findPropertyFromString(videoPathString, "list");
 			var listTemp = template_playall;
-			var listStr;
 			if(listId)
 			{
 				if($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
@@ -166,7 +160,6 @@ this.injectLinks = function()
 				mainTemplate = mainTemplate.replace("$play_all", listTemp);
 				//$(this).prepend(copyTemp);
 
-				listStr = "list_" + listId.toString();
 			}
 			else
 			{
