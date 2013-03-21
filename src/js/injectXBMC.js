@@ -292,7 +292,7 @@ else if(pathName.indexOf("/embed") == 0)
 	var videoId = pathName.replace("/embed/", "");
 	console.log("videoId, " + videoId);
 	
-	var copyTemp = template_playnow_sidebar.replace("$pid", videoId);
+	var copyTemp = template_playnow.replace("$pid", videoId);
 	copyTemp = copyTemp.replace("$qid", videoId);
 		
 	var mainTemplate = template_main;
@@ -300,7 +300,7 @@ else if(pathName.indexOf("/embed") == 0)
 	mainTemplate = mainTemplate.replace("$sep", "");
 	mainTemplate = mainTemplate.replace("$play_now", copyTemp);
 		
-	$(".player-actions-container").prepend(mainTemplate);
+	$(".html5-info-panel").append(mainTemplate);
 
 }
 else if(pathName == "/share_popup")
