@@ -6,6 +6,42 @@ body
 	background-color: #FFFFFF;
 	overflow-x: hidden;
 }
+
+input[type=text], input[type=password]
+{
+
+    -webkit-transition: all 0.30s ease-in-out;
+    color: #393939;
+    height: 30px;
+    padding-left: 5px;
+    padding-right: 5px;
+
+    border-radius: 5px;
+    border:1px solid #a0a0a0;
+    font-family: Arial;
+    font-size: 15px;
+    outline: none;
+    width: 240px;
+}
+
+input[type=text]:hover, input[type=password]:hover
+{
+    box-shadow: 0 0 5px #464646;
+
+}
+input[type=text]:focus, input[type=password]:focus
+{
+    box-shadow: 0 0 8px rgb(74, 183, 215);
+    color: #000;
+    border:1px solid #2f748a;
+    outline: none;
+
+}
+
+input::-webkit-input-placeholder
+{
+    color: #a1a1a1;
+}
   
 .options_header
 {
@@ -43,6 +79,7 @@ body
 	text-align: right;
 	
 	font-size: 15px;
+    line-height: 30px;
 	font-family: Arial, Helvetica, sans-serif;
 	color: #333333;
 	display: block;
@@ -61,7 +98,7 @@ body
 {				
 	height: 30px;
 	/*background-color: red;*/
-	margin-bottom: 5px;				
+	margin-bottom: 15px;
 	
 }
 
@@ -158,3 +195,4 @@ body
 	
 	display: none;
 }
+
