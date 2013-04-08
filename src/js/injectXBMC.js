@@ -3,6 +3,13 @@
  * @author: Karthik VJ
  */
 
+;(function() {
+
+var ResultData = new function()
+{
+    this.OK = "OK";
+    this.ERROR = "ERROR";
+};
 var pathName = window.location.pathname;
 var template_main = '<div class="xbmc_control">YouTube to XBMC: $play_all $sep $play_now</div>';
 var template_playnow = '<a href="#" rel="$pid" class="xbmc_playNow" onclick="return false;">Play Now</a> | <a href="#" rel="$qid" class="xbmc_queue" onclick="return false;">[+] Add to Queue</a>';
@@ -328,4 +335,4 @@ else
 }
 
 
-
+}());
