@@ -11,11 +11,12 @@ var ResultData = new function()
     this.ERROR = "ERROR";
 };
 var pathName = window.location.pathname;
-var template_main = '<div class="xbmc_control">YouTube to XBMC: $play_all $sep $play_now</div>';
-var template_playnow = '<a href="#" rel="$pid" class="xbmc_playNow" onclick="return false;">Play Now</a> | <a href="#" rel="$qid" class="xbmc_queue" onclick="return false;">[+] Add to Queue</a>';
-var template_playnow_sidebar = '<span rel="$pid" class="xbmc_playNow xbmc_link" onclick="return false;">Play Now</span> | <span rel="$qid" class="xbmc_queue xbmc_link" onclick="return false;">[+] Add to Queue</span>';
-var template_playall = '<a href="#" rel="$lid" class="xbmc_playlist" onclick="return false;">Play All</a>';
-var template_playall_sidebar = '<span rel="$lid" class="xbmc_playlist xbmc_link" onclick="return false;">Play All</span>';
+var template_main = '<div class="xbmc_control">$header $play_all $sep $play_now</div>';
+var template_header = 'YouTube to XBMC:';
+var template_playnow = '<a href="#" rel="$pid" class="xbmc_playNow" title="Play Now - YouTube to XBMC" onclick="return false;">Play Now</a> | <a href="#" rel="$qid" class="xbmc_queue" title="Add to Queue - YouTube to XBMC" onclick="return false;">[+] Add to Queue</a>';
+var template_playnow_sidebar = '<span rel="$pid" class="xbmc_playNow xbmc_link" title="Play Now - YouTube to XBMC" onclick="return false;">Play Now</span> | <span rel="$qid" class="xbmc_queue xbmc_link" title="Add to Queue - YouTube to XBMC" onclick="return false;">[+] Add to Queue</span>';
+var template_playall = '<a href="#" rel="$lid" class="xbmc_playlist" title="Play All - YouTube to XBMC" onclick="return false;">Play All</a>';
+var template_playall_sidebar = '<span rel="$lid" class="xbmc_playlist xbmc_link" title="Play All - YouTube to XBMC" onclick="return false;">Play All</span>';
 var timer;
 
 console.log("pathName, " + pathName);
@@ -81,7 +82,7 @@ this.injectLinks = function()
 {
 	console.log("injectLinks");
 	// (home / subscription on home page), search page, video manager, user page, user browse video, Popular on YouTube, Popular on youtube right side, video list (on video page), play list page
-	$(".feed-item-content, .yt-lockup2-content, .vm-video-info-container, .yt-tile-visible, .channels-content-item, .lohp-category-shelf-item, .lohp-large-shelf-container, .lohp-medium-shelf-content, .lohp-vertical-shelf-item-content, .video-list-item, .playlist-video-item, .yt-lockup-content").each(function(index)
+	$(".feed-item-content, .yt-lockup2-content, .vm-video-info-container, .yt-tile-visible, .channels-content-item, .lohp-category-shelf-item, .lohp-large-shelf-container, .lohp-medium-shelf-content, .lohp-vertical-shelf-item-content, .video-list-item, .playlist-video-item, .yt-lockup-content, .recent-activity-snippet").each(function(index)
 	{
 		var alreadyAdded = false;
 		$(this).find(".xbmc_control").each(function(xIndex)
@@ -121,6 +122,8 @@ this.injectLinks = function()
 			}
 
 			var copyTemp = template_playnow;
+            var copyHeader = template_header;
+
 			if(videoId != 0)
 			{
 				console.log("videoId, "  +videoId);
@@ -128,6 +131,12 @@ this.injectLinks = function()
 				{
 					copyTemp = template_playnow_sidebar;
 				}
+
+                if($(this).hasClass("channels-content-item"))
+                {
+                    copyHeader = "";
+                }
+
 				copyTemp = copyTemp.replace("$pid", videoId);
 				copyTemp = copyTemp.replace("$qid", videoId);
 
@@ -174,6 +183,7 @@ this.injectLinks = function()
 				mainTemplate = mainTemplate.replace("$play_all", "");
 			}
 
+            mainTemplate = mainTemplate.replace("$header", copyHeader);
 
 			//////
 			if(listId != 0 || videoId !=0)
@@ -262,7 +272,7 @@ if(pathName == "/watch")
 		copyTemp = copyTemp.replace("$qid", mainVideoId);
 						
 		mainTemplate = mainTemplate.replace("$play_now", copyTemp);
-					
+
 	}
 	else
 	{
@@ -285,6 +295,8 @@ if(pathName == "/watch")
 		mainTemplate = mainTemplate.replace("$sep", "");
 		mainTemplate = mainTemplate.replace("$play_all", "");
 	}
+
+    mainTemplate = mainTemplate.replace("$header", template_header);
 	
 	if(listId != 0 || videoId !=0)
 	{
@@ -306,7 +318,8 @@ else if(pathName.indexOf("/embed") == 0)
 	mainTemplate = mainTemplate.replace("$play_all", "");
 	mainTemplate = mainTemplate.replace("$sep", "");
 	mainTemplate = mainTemplate.replace("$play_now", copyTemp);
-		
+    mainTemplate = mainTemplate.replace("$header", template_header);
+
 	$(".html5-info-panel").append(mainTemplate);
 
 }
@@ -324,6 +337,7 @@ else if(pathName == "/share_popup")
 
         mainTemplate = mainTemplate.replace("$sep", "");
         mainTemplate = mainTemplate.replace("$play_all", "");
+        mainTemplate = mainTemplate.replace("$header", template_header);
 
         $("#page").prepend(mainTemplate);
     }

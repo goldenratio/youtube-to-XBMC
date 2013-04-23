@@ -3,7 +3,7 @@
 	
 	"name": "YouTube to XBMC",
 	"description": "Send youtube videos to XBMC media center",
-	"version": "2.7",
+	"version": "2.8",
 	"permissions": [ "http://*/*", "storage" ],	
   
 	"icons": { 
