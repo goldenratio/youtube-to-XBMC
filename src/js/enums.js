@@ -3,6 +3,9 @@
  * @author: Karthik VJ
  */
 
+// enable / disable console log
+var ENABLE_CONSOLE = false;
+
 var Status = new function()
 {
 	this.SUCCESS = "success_status";	

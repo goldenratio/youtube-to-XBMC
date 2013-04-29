@@ -3,6 +3,13 @@
  * @author: Karthik VJ
  */
 
+if(ENABLE_CONSOLE == false)
+{
+    var console = console || {};
+    console.log = function() {};
+}
+
+
 var Player = function()
 {
 	var thisObject = this;	

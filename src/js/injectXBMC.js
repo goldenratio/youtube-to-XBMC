@@ -5,11 +5,12 @@
 
 ;(function() {
 
-var ResultData = new function()
+if(ENABLE_CONSOLE == false)
 {
-    this.OK = "OK";
-    this.ERROR = "ERROR";
-};
+    var console = console || {};
+    console.log = function() {};
+}
+
 var pathName = window.location.pathname;
 var template_main = '<div class="xbmc_control">$header $play_all $sep $play_now</div>';
 var template_header = 'YouTube to XBMC:';
@@ -201,9 +202,9 @@ this.injectLinks = function()
 
 	$("#content").bind('DOMNodeInserted', function(event)
 	{
-		console.log("DOM updated!");
+		//console.log("DOM updated!");
 		var element = event.target;
-		console.log("element, " + element.tagName);
+		//console.log("element, " + element.tagName);
 
 		clearInterval(timer);
 		timer = setInterval(function(){
