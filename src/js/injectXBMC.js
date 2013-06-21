@@ -3,15 +3,15 @@
  * @author: Karthik VJ
  */
 
-;(function() {
-
 if(ENABLE_CONSOLE == false)
 {
     var console = console || {};
     console.log = function() {};
 }
 
-var pathName = window.location.pathname;
+;(function() {
+
+    var pathName = window.location.pathname;
 var template_main = '<div class="xbmc_control">$header $play_all $sep $play_now</div>';
 var template_header = 'YouTube to XBMC:';
 var template_playnow = '<a href="#" rel="$pid" class="xbmc_playNow" title="Play Now - YouTube to XBMC" onclick="return false;">Play Now</a> | <a href="#" rel="$qid" class="xbmc_queue" title="Add to Queue - YouTube to XBMC" onclick="return false;">[+] Add to Queue</a>';
