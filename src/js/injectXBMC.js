@@ -11,7 +11,7 @@ if(ENABLE_CONSOLE == false)
 
 ;(function() {
 
-    var pathName = window.location.pathname;
+var pathName = window.location.pathname;
 var template_main = '<div class="xbmc_control">$header $play_all $sep $play_now</div>';
 var template_header = 'YouTube to XBMC:';
 var template_playnow = '<a href="#" rel="$pid" class="xbmc_playNow" title="Play Now - YouTube to XBMC" onclick="return false;">Play Now</a> | <a href="#" rel="$qid" class="xbmc_queue" title="Add to Queue - YouTube to XBMC" onclick="return false;">[+] Add to Queue</a>';
@@ -121,6 +121,13 @@ this.injectLinks = function()
 			{
 				videoId = Utils.findPropertyFromString(videoPathString, "video_id");
 			}
+
+            if(videoId == 0)
+            {
+                videoId = Utils.findPropertyFromString(videoPathString, "video_ids");
+                videoId = decodeURIComponent(videoId);
+                videoId = videoId.split(",")[0];
+            }
 
 			var copyTemp = template_playnow;
             var copyHeader = template_header;
