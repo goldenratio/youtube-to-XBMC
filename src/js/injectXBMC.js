@@ -126,7 +126,12 @@ this.injectLinks = function()
             {
                 videoId = Utils.findPropertyFromString(videoPathString, "video_ids");
                 videoId = decodeURIComponent(videoId);
-                videoId = videoId.split(",")[0];
+                var vIndex = Utils.findPropertyFromString(videoPathString, "index");
+                if(vIndex < videoId.length)
+                {
+                    videoId = videoId.split(",")[vIndex];
+                }
+
             }
 
 			var copyTemp = template_playnow;
