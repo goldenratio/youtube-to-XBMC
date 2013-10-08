@@ -25,6 +25,10 @@
 			"all_frames": true
 		}
 	],
+
+    "web_accessible_resources": [
+        "js/jquery.min.map"
+    ],
   
   "options_page": "settings.html"
 }
