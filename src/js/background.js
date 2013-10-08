@@ -591,3 +591,18 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse)
     return true;
 	 
 });
+
+// Called when the url of a tab changes.
+function checkForValidUrl(tabId, changeInfo, tab)
+{
+    if (tab.url.indexOf('youtube.com') > -1)
+    {
+        chrome.pageAction.show(tabId);
+    }
+};
+
+// Listen for any changes to the URL of any tab.
+chrome.tabs.onUpdated.addListener(checkForValidUrl);
+
+
+

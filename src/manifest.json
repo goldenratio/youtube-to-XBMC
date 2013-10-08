@@ -4,13 +4,22 @@
 	"name": "YouTube to XBMC",
 	"description": "Send youtube videos to XBMC media center",
 	"version": "3.3",
-	"permissions": [ "http://*/*", "storage" ],	
+	"permissions": [ "http://*/*", "storage", "tabs" ],
   
 	"icons": { 
 		"16": "assets/icon_16.png",		
 		"48": "assets/icon_48.png",
 		"128": "assets/icon_128.png"
 	},
+
+    "page_action": {
+        "default_icon": {
+            "19": "assets/settings_19.png",
+            "38": "assets/settings_38.png"
+        },
+        "default_title": "YouTube to XBMC Settings",
+        "default_popup": "settings.html"
+    },
   
 	"background": {
 		"scripts": ["js/enums.js", "js/background.js"]
