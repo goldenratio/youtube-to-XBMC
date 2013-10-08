@@ -2,7 +2,7 @@
 	"manifest_version": 2,
 	
 	"name": "YouTube to XBMC",
-	"description": "Send youtube videos to XBMC media center",
+	"description": "Send YouTube videos to XBMC Media Center",
 	"version": "3.3",
 	"permissions": [ "http://*/*", "storage", "tabs" ],
   
