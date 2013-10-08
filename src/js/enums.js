@@ -4,7 +4,7 @@
  */
 
 // enable / disable console log
-var ENABLE_CONSOLE = false;
+var ENABLE_CONSOLE = true;
 
 var Status = new function()
 {
