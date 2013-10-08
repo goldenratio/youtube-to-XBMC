@@ -284,7 +284,7 @@ var ConnectionData = function()
 			thisObject.context.onConnectionSuccess();
 			
 		}
-	}
+	};
 	
 	this.updateResponseStatus = function(status)
 	{		

@@ -394,7 +394,7 @@ var RPCService = function()
 			
 	this.onLoad = function()
 	{	
-		console.log("load data complete");
+		console.log("load data complete, responseTest >> " + this.responseText);
 		thisObject.isPending = false;	
 		if(this.status == 200)
 		{							
