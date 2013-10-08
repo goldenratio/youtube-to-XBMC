@@ -596,7 +596,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse)
 /**
  * Listen for any changes to the URL of any tab.
  */
-chrome.tabs.onUpdated.addListener(function checkForValidUrl(tabId, changeInfo, tab)
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 {
     if (tab.url.indexOf('youtube.com') > -1)
     {
