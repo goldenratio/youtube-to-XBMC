@@ -356,8 +356,11 @@ var RPCService = function()
     this.setDebugMode = function(state)
     {
         //console.log("data from settings debug, " + state);
-        thisObject.debugMode = state;
-        updateConsole(thisObject.debugMode);
+        if(thisObject.debugMode != state)
+        {
+            thisObject.debugMode = state;
+            updateConsole(thisObject.debugMode);
+        }
     };
 	
 	this.sendRequest = function(context, method, params, callback)
