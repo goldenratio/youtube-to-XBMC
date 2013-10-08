@@ -3,12 +3,42 @@
  * @author: Karthik VJ
  */
 
-if(ENABLE_CONSOLE == false)
+///////////////////////////////////////
+//////// CONSOLE LOG MAGIC ////////////
+//////////////////////////////////////
+
+var console = console || {};
+console.log = console.log || function() {};
+console.logCopy = console.log.bind(console);
+
+console.log = function(data)
 {
-    var console = console || {};
-    console.log = function() {};
+    var currentDate = new Date();
+
+    var timeString = '[' + currentDate.getHours() + ':' + currentDate.getMinutes() + ':' + currentDate.getSeconds() + '] ';
+    this.logCopy(timeString, data);
+};
+
+var enableConsole = { 'log': console.log };
+
+function updateConsole(state)
+{
+    if(state == false)
+    {
+        console.log("debugMode, " + state);
+        console.log = function() {};
+    }
+    else
+    {
+        console.log = enableConsole.log;
+        console.log("debugMode, " + state);
+    }
 }
 
+//updateConsole(false);
+
+
+/////////////////////////////////////
 
 var Player = function()
 {
@@ -276,6 +306,7 @@ var Player = function()
 var RPCService = function()
 {	
 	this.url;
+    this.debugMode;
 	this.youTubePath = "plugin://plugin.video.youtube/?action=play_video&videoid=";
 	this.callback;
 	this.context;	
@@ -286,23 +317,48 @@ var RPCService = function()
 	
 	this.init = function()
 	{
+        thisObject.debugMode = false;
 		chrome.storage.local.get(function(item)
 		{			
 			if(item.xbmcURL)
 			{				
 				console.log("found xbmc URL, " + item.xbmcURL);
 				thisObject.url = item.xbmcURL; 
-			}					
-			
+			}
+
+			if(item.debugMode)
+            {
+                if(item.debugMode == true)
+                {
+                    thisObject.debugMode = true;
+                }
+            }
+
+            updateConsole(thisObject.debugMode);
 		});
 		
 	};
-	
+
+    /**
+     * Set from settings.js when data is changed.
+     * @param xbmcURL
+     */
 	this.setURL = function(xbmcURL)
 	{
 		//console.log("xbmc URL, " + xbmcURL);
 		thisObject.url = xbmcURL;
 	};
+
+    /**
+     * Set from settings.js when data is changed.
+     * @param state @{Boolean}
+     */
+    this.setDebugMode = function(state)
+    {
+        //console.log("data from settings debug, " + state);
+        thisObject.debugMode = state;
+        updateConsole(thisObject.debugMode);
+    };
 	
 	this.sendRequest = function(context, method, params, callback)
 	{		
@@ -423,7 +479,7 @@ var GDataService = function()
 			}		
 		}
 		return 0;
-	}
+	};
 
 	
 	this.onLoad = function()

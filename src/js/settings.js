@@ -24,7 +24,8 @@ var Options = function()
 		var portTextField = document.getElementById(SettingsData.PORT);
 		var userNameTextField = document.getElementById(SettingsData.USERNAME);
 		var pwdTextField = document.getElementById(SettingsData.PASSWORD);
-		 				
+		var debugModeCheckbox = document.getElementById(SettingsData.DEBUG_MODE);
+
 		var connectButton = document.getElementById(ButtonData.CONNECT);			
 		connectButton.addEventListener("click", thisObject.onConnectHandler);
 		
@@ -54,6 +55,14 @@ var Options = function()
 			{				
 				pwdTextField.value = item.password; 
 			}
+
+            if(item.debugMode)
+            {
+                if(item.debugMode == true)
+                {
+                    debugModeCheckbox.checked = true;
+                }
+            }
 			
 			if(item.host && item.port)
 			{
@@ -114,7 +123,8 @@ var Options = function()
 		console.log("update local storage");
 		chrome.storage.local.set({'host': connectionData.host, 'port': connectionData.port, 
 						'userName': connectionData.userName, 'password': connectionData.password,
-						'xbmcURL': connectionData.url}, function()
+						'xbmcURL': connectionData.url,
+                        'debugMode' : connectionData.debugMode}, function()
 		{
 			console.log("data saved");
 		});
@@ -185,7 +195,7 @@ var StatusMessage = function()
 			status.style.display = "block";
 		else
 			status.style.display = "none";
-	}
+	};
 		
 	
 	this.hideAll = function()
@@ -219,6 +229,7 @@ var ConnectionData = function()
 	this.port;
 	this.userName;
 	this.password;
+    this.debugMode;
 			
 	this.canConnect = function(context)
 	{
@@ -227,13 +238,13 @@ var ConnectionData = function()
 		var portData = document.getElementById(SettingsData.PORT).value;
 		var user = document.getElementById(SettingsData.USERNAME).value;
 		var pwd = document.getElementById(SettingsData.PASSWORD).value;
+        var debugChecked = document.getElementById(SettingsData.DEBUG_MODE).checked;
+
 		if(hostData == "" || portData == "")
 		return false;
 		
 		this.url = "http://" + user + ":" + pwd + "@" + hostData + ":" + portData + "/jsonrpc";
-		rpc.setURL(this.url);				
-		rpc.sendRequest(this, "JSONRPC.Ping", null);	
-		
+
 		//var params = '{ "item" : {"file" : "plugin://plugin.video.youtube/?action=play_video&videoid=iQOHRKKNNLQ"}}';					
 		//rpc.sendRequest(this, "Player.Open", params);
 		
@@ -241,8 +252,13 @@ var ConnectionData = function()
 		this.port = portData;
 		this.userName = user;
 		this.password = pwd;
-				
-		return true;
+        this.debugMode = debugChecked;
+
+        rpc.setURL(this.url);
+        rpc.setDebugMode(this.debugMode);
+        rpc.sendRequest(this, "JSONRPC.Ping", null);
+
+        return true;
 	};
 	
 	this.clear = function()
@@ -250,7 +266,8 @@ var ConnectionData = function()
 		document.getElementById(SettingsData.HOST).value = "";
 		document.getElementById(SettingsData.PORT).value = "";
 		document.getElementById(SettingsData.USERNAME).value = "";
-		document.getElementById(SettingsData.PASSWORD).value = "";		
+		document.getElementById(SettingsData.PASSWORD).value = "";
+        document.getElementById(SettingsData.DEBUG_MODE).checked = false;
 	};
 		
 	this.responseData = function(text)

@@ -4,7 +4,11 @@
  */
 
 // enable / disable console log
-var ENABLE_CONSOLE = true;
+/**
+ * @deprecated currently used in inject script and settings.js, will be replaced with debugMode flag
+ * @type {boolean}
+ */
+var ENABLE_CONSOLE = false;
 
 var Status = new function()
 {
@@ -21,6 +25,7 @@ var SettingsData = new function()
 	this.PORT = "port";
 	this.USERNAME = "username";
 	this.PASSWORD = "pwd";
+    this.DEBUG_MODE = "debugMode";
 }; 
 
 
