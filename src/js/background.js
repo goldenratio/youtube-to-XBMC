@@ -379,10 +379,11 @@ var RPCService = function()
 							 
 			data.params = params;
 		}
-				
-		console.log(data);
+
 		thisObject.isPending = true;
 		var strData = JSON.stringify(data);
+        console.log(">> " + strData);
+
 		xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = thisObject.readResponse;
 		xhr.open("POST", this.url, true);		
@@ -394,7 +395,7 @@ var RPCService = function()
 			
 	this.onLoad = function()
 	{	
-		console.log("load data complete, responseText >> " + this.responseText);
+		console.log("<< " + this.responseText);
 		thisObject.isPending = false;	
 		if(this.status == 200)
 		{							
