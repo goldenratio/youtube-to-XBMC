@@ -223,6 +223,11 @@ this.injectLinks = function()
 			clearInterval(timer);
 			$("#content").unbind('DOMNodeInserted');
 			injectLinks();
+            if(pathName == "/watch" && checkForVideoIdChangeInWatchPage())
+            {
+                console.log("video ID change.. inject watch link!");
+                addLinkToWatchPage();
+            }
 		}, 2000)
 	});
 
@@ -264,60 +269,86 @@ this.initListeners = function()
 		rpc.queueVideoToXBMC($(this).attr("rel"));
 		event.preventDefault();
 	});
-}
+};
 
+/**
+ * This method checks if the videoID was changed, i.e user has moved to another video.
+ * With recent changes in youtube, instead of loading a new page, URL param is changed and new
+ * video is loaded.
+ * This method is used to inject links again, once the URL param is changed.
+ * NB! only used in watch page
+ *
+ * @returns {boolean}
+ */
+this.checkForVideoIdChangeInWatchPage = function()
+{
+    console.log("checkForVideoIdChange");
+    var updatedVideoID = Utils.findPropertyFromString(window.location.toString(), "v");
+    if(currentWatchPageVideoID != updatedVideoID && currentWatchPageVideoID != "")
+    {
+        return true;
+    }
+    return false;
+};
+
+this.addLinkToWatchPage = function()
+{
+    console.log("window.location, " + window.location);
+    var loc = window.location.toString();
+    currentWatchPageVideoID = Utils.findPropertyFromString(loc, "v");
+    var mainVideoId = Utils.findPropertyFromString(loc, "v");
+    //alert("mainVideoId, " + mainVideoId);
+    var mainTemplate = template_main;
+    if(mainVideoId != 0)
+    {
+        var copyTemp = template_playnow.replace("$pid", mainVideoId);
+        copyTemp = copyTemp.replace("$qid", mainVideoId);
+
+        mainTemplate = mainTemplate.replace("$play_now", copyTemp);
+
+    }
+    else
+    {
+        mainTemplate = mainTemplate.replace("$play_now", "");
+    }
+
+    var listId = Utils.findPropertyFromString(loc, "list");
+    if(listId != 0)
+    {
+        if(mainVideoId != 0)
+        {
+            listId = listId + " " + mainVideoId;
+        }
+        copyTemp = template_playall.replace("$lid", listId);
+        mainTemplate = mainTemplate.replace("$play_all", copyTemp);
+        mainTemplate = mainTemplate.replace("$sep", "|");
+    }
+    else
+    {
+        mainTemplate = mainTemplate.replace("$sep", "");
+        mainTemplate = mainTemplate.replace("$play_all", "");
+    }
+
+    mainTemplate = mainTemplate.replace("$header", template_header);
+
+    if(listId != 0 || videoId !=0)
+    {
+        $("#watch7-headline").prepend(mainTemplate);
+    }
+
+};
 /////////////////////////////
 
+var currentWatchPageVideoID = "";
 var rpc = new RpcService();
 this.initListeners();
 
 ////////////////////////////
 if(pathName == "/watch")
 {
-	console.log("window.location, " + window.location);
-	var loc = window.location.toString();
-	var mainVideoId = Utils.findPropertyFromString(loc, "v");
-	//alert("mainVideoId, " + mainVideoId);
-	var mainTemplate = template_main;	
-	if(mainVideoId != 0)
-	{
-		var copyTemp = template_playnow.replace("$pid", mainVideoId);
-		copyTemp = copyTemp.replace("$qid", mainVideoId);
-						
-		mainTemplate = mainTemplate.replace("$play_now", copyTemp);
-
-	}
-	else
-	{
-		mainTemplate = mainTemplate.replace("$play_now", "");
-	}
-	
-	var listId = Utils.findPropertyFromString(loc, "list");
-	if(listId != 0)
-	{
-		if(mainVideoId != 0)
-		{
-			listId = listId + " " + mainVideoId;
-		}
-		copyTemp = template_playall.replace("$lid", listId);										
-		mainTemplate = mainTemplate.replace("$play_all", copyTemp);
-		mainTemplate = mainTemplate.replace("$sep", "|");
-	}
-	else
-	{
-		mainTemplate = mainTemplate.replace("$sep", "");
-		mainTemplate = mainTemplate.replace("$play_all", "");
-	}
-
-    mainTemplate = mainTemplate.replace("$header", template_header);
-	
-	if(listId != 0 || videoId !=0)
-	{
-		$("#watch7-headline").prepend(mainTemplate);		
-	}
-		
+    addLinkToWatchPage();
 	injectLinks();
-	
+
 }
 else if(pathName.indexOf("/embed") == 0)
 {		
