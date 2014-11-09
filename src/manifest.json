@@ -1,9 +1,9 @@
 {
 	"manifest_version": 2,
 	
-	"name": "YouTube to XBMC",
-	"description": "Send YouTube videos to XBMC Media Center",
-	"version": "3.3.2",
+	"name": "Kassi - Send to Kodi/XBMC",
+	"description": "Send YouTube videos to Kodi/XBMC Media Center",
+	"version": "3.3.3",
 	"permissions": [ "http://*/*", "storage", "tabs" ],
   
 	"icons": { 
@@ -39,5 +39,7 @@
         "js/jquery.min.map"
     ],
   
-  "options_page": "settings.html"
+  "options_page": "settings.html",
+
+  "short_name": "Kassi Share"
 }

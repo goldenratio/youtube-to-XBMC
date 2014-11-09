@@ -1,4 +1,4 @@
-youtube-to-XBMC media center (Chrome Extension)
+Kassi - Send YouTube videos to Kodi/XBMC Media Center (Chrome Extension)
 ===============================================
 
 ~~YouTube to XBMC is available in Chrome Web Store, https://chrome.google.com/webstore/detail/youtube-to-xbmc/gbghegmimhjemkhpimohkdopkeahldbh~~
