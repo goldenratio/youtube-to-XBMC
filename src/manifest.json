@@ -1,44 +1,44 @@
 {
-	"manifest_version": 2,
-	
-	"name": "Kassi Share - Send to Kodi/XBMC",
-	"description": "Send YouTube videos to Kodi/XBMC Media Center",
-	"version": "3.3.4",
-	"permissions": [ "http://*/*", "storage", "tabs" ],
-  
-	"icons": { 
-		"16": "assets/icon_16.png",		
-		"48": "assets/icon_48.png",
-		"128": "assets/icon_128.png"
-	},
+  "manifest_version": 2,
 
-    "page_action": {
-        "default_icon": {
-            "19": "assets/settings_19.png",
-            "38": "assets/settings_38.png"
-        },
-        "default_title": "Kassi Share - Settings",
-        "default_popup": "settings.html"
+  "name": "Kassi Share - Send to Kodi/XBMC",
+  "description": "Send YouTube videos to Kodi/XBMC Media Center",
+  "version": "3.3.4",
+  "permissions": [ "http://*/*", "storage", "tabs" ],
+
+  "icons": {
+    "16": "assets/icon_16.png",
+    "48": "assets/icon_48.png",
+    "128": "assets/icon_128.png"
+  },
+
+  "page_action": {
+    "default_icon": {
+      "19": "assets/settings_19.png",
+      "38": "assets/settings_38.png"
     },
-  
-	"background": {
-		"scripts": ["js/enums.js", "js/background.js"]
-	},
-  
-	"content_scripts": [
-		{
-			"matches": ["http://www.youtube.com/*", "https://www.youtube.com/*"],
-			"css": ["css/toastr.css", "css/inject.css"],
-			"js": ["js/jquery-1.9.1.min.js", "js/toastr.js", "js/enums.js", "js/injectXBMC.js"],
-			"run_at": "document_idle",
-			"all_frames": true
-		}
-	],
+    "default_title": "Kassi Share - Settings",
+    "default_popup": "settings.html"
+  },
 
-    "web_accessible_resources": [
-        "js/jquery.min.map"
-    ],
-  
+  "background": {
+    "scripts": ["js/enums.js", "js/background.js"]
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["http://www.youtube.com/*", "https://www.youtube.com/*"],
+      "css": ["css/toastr.css", "css/inject.css"],
+      "js": ["js/jquery-1.9.1.min.js", "js/toastr.js", "js/enums.js", "js/injectXBMC.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+
+  "web_accessible_resources": [
+    "js/jquery.min.map"
+  ],
+
   "options_page": "settings.html",
 
   "short_name": "Kassi Share"
