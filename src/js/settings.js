@@ -240,7 +240,13 @@ var ConnectionData = function()
         var pwd = document.getElementById(SettingsData.PASSWORD).value;
         var debugChecked = document.getElementById(SettingsData.DEBUG_MODE).checked;
 
-        if(hostData == "" || portData == "")
+        if(portData == "")
+        {
+            // default port
+            portData = "8080";
+        }
+
+        if(hostData == "")
             return false;
 
         this.url = "http://" + user + ":" + pwd + "@" + hostData + ":" + portData + "/jsonrpc";

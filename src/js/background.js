@@ -434,7 +434,8 @@ var RPCService = function()
 
 var GDataService = function()
 {
-    this.feedPath = "http://gdata.youtube.com/feeds/api/playlists/$list_id/?alt=json";
+    this.api_key = "AIzaSyD_GFTv0BYK2UqbuEmFuAb1PkJ1wHSjpaA";
+    this.feedPath = "https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&playlistId=$list_id&key=$api_key";
     this.isPending = false;
     this.selectedVideoId;
     this.context;
@@ -453,6 +454,8 @@ var GDataService = function()
             thisObject.selectedVideoId = defaultVideoId;
         }
         var path = thisObject.feedPath.replace("$list_id", playlistId);
+        path = path.replace("$api_key", thisObject.api_key);
+
         thisObject.isPending = true;
 
         xhr = new XMLHttpRequest();
@@ -496,26 +499,19 @@ var GDataService = function()
             var videoList = [];
             console.log("parse!");
             var obj = JSON.parse(this.responseText);
-            console.log(JSON.stringify(obj));
-            console.log("total entries, " + obj.feed.entry.length);
-            var i;
-            for(i = 0; i < obj.feed.entry.length; i++)
-            {
-                var link = obj.feed.entry[i].link;
-                for(var j = 0; j < link.length; j++)
-                {
-                    if(link[j].type == "text/html")
-                    {
-                        console.log("link, " + link[j].href);
-                        var videoId = thisObject.findPropertyFromString(link[j].href, "v");
-                        console.log("video id, " + videoId);
-                        if(videoId != 0)
-                        {
-                            videoList.push(videoId);
-                        }
-                        break;
-                    }
+            var itemList = obj.items;
 
+            //console.log(JSON.stringify(obj));
+            console.log("total entries, " + itemList.length);
+            var i;
+            for(i = 0; i < itemList.length; i++)
+            {
+                var videoId = itemList[i]["contentDetails"]["videoId"];
+                console.log(videoId);
+
+                if(videoId)
+                {
+                    videoList.push(videoId);
                 }
             }
 
@@ -544,12 +540,12 @@ var GDataService = function()
                 //{message: "playList", videoId: listId, path: path}
                 for(i = 0; i < videoList.length; i++)
                 {
-                    var obj = {message: "queueVideo", videoId: videoList[i]};
+                    var objData = {message: "queueVideo", videoId: videoList[i]};
                     if(i == 0)
                     {
-                        obj.message = "playVideo";
+                        objData.message = "playVideo";
                     }
-                    player.onMessage(obj);
+                    player.onMessage(objData);
                 }
             }
 
