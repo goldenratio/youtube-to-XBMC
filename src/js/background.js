@@ -141,7 +141,7 @@ var Player = function()
         else if (request.message == "playList")
         {
             console.log("playList, " + request.listId + ", videoId = " + request.videoId);
-            gService.loadFeed(request.listId, request.videoId);
+            gService.loadFeed(request.listId, request.videoId, "");
         }
     };
 
@@ -435,14 +435,21 @@ var RPCService = function()
 var GDataService = function()
 {
     this.api_key = "AIzaSyD_GFTv0BYK2UqbuEmFuAb1PkJ1wHSjpaA";
-    this.feedPath = "https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&playlistId=$list_id&key=$api_key";
+    this.feedPath = "https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails" +
+        "&maxResults=$max_results" +
+        "&pageToken=$next_page_token" +
+        "&playlistId=$list_id" +
+        "&key=$api_key";
+
     this.isPending = false;
     this.selectedVideoId;
+    this.playlistId;
     this.context;
+    var videoList = [];
     var xhr;
     var thisObject = this;
 
-    this.loadFeed = function(playlistId, defaultVideoId)
+    this.loadFeed = function(playlistId, defaultVideoId, nextPageToken)
     {
         if(!playlistId)
         {
@@ -453,10 +460,29 @@ var GDataService = function()
         {
             thisObject.selectedVideoId = defaultVideoId;
         }
-        var path = thisObject.feedPath.replace("$list_id", playlistId);
-        path = path.replace("$api_key", thisObject.api_key);
+
+        thisObject.playlistId = playlistId;
+
+        if(videoList)
+        {
+            videoList.length = 0;
+        }
+        else
+        {
+            videoList = [];
+        }
 
         thisObject.isPending = true;
+        sendPlayListRequest(nextPageToken);
+
+    };
+
+    var sendPlayListRequest = function(nextPageToken)
+    {
+        var path = thisObject.feedPath.replace("$list_id", thisObject.playlistId);
+        path = path.replace("$api_key", thisObject.api_key);
+        path = path.replace("$max_results", "50");
+        path = path.replace("$next_page_token", nextPageToken);
 
         xhr = new XMLHttpRequest();
         xhr.onreadystatechange = thisObject.readResponse;
@@ -468,13 +494,9 @@ var GDataService = function()
 
     this.findPropertyFromString = function(str, property)
     {
-        //console.log("findPropertyFromString, str = " + str);
-        //console.log("findPropertyFromString, property = " + property);
         property = property + "=";
         var index = str.indexOf('?');
         str = str.substring(index + 1);
-        //console.log("index = " + index);
-        //console.log("str = " + str);
 
         var list = str.split('&');
         //console.log("list.length, " + list.length);
@@ -496,7 +518,6 @@ var GDataService = function()
         if(this.status == 200)
         {
             // parse the feed
-            var videoList = [];
             console.log("parse!");
             var obj = JSON.parse(this.responseText);
             var itemList = obj.items;
@@ -513,6 +534,14 @@ var GDataService = function()
                 {
                     videoList.push(videoId);
                 }
+            }
+
+            var nextPageToken = obj["nextPageToken"];
+
+            if(nextPageToken != null && typeof nextPageToken === "string")
+            {
+                sendPlayListRequest(nextPageToken);
+                return;
             }
 
             if(videoList.length > 0)
