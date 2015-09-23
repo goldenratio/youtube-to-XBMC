@@ -3,7 +3,7 @@
  * @author: Karthik VJ
  */
 
-if(ENABLE_CONSOLE == false)
+if (ENABLE_CONSOLE == false)
 {
     var console = console || {};
     console.log = function() {};
@@ -36,35 +36,35 @@ var Options = function()
         //chrome.storage.local.clear();
         chrome.storage.local.get(function(item)
         {
-            if(item.host)
+            if (item.host)
             {
                 hostTextField.value = item.host;
             }
 
-            if(item.port)
+            if (item.port)
             {
                 portTextField.value = item.port;
             }
 
-            if(item.userName)
+            if (item.userName)
             {
                 userNameTextField.value = item.userName;
             }
 
-            if(item.password)
+            if (item.password)
             {
                 pwdTextField.value = item.password;
             }
 
-            if(item.debugMode)
+            if (item.debugMode)
             {
-                if(item.debugMode == true)
+                if (item.debugMode == true)
                 {
                     debugModeCheckbox.checked = true;
                 }
             }
 
-            if(item.host && item.port)
+            if (item.host && item.port)
             {
                 thisObject.onConnectHandler();
             }
@@ -79,7 +79,7 @@ var Options = function()
     this.onConnectHandler = function()
     {
 
-        if(connectionData.canConnect(thisObject) == false)
+        if (connectionData.canConnect(thisObject) == false)
         {
             statusMessage.showDataMissing(true);
         }
@@ -88,7 +88,6 @@ var Options = function()
             // disable buttons.. show connecting
             statusMessage.showConnecting(true);
         }
-
 
     };
 
@@ -145,20 +144,19 @@ var StatusMessage = function()
     {
         thisObject.hideAll();
         var status = document.getElementById(Status.SUCCESS);
-        if(state == true)
+        if (state == true)
             status.style.display = "block";
         else
             status.style.display = "none";
 
     };
 
-
     this.showFail = function(state)
     {
         thisObject.hideAll();
         var status = document.getElementById(Status.FAIL);
 
-        if(state == true)
+        if (state == true)
             status.style.display = "block";
         else
             status.style.display = "none";
@@ -169,7 +167,7 @@ var StatusMessage = function()
         thisObject.hideAll();
         var status = document.getElementById(Status.MISSING_DATA);
 
-        if(state == true)
+        if (state == true)
             status.style.display = "block";
         else
             status.style.display = "none";
@@ -180,7 +178,7 @@ var StatusMessage = function()
         thisObject.hideAll();
         var status = document.getElementById(Status.CONNECTING);
 
-        if(state == true)
+        if (state == true)
             status.style.display = "block";
         else
             status.style.display = "none";
@@ -191,7 +189,7 @@ var StatusMessage = function()
         thisObject.hideAll();
         var status = document.getElementById(Status.UNAUTHORIZED);
 
-        if(state == true)
+        if (state == true)
             status.style.display = "block";
         else
             status.style.display = "none";
@@ -240,7 +238,7 @@ var ConnectionData = function()
         var pwd = document.getElementById(SettingsData.PASSWORD).value;
         var debugChecked = document.getElementById(SettingsData.DEBUG_MODE).checked;
 
-        if(portData == "")
+        if (portData == "")
         {
             // default port
             portData = "8080";
@@ -281,7 +279,7 @@ var ConnectionData = function()
         var obj = JSON.parse(text);
         //console.log(text);
         console.log(JSON.stringify(obj));
-        if(obj.error)
+        if (obj.error)
         {
             thisObject.context.onConnectionFail();
         }
@@ -294,7 +292,7 @@ var ConnectionData = function()
 
     this.updateResponseStatus = function(status)
     {
-        if(status == 0)
+        if (status == 0)
         {
             thisObject.context.onConnectionFail();
         }
@@ -318,7 +316,7 @@ window.addEventListener("load", loadComplete, false);
 
 function loadComplete()
 {
-    if(options)
+    if (options)
     {
         options.init();
     }
