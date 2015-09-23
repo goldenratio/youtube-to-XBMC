@@ -3,7 +3,7 @@
  * @author: Karthik VJ
  */
 
-if(ENABLE_CONSOLE == false)
+if (ENABLE_CONSOLE == false)
 {
     var console = console || {};
     console.log = function() {};
@@ -35,7 +35,7 @@ if(ENABLE_CONSOLE == false)
         {
             chrome.extension.sendMessage({message: "queueVideo", videoId: vId}, function(response) {
                 console.log("inject script >> video sent! " + response);
-                if(response == ResultData.OK)
+                if (response == ResultData.OK)
                 {
                     toastr.success("Added to Queue!");
                 }
@@ -67,9 +67,9 @@ if(ENABLE_CONSOLE == false)
 
             var list = str.split('&');
             //console.log("list.length, " + list.length);
-            for(var i = 0; i < list.length; i++)
+            for (var i = 0; i < list.length; i++)
             {
-                if(list[i].search(property) == 0)
+                if (list[i].search(property) == 0)
                 {
                     return list[i].replace(property, "");
                 }
@@ -93,7 +93,7 @@ if(ENABLE_CONSOLE == false)
 
             });
 
-            if(alreadyAdded)
+            if (alreadyAdded)
             {
                 return; // continue
             }
@@ -110,24 +110,24 @@ if(ENABLE_CONSOLE == false)
                 return false;
             });
 
-            if(videoPathString)
+            if (videoPathString)
             {
                 console.log("videoPathString, " + videoPathString);
                 var mainTemplate = template_main;
 
                 // just a single video
                 videoId = Utils.findPropertyFromString(videoPathString, "v");
-                if(videoId == 0)
+                if (videoId == 0)
                 {
                     videoId = Utils.findPropertyFromString(videoPathString, "video_id");
                 }
 
-                if(videoId == 0)
+                if (videoId == 0)
                 {
                     videoId = Utils.findPropertyFromString(videoPathString, "video_ids");
                     videoId = decodeURIComponent(videoId);
                     var vIndex = Utils.findPropertyFromString(videoPathString, "index");
-                    if(vIndex < videoId.length)
+                    if (vIndex < videoId.length)
                     {
                         videoId = videoId.split(",")[vIndex];
                     }
@@ -137,15 +137,15 @@ if(ENABLE_CONSOLE == false)
                 var copyTemp = template_playnow;
                 var copyHeader = template_header;
 
-                if(videoId != 0)
+                if (videoId != 0)
                 {
                     console.log("videoId, "  +videoId);
-                    if($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
+                    if ($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
                     {
                         copyTemp = template_playnow_sidebar;
                     }
 
-                    if($(this).hasClass("channels-content-item"))
+                    if ($(this).hasClass("channels-content-item"))
                     {
                         copyHeader = "";
                     }
@@ -166,14 +166,14 @@ if(ENABLE_CONSOLE == false)
                 // find play list id
                 listId = Utils.findPropertyFromString(videoPathString, "list");
                 var listTemp = template_playall;
-                if(listId)
+                if (listId)
                 {
-                    if($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
+                    if ($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
                     {
                         listTemp = template_playall_sidebar;
                     }
                     // it is play list
-                    if(videoId != 0)
+                    if (videoId != 0)
                     {
                         // there is video too
                         listId = listId + " " + videoId;
@@ -199,7 +199,7 @@ if(ENABLE_CONSOLE == false)
                 mainTemplate = mainTemplate.replace("$header", copyHeader);
 
                 //////
-                if(listId != 0 || videoId !=0)
+                if (listId != 0 || videoId !=0)
                 {
                     $(this).prepend(mainTemplate);
                 }
@@ -223,7 +223,7 @@ if(ENABLE_CONSOLE == false)
                 clearInterval(timer);
                 $("#content").unbind('DOMNodeInserted');
                 injectLinks();
-                if(pathName == "/watch" && checkForVideoIdChangeInWatchPage())
+                if (pathName == "/watch" && checkForVideoIdChangeInWatchPage())
                 {
                     console.log("video ID change.. inject watch link!");
                     addLinkToWatchPage();
@@ -243,7 +243,7 @@ if(ENABLE_CONSOLE == false)
             console.log("playlist, " + $(this).attr("rel"));
             var listId = $(this).attr("rel");
 
-            if(listId)
+            if (listId)
             {
                 var listData = listId.split(" ");
 
@@ -284,7 +284,7 @@ if(ENABLE_CONSOLE == false)
     {
         console.log("checkForVideoIdChange");
         var updatedVideoID = Utils.findPropertyFromString(window.location.toString(), "v");
-        if(currentWatchPageVideoID != updatedVideoID && currentWatchPageVideoID != "")
+        if (currentWatchPageVideoID != updatedVideoID && currentWatchPageVideoID != "")
         {
             return true;
         }
@@ -299,7 +299,7 @@ if(ENABLE_CONSOLE == false)
         var mainVideoId = Utils.findPropertyFromString(loc, "v");
         //alert("mainVideoId, " + mainVideoId);
         var mainTemplate = template_main;
-        if(mainVideoId != 0)
+        if (mainVideoId != 0)
         {
             var copyTemp = template_playnow.replace("$pid", mainVideoId);
             copyTemp = copyTemp.replace("$qid", mainVideoId);
@@ -313,9 +313,9 @@ if(ENABLE_CONSOLE == false)
         }
 
         var listId = Utils.findPropertyFromString(loc, "list");
-        if(listId != 0)
+        if (listId != 0)
         {
-            if(mainVideoId != 0)
+            if (mainVideoId != 0)
             {
                 listId = listId + " " + mainVideoId;
             }
@@ -331,7 +331,7 @@ if(ENABLE_CONSOLE == false)
 
         mainTemplate = mainTemplate.replace("$header", template_header);
 
-        if(listId != 0 || videoId !=0)
+        if (listId != 0 || videoId !=0)
         {
             $("#watch7-headline").prepend(mainTemplate);
         }
@@ -344,13 +344,13 @@ if(ENABLE_CONSOLE == false)
     this.initListeners();
 
 ////////////////////////////
-    if(pathName == "/watch")
+    if (pathName == "/watch")
     {
         addLinkToWatchPage();
         injectLinks();
 
     }
-    else if(pathName.indexOf("/embed") == 0)
+    else if (pathName.indexOf("/embed") == 0)
     {
         var videoId = pathName.replace("/embed/", "");
         console.log("videoId, " + videoId);
@@ -367,13 +367,13 @@ if(ENABLE_CONSOLE == false)
         $(".html5-info-panel").append(mainTemplate);
 
     }
-    else if(pathName == "/share_popup")
+    else if (pathName == "/share_popup")
     {
         var loc = window.location.toString();
         var mainVideoId = Utils.findPropertyFromString(loc, "v");
 
         var mainTemplate = template_main;
-        if(mainVideoId != 0)
+        if (mainVideoId != 0)
         {
             var copyTemp = template_playnow.replace("$pid", mainVideoId);
             copyTemp = copyTemp.replace("$qid", mainVideoId);
