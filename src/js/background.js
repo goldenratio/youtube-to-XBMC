@@ -23,7 +23,7 @@ var enableConsole = { 'log': console.log };
 
 function updateConsole(state)
 {
-    if(state == false)
+    if (state == false)
     {
         console.log("debugMode, " + state);
         console.log = function() {};
@@ -50,7 +50,7 @@ var Player = function()
      */
     this.onMessage = function(request, sender, sendResponse)
     {
-        if(sender)
+        if (sender)
         {
             console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
         }
@@ -62,7 +62,7 @@ var Player = function()
             return;
         }
 
-        if(rpc.isPending || gService.isPending)
+        if (rpc.isPending || gService.isPending)
         {
             var requestData = {request: request, callback: sendResponse};
             thisObject.pendingRequest.push(requestData);
@@ -114,7 +114,7 @@ var Player = function()
 
             thisObject.getActivePlayers(function(result)
             {
-                if(result.length <= 0)
+                if (result.length <= 0)
                 {
                     // clear any previous pending play list
                     thisObject.clearPlayList(function(clearResult)
@@ -151,9 +151,9 @@ var Player = function()
         thisObject.addtoPlayList(videoId, function(playListResult)
         {
             console.log("addtoPlayList, " + playListResult);
-            if(playListResult == ResultData.OK)
+            if (playListResult == ResultData.OK)
             {
-                if(callback)
+                if (callback)
                 {
                     callback(ResultData.OK);
                 }
@@ -228,7 +228,6 @@ var Player = function()
 
     };
 
-
     this.playCurrentVideoFromList = function(callback)
     {
         console.log("------ this.playCurrentVideoFromList ----------");
@@ -274,14 +273,14 @@ var Player = function()
         console.log(JSON.stringify(obj));
 
         console.log("success");
-        if(callback)
+        if (callback)
         {
             console.log("sending.. " + obj.result);
             callback(obj.result);
         }
 
         // check for pending requests
-        if(thisObject.pendingRequest.length > 0)
+        if (thisObject.pendingRequest.length > 0)
         {
             thisObject.onMessage(thisObject.pendingRequest[0].request, thisObject.pendingRequest[0].callback);
             thisObject.pendingRequest.shift();
@@ -294,7 +293,7 @@ var Player = function()
      */
     this.updateResponseStatus = function(status)
     {
-        if(status == 0)
+        if (status == 0)
         {
             console.log("Error! Cannot connect to XBMC");
             chrome.tabs.create({'url': chrome.extension.getURL("settings.html")}, function () {});
@@ -320,13 +319,13 @@ var RPCService = function()
         thisObject.debugMode = false;
         chrome.storage.local.get(function(item)
         {
-            if(item.xbmcURL)
+            if (item.xbmcURL)
             {
                 console.log("found xbmc URL, " + item.xbmcURL);
                 thisObject.url = item.xbmcURL;
             }
 
-            if(item.debugMode)
+            if (item.debugMode)
             {
                 if(item.debugMode == true)
                 {
@@ -356,7 +355,7 @@ var RPCService = function()
     this.setDebugMode = function(state)
     {
         //console.log("data from settings debug, " + state);
-        if(thisObject.debugMode != state)
+        if (thisObject.debugMode != state)
         {
             thisObject.debugMode = state;
             updateConsole(thisObject.debugMode);
@@ -370,7 +369,7 @@ var RPCService = function()
         thisObject.context = context;
         var data = { jsonrpc: "2.0", method: method, id: 1 };
 
-        if(params)
+        if (params)
         {
             if(params.item)
             {
@@ -400,9 +399,9 @@ var RPCService = function()
     {
         console.log("<< " + this.responseText);
         thisObject.isPending = false;
-        if(this.status == 200)
+        if (this.status == 200)
         {
-            if(thisObject.context)
+            if (thisObject.context)
             {
                 thisObject.context.responseData(this.responseText, thisObject.callback);
             }
@@ -414,7 +413,7 @@ var RPCService = function()
     this.readResponse = function()
     {
         console.log("this.readyState, " + this.readyState);
-        if(this.readyState == 4)
+        if (this.readyState == 4)
         {
             console.log("status, " + this.status);
             if(this.status == 0)
@@ -422,7 +421,7 @@ var RPCService = function()
                 thisObject.isPending = false;
             }
 
-            if(thisObject.context)
+            if (thisObject.context)
             {
                 thisObject.context.updateResponseStatus(this.status);
             }
@@ -451,19 +450,19 @@ var GDataService = function()
 
     this.loadFeed = function(playlistId, defaultVideoId, nextPageToken)
     {
-        if(!playlistId)
+        if (!playlistId)
         {
             console.log("playlist id can not be null");
             return;
         }
-        if(defaultVideoId)
+        if (defaultVideoId)
         {
             thisObject.selectedVideoId = defaultVideoId;
         }
 
         thisObject.playlistId = playlistId;
 
-        if(videoList)
+        if (videoList)
         {
             videoList.length = 0;
         }
@@ -500,9 +499,9 @@ var GDataService = function()
 
         var list = str.split('&');
         //console.log("list.length, " + list.length);
-        for(var i = 0; i < list.length; i++)
+        for (var i = 0; i < list.length; i++)
         {
-            if(list[i].search(property) == 0)
+            if (list[i].search(property) == 0)
             {
                 return list[i].replace(property, "");
             }
@@ -515,7 +514,7 @@ var GDataService = function()
     {
         console.log("feed is loaded!");
         thisObject.isPending = false;
-        if(this.status == 200)
+        if (this.status == 200)
         {
             // parse the feed
             console.log("parse!");
@@ -525,12 +524,12 @@ var GDataService = function()
             //console.log(JSON.stringify(obj));
             console.log("total entries, " + itemList.length);
             var i;
-            for(i = 0; i < itemList.length; i++)
+            for (i = 0; i < itemList.length; i++)
             {
                 var videoId = itemList[i]["contentDetails"]["videoId"];
                 console.log(videoId);
 
-                if(videoId)
+                if (videoId)
                 {
                     videoList.push(videoId);
                 }
@@ -538,22 +537,22 @@ var GDataService = function()
 
             var nextPageToken = obj["nextPageToken"];
 
-            if(nextPageToken != null && typeof nextPageToken === "string")
+            if (nextPageToken != null && typeof nextPageToken === "string")
             {
                 sendPlayListRequest(nextPageToken);
                 return;
             }
 
-            if(videoList.length > 0)
+            if (videoList.length > 0)
             {
                 // send this video list
                 console.log(videoList);
                 console.log("thisObject.selectedVideoId, " + thisObject.selectedVideoId);
-                if(thisObject.selectedVideoId)
+                if (thisObject.selectedVideoId)
                 {
                     var index = videoList.indexOf(thisObject.selectedVideoId);
                     console.log("index, " + index);
-                    if(index >= 0)
+                    if (index >= 0)
                     {
                         console.log("videoList = " + videoList);
                         console.log("---------------------------------------");
@@ -567,10 +566,10 @@ var GDataService = function()
                     }
                 }
                 //{message: "playList", videoId: listId, path: path}
-                for(i = 0; i < videoList.length; i++)
+                for (i = 0; i < videoList.length; i++)
                 {
                     var objData = {message: "queueVideo", videoId: videoList[i]};
-                    if(i == 0)
+                    if (i == 0)
                     {
                         objData.message = "playVideo";
                     }
@@ -585,10 +584,10 @@ var GDataService = function()
     this.readResponse = function()
     {
         console.log("this.readyState, " + this.readyState);
-        if(this.readyState == 4)
+        if (this.readyState == 4)
         {
             console.log("status, " + this.status);
-            if(this.status == 0)
+            if (this.status == 0)
             {
                 thisObject.isPending = false;
                 alert("Error getting playlist data from Google Data!");
@@ -611,7 +610,7 @@ rpc.init();
  */
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse)
 {
-    if(player)
+    if (player)
     {
         player.onMessage(request, sender, sendResponse);
 
@@ -632,6 +631,3 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
         chrome.pageAction.show(tabId);
     }
 });
-
-
-
