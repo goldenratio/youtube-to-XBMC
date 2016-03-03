@@ -14,8 +14,8 @@
 
   "browser_action": {
     "default_icon": {
-      "19": "assets/settings_19.png",
-      "38": "assets/settings_38.png"
+      "19": "assets/icon_19.png",
+      "38": "assets/icon_38.png"
     },
     "default_title": "Kassi Share - Settings",
     "default_popup": "settings.html"
