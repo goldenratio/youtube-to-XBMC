@@ -12,7 +12,7 @@
     "128": "assets/icon_128.png"
   },
 
-  "page_action": {
+  "browser_action": {
     "default_icon": {
       "19": "assets/settings_19.png",
       "38": "assets/settings_38.png"
