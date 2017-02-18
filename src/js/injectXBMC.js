@@ -13,11 +13,15 @@ if (ENABLE_CONSOLE == false)
 
     var pathName = window.location.pathname;
     var template_main = '<div class="xbmc_control">$header $play_all $sep $play_now</div>';
-    var template_header = 'YouTube to XBMC:';
-    var template_playnow = '<a href="#" rel="$pid" class="xbmc_playNow" title="Play Now - YouTube to XBMC" onclick="return false;">Play Now</a> | <a href="#" rel="$qid" class="xbmc_queue" title="Add to Queue - YouTube to XBMC" onclick="return false;">[+] Add to Queue</a>';
-    var template_playnow_sidebar = '<span rel="$pid" class="xbmc_playNow xbmc_link" title="Play Now - YouTube to XBMC" onclick="return false;">Play Now</span> | <span rel="$qid" class="xbmc_queue xbmc_link" title="Add to Queue - YouTube to XBMC" onclick="return false;">[+] Add to Queue</span>';
-    var template_playall = '<a href="#" rel="$lid" class="xbmc_playlist" title="Play All - YouTube to XBMC" onclick="return false;">Play All</a>';
-    var template_playall_sidebar = '<span rel="$lid" class="xbmc_playlist xbmc_link" title="Play All - YouTube to XBMC" onclick="return false;">Play All</span>';
+    var template_header = '';
+
+    // main
+    var template_playnow = '<a href="#" rel="$pid" class="xbmc_playNow" title="Play Now - Kassi Share" onclick="return false;">Play Now</a> | <a href="#" rel="$qid" class="xbmc_queue" title="Add to Queue - Kassi Share" onclick="return false;">[+] Add to Queue</a>';
+    var template_playall = '<a href="#" rel="$lid" class="xbmc_playlist" title="Play All - Kassi Share" onclick="return false;">Play All</a>';
+
+    // sidebar
+    var template_playnow_sidebar = '<span rel="$pid" class="xbmc_playNow xbmc_link" style="padding-left: 180px;" title="Play Now - Kassi Share" onclick="return false;">Play Now</span> | <span rel="$qid" class="xbmc_queue xbmc_link" title="Add to Queue - Kassi Share" onclick="return false;">[+] Add to Queue</span>';
+    var template_playall_sidebar = '<span rel="$lid" class="xbmc_playlist xbmc_link" title="Play All - Kassi Share" onclick="return false;">Play All</span>';
     var timer;
 
     console.log("pathName, " + pathName);
@@ -83,7 +87,7 @@ if (ENABLE_CONSOLE == false)
     {
         console.log("injectLinks");
         // (home / subscription on home page), search page, video manager, user page, user browse video, Popular on YouTube, Popular on youtube right side, video list (on video page), play list page
-        $(".feed-item-content, .yt-lockup2-content, .vm-video-info-container, .yt-tile-visible, .channels-content-item, .lohp-category-shelf-item, .lohp-large-shelf-container, .lohp-medium-shelf-content, .lohp-vertical-shelf-item-content, .video-list-item, .playlist-video-item, .yt-lockup-content, .recent-activity-snippet").each(function(index)
+        $(".feed-item-content, .yt-lockup2-content, .vm-video-info-container, .yt-tile-visible, .channels-content-item, .lohp-category-shelf-item, .lohp-large-shelf-container, .lohp-medium-shelf-content, .lohp-vertical-shelf-item-content, .video-list-item, .playlist-video-item, .yt-lockup-content, .recent-activity-snippet, .playlist-actions, .pl-video-title").each(function(index)
         {
             var alreadyAdded = false;
             $(this).find(".xbmc_control").each(function(xIndex)
@@ -95,6 +99,7 @@ if (ENABLE_CONSOLE == false)
 
             if (alreadyAdded)
             {
+                console.info("Already added - injectLinks");
                 return; // continue
             }
 
@@ -103,7 +108,7 @@ if (ENABLE_CONSOLE == false)
             var listId;
             var videoId;
             // (home / subscription on home page), search page, video manager, (user page / user browse video / Popular on YouTube)
-            $(this).find(".feed-video-title, .yt-uix-tile-link, .vm-video-title-content, .yt-uix-sessionlink").each(function(vIndex)
+            $(this).find(".feed-video-title, .yt-uix-tile-link, .vm-video-title-content, .yt-uix-sessionlink, a").each(function(vIndex)
             {
                 //console.log("video link, " + vIndex + ", " + $(this).attr("href"));
                 videoPathString = $(this).attr("href");
@@ -215,15 +220,14 @@ if (ENABLE_CONSOLE == false)
         $("#content").bind('DOMNodeInserted', function(event)
         {
             //console.log("DOM updated!");
-            var element = event.target;
-            //console.log("element, " + element.tagName);
 
             clearInterval(timer);
             timer = setInterval(function(){
                 clearInterval(timer);
                 $("#content").unbind('DOMNodeInserted');
                 injectLinks();
-                if (pathName == "/watch" && checkForVideoIdChangeInWatchPage())
+                //console.log("checkForVideoIdChangeInWatchPage " + checkForVideoIdChangeInWatchPage());
+                if (window.location.pathname == "/watch")
                 {
                     console.log("video ID change.. inject watch link!");
                     addLinkToWatchPage();
@@ -293,7 +297,21 @@ if (ENABLE_CONSOLE == false)
 
     this.addLinkToWatchPage = function()
     {
-        console.log("window.location, " + window.location);
+        console.log("addLinkToWatchPage, window.location, " + window.location);
+
+        var alreadyAdded = false;
+        $("#watch7-headline").find(".xbmc_control").each(function(xIndex)
+        {
+            alreadyAdded = true;
+            return false;
+        });
+
+        if (alreadyAdded)
+        {
+            console.info("Already added - addLinkToWatchPage");
+            return;
+        }
+
         var loc = window.location.toString();
         currentWatchPageVideoID = Utils.findPropertyFromString(loc, "v");
         var mainVideoId = Utils.findPropertyFromString(loc, "v");
@@ -344,6 +362,7 @@ if (ENABLE_CONSOLE == false)
     this.initListeners();
 
 ////////////////////////////
+
     if (pathName == "/watch")
     {
         addLinkToWatchPage();
