@@ -10,6 +10,12 @@
 	display: block;			
 }
 
+.xbmc_control_embed
+{
+	max-width: 300px;
+	margin: auto;
+}
+
 span.xbmc_link
 {	    
 	cursor: pointer;

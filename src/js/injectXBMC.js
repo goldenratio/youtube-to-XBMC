@@ -5,8 +5,8 @@
 
 if (ENABLE_CONSOLE == false)
 {
-    var console = console || {};
-    console.log = function() {};
+    //var console = console || {};
+    //console.log = function() {};
 }
 
 ;(function() {
@@ -383,7 +383,8 @@ if (ENABLE_CONSOLE == false)
         mainTemplate = mainTemplate.replace("$play_now", copyTemp);
         mainTemplate = mainTemplate.replace("$header", template_header);
 
-        $(".html5-info-panel").append(mainTemplate);
+        $(".ytp-share-panel-inner-content").append(mainTemplate);
+        $(".xbmc_control").addClass("xbmc_control_embed");
 
     }
     else if (pathName == "/share_popup")
