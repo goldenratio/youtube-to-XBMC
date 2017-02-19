@@ -239,7 +239,7 @@ var Player = function()
         };
 
         rpc.sendRequest(thisObject, "Player.Open", params, callback);
-    }
+    };
 
     this.clearPlayList = function(callback)
     {

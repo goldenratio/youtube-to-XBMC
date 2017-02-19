@@ -5,8 +5,8 @@
 
 if (ENABLE_CONSOLE == false)
 {
-    //var console = console || {};
-    //console.log = function() {};
+    var console = console || {};
+    console.log = function() {};
 }
 
 ;(function() {
