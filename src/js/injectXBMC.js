@@ -3,9 +3,16 @@
  * @author: Karthik VJ
  */
 
+// ---- polyfills ---
+var console = console || {};
+console.log = console.log || function() {};
+console.logCopy = console.log.bind(console);
+
+var sendMessageToBackground = chrome.extension.sendMessage || chrome.runtime.sendMessage || function(){};
+
+// --------------
 if (ENABLE_CONSOLE == false)
 {
-    var console = console || {};
     console.log = function() {};
 }
 
@@ -30,14 +37,13 @@ if (ENABLE_CONSOLE == false)
     {
         this.playVideoOnXBMC = function(vId)
         {
-            chrome.extension.sendMessage({message: "playVideo", videoId: vId}, function(response) {
-                console.log("video sent! " + response);
-            });
+            console.log("sending message to background");
+            sendMessageToBackground({message: "playVideo", videoId: vId});
         };
 
         this.queueVideoToXBMC = function(vId)
         {
-            chrome.extension.sendMessage({message: "queueVideo", videoId: vId}, function(response) {
+            sendMessageToBackground({message: "queueVideo", videoId: vId}, function(response) {
                 console.log("inject script >> video sent! " + response);
                 if (response == ResultData.OK)
                 {
@@ -51,7 +57,7 @@ if (ENABLE_CONSOLE == false)
         };
         this.playListOnXBMC = function(listId, videoId)
         {
-            chrome.extension.sendMessage({message: "playList", listId: listId, videoId: videoId}, function(response) {
+            sendMessageToBackground({message: "playList", listId: listId, videoId: videoId}, function(response) {
                 console.log("list sent! " + response);
             });
         };

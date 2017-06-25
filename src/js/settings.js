@@ -3,9 +3,12 @@
  * @author: Karthik VJ
  */
 
+var console = console || {};
+console.log = console.log || function() {};
+console.logCopy = console.log.bind(console);
+
 if (ENABLE_CONSOLE == false)
 {
-    var console = console || {};
     console.log = function() {};
 }
 
@@ -247,7 +250,13 @@ var ConnectionData = function()
         if(hostData == "")
             return false;
 
-        this.url = "http://" + user + ":" + pwd + "@" + hostData + ":" + portData + "/jsonrpc";
+
+        var loginDetails = "";
+        if(user != "" && pwd != "")
+        {
+            loginDetails = user + ":" + pwd + "@";
+        }
+        this.url = "http://" + loginDetails + hostData + ":" + portData + "/jsonrpc";
 
         //var params = '{ "item" : {"file" : "plugin://plugin.video.youtube/?action=play_video&videoid=iQOHRKKNNLQ"}}';
         //rpc.sendRequest(this, "Player.Open", params);

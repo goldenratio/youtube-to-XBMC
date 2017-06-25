@@ -3,13 +3,15 @@
  * @author: Karthik VJ
  */
 
-///////////////////////////////////////
-//////// CONSOLE LOG MAGIC ////////////
-//////////////////////////////////////
+// --- polyfills ----- /////
 
 var console = console || {};
 console.log = console.log || function() {};
 console.logCopy = console.log.bind(console);
+
+var messageFromContent = chrome.extension.onMessage || chrome.runtime.onMessage || function(){};
+
+// --------------------
 
 console.log = function(data)
 {
@@ -608,7 +610,7 @@ rpc.init();
 /**
  * Invoked when content script sends message
  */
-chrome.extension.onMessage.addListener(function(request, sender, sendResponse)
+messageFromContent.addListener(function(request, sender, sendResponse)
 {
     if (player)
     {
