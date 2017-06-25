@@ -223,25 +223,26 @@ if (ENABLE_CONSOLE == false)
 
         });
 
-        $("#content").bind('DOMNodeInserted', function(event)
+        $("#content").bind("DOMNodeInserted", function(event)
         {
-            //console.log("DOM updated!");
-
-            clearInterval(timer);
-            timer = setInterval(function(){
-                clearInterval(timer);
-                $("#content").unbind('DOMNodeInserted');
-                injectLinks();
-                //console.log("checkForVideoIdChangeInWatchPage " + checkForVideoIdChangeInWatchPage());
-                if (window.location.pathname == "/watch")
-                {
-                    console.log("video ID change.. inject watch link!");
-                    addLinkToWatchPage();
-                }
-            }, 2000)
+            injectLinksWithDelay();
         });
+    };
 
-
+    this.injectLinksWithDelay = function()
+    {
+        clearTimeout(timer);
+        timer = setTimeout(function(){
+            //clearInterval(timer);
+            //$("#content").unbind('DOMNodeInserted');
+            injectLinks();
+            //console.log("checkForVideoIdChangeInWatchPage " + checkForVideoIdChangeInWatchPage());
+            if (window.location.pathname == "/watch")
+            {
+                console.log("video ID change.. inject watch link!");
+                addLinkToWatchPage();
+            }
+        }, 1000)
     };
 
 
