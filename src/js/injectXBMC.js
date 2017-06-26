@@ -35,11 +35,15 @@ class RpcService
             console.log("inject script >> video sent! " + response);
             if (response == ResultData.OK)
             {
-                toastr.success("Added to Queue!");
+                iziToast.success({
+                    message: "Added to Queue!"
+                });
             }
             else
             {
-                toastr.error("Error! Can't Add to Queue!");
+                iziToast.error({
+                    message: "Error! Can't Add to Queue!"
+                });
             }
         });
     }
@@ -419,8 +423,6 @@ class Main
         }
 
     }
-
-
 
 }
 
