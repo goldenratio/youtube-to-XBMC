@@ -4,7 +4,7 @@
   "name": "Kassi Share - Send to Kodi/XBMC",
   "description": "Send YouTube videos to Kodi/XBMC Media Center",
   "version": "3.4.1",
-  "permissions": [ "http://*/*", "storage", "tabs" ],
+  "permissions": [ "http://*/*", "https://*/*", "storage", "tabs" ],
 
   "icons": {
     "16": "assets/icon_16.png",
