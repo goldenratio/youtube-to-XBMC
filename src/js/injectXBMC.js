@@ -209,9 +209,12 @@ class Main
         this.rpc = new RpcService();
 
         let contentDiv = document.getElementById("content");
-        contentDiv.addEventListener("DOMNodeInserted", (event) => {
-            this.injectLinksWithDelay();
-        });
+        if(contentDiv)
+        {
+            contentDiv.addEventListener("DOMNodeInserted", (event) => {
+                this.injectLinksWithDelay();
+            });
+        }
 
         if (window.location.pathname == "/watch")
         {
@@ -363,6 +366,7 @@ class Main
 
                         thisObject.addListeners(div);
                         el.insertBefore(div, el.firstChild);
+                        break;
                     }
 
                     listId = null;
