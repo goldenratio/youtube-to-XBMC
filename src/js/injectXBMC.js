@@ -21,6 +21,12 @@ class RpcService
     constructor()
     {
         this.sendMessageToBackground = chrome.extension.sendMessage || chrome.runtime.sendMessage || function(){};
+        iziToast.settings({
+            timeout: 2000,
+            resetOnHover: false,
+            pauseOnHover: false,
+            messageLineHeight: 30
+        });
     }
 
     playVideoOnXBMC(vId)
