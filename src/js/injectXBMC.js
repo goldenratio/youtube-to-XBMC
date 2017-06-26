@@ -38,7 +38,7 @@ if (ENABLE_CONSOLE == false)
         this.playVideoOnXBMC = function(vId)
         {
             console.log("sending message to background");
-            sendMessageToBackground({message: "playVideo", videoId: vId});
+            sendMessageToBackground({message: "playVideo", videoId: vId}, function(response) {});
         };
 
         this.queueVideoToXBMC = function(vId)
@@ -105,7 +105,7 @@ if (ENABLE_CONSOLE == false)
 
             if (alreadyAdded)
             {
-                console.info("Already added - injectLinks");
+                console.log("Already added - injectLinks");
                 return; // continue
             }
 
@@ -315,7 +315,7 @@ if (ENABLE_CONSOLE == false)
 
         if (alreadyAdded)
         {
-            console.info("Already added - addLinkToWatchPage");
+            console.log("Already added - addLinkToWatchPage");
             return;
         }
 
