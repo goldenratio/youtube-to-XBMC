@@ -48,7 +48,7 @@ class RpcService
             else
             {
                 iziToast.error({
-                    message: "Error! Can't Add to Queue!"
+                    message: "Error! Unable to Add to Queue!"
                 });
             }
         });
