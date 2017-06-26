@@ -3,6 +3,8 @@
  * @author: Karthik VJ
  */
 
+"use strict";
+
 // ---- polyfills ---
 var console = console || {};
 console.log = console.log || function() {};
@@ -40,14 +42,14 @@ class RpcService
                 toastr.error("Error! Can't Add to Queue!");
             }
         });
-    };
+    }
 
     playListOnXBMC(listId, videoId)
     {
         this.sendMessageToBackground({message: "playList", listId: listId, videoId: videoId}, function(response) {
             console.log("list sent! " + response);
         });
-    };
+    }
 
 }
 
@@ -186,22 +188,87 @@ class Utils
     }
 }
 
-;(function() {
 
-    var timer;
 
-    this.injectLinks = function()
+
+class Main
+{
+    constructor()
     {
-        console.log("injectLinks");
-        // (home / subscription on home page), search page, video manager, user page, user browse video, Popular on YouTube, Popular on youtube right side, video list (on video page), play list page
-        $(".feed-item-content, .yt-lockup2-content, .vm-video-info-container, .yt-tile-visible, .channels-content-item, .lohp-category-shelf-item, .lohp-large-shelf-container, .lohp-medium-shelf-content, .lohp-vertical-shelf-item-content, .video-list-item, .playlist-video-item, .yt-lockup-content, .recent-activity-snippet, .playlist-actions, .pl-video-title").each(function(index)
+        this.timerId = -1;
+        this.rpc = new RpcService();
+
+        let contentDiv = document.getElementById("content");
+        contentDiv.addEventListener("DOMNodeInserted", (event) => {
+            this.injectLinksWithDelay();
+        });
+
+        if (window.location.pathname == "/watch")
         {
-            var alreadyAdded = false;
-            $(this).find(".xbmc_control").each(function(xIndex)
+            this.addLinkToWatchPage();
+        }
+
+        this.injectLinks();
+    }
+
+    addListeners(el)
+    {
+        var thisObject = this;
+        // click event listeners
+        el.querySelectorAll(".xbmc_playlist").forEach(function(innerEl)
+        {
+            innerEl.addEventListener("click", (event) => {
+                let listId = innerEl.getAttribute("rel");
+
+                if (listId)
+                {
+                    var listData = listId.split(" ");
+                    console.log("playlist, " + listData);
+                    thisObject.rpc.playListOnXBMC(listData[0], listData[1]);
+                    event.preventDefault();
+                }
+            });
+
+        });
+
+        el.querySelectorAll(".xbmc_playNow").forEach(function(innerEl)
+        {
+            innerEl.addEventListener("click", (event) => {
+                let rel = innerEl.getAttribute("rel");
+                console.log("play single video, " + rel);
+                thisObject.rpc.playVideoOnXBMC(rel);
+                event.preventDefault();
+            });
+
+        });
+
+        el.querySelectorAll(".xbmc_queue").forEach(function(innerEl)
+        {
+            innerEl.addEventListener("click", (event) => {
+                let rel = innerEl.getAttribute("rel");
+                console.log("queue single video, " + rel);
+                thisObject.rpc.queueVideoToXBMC(rel);
+                event.preventDefault();
+            });
+
+        });
+    }
+
+    injectLinks()
+    {
+        let thisObject = this;
+        console.log("injectLinks ", this);
+        // (home / subscription on home page), search page, video manager, user page, user browse video, Popular on YouTube, Popular on youtube right side, video list (on video page), play list page
+        let classes = ".feed-item-content, .yt-lockup2-content, .vm-video-info-container, .yt-tile-visible, .channels-content-item, .lohp-category-shelf-item, .lohp-large-shelf-container, .lohp-medium-shelf-content, .lohp-vertical-shelf-item-content, .video-list-item, .playlist-video-item, .yt-lockup-content, .recent-activity-snippet, .playlist-actions, .pl-video-title";
+        let divList = document.querySelectorAll(classes) || [];
+        divList.forEach(function(el)
+        {
+
+            let alreadyAdded = false;
+            el.querySelectorAll(".xbmc_control").forEach(function(innerEl)
             {
                 alreadyAdded = true;
                 return false;
-
             });
 
             if (alreadyAdded)
@@ -210,139 +277,115 @@ class Utils
                 return; // continue
             }
 
-            console.log(index);
-            let videoPathString;
-            let listId = null;
-            let videoId = null;
-            let isSideBar = false;
-
             // (home / subscription on home page), search page, video manager, (user page / user browse video / Popular on YouTube)
-            $(this).find(".feed-video-title, .yt-uix-tile-link, .vm-video-title-content, .yt-uix-sessionlink, a").each(function(vIndex)
+            let df = el.querySelectorAll(".feed-video-title, .yt-uix-tile-link, .vm-video-title-content, .yt-uix-sessionlink, a");
+            let len = df.length;
+            console.log(typeof df, df);
+
+            for (let i = 0; i < len; i++)
             {
-                //console.log("video link, " + vIndex + ", " + $(this).attr("href"));
-                videoPathString = $(this).attr("href");
-                return false;
-            });
+                let innerEl = df[i];
 
-            if (videoPathString)
-            {
-                console.log("videoPathString, " + videoPathString);
+                let videoPathString = innerEl.getAttribute("href");
+                let listId;
+                let videoId;
+                let isSideBar = false;
 
-                // just a single video
-                videoId = Utils.findPropertyFromString(videoPathString, "v");
-                if (!videoId)
+                if (videoPathString)
                 {
-                    videoId = Utils.findPropertyFromString(videoPathString, "video_id");
-                }
+                    console.log("videoPathString, " + videoPathString);
 
-                if (!videoId)
-                {
-                    videoId = Utils.findPropertyFromString(videoPathString, "video_ids");
-                    videoId = decodeURIComponent(videoId);
-                    var vIndexText = Utils.findPropertyFromString(videoPathString, "index");
-                    var vIndex = vIndexText ? parseInt(vIndexText) : 0;
-                    if (vIndex < videoId.length)
+                    // just a single video
+                    videoId = Utils.findPropertyFromString(videoPathString, "v");
+                    if (!videoId)
                     {
-                        try
+                        videoId = Utils.findPropertyFromString(videoPathString, "video_id");
+                    }
+
+                    if (!videoId)
+                    {
+                        videoId = Utils.findPropertyFromString(videoPathString, "video_ids");
+                        if(videoId)
                         {
-                            videoId = videoId.split(",")[vIndex];
-                        } catch(err) {}
+                            videoId = decodeURIComponent(videoId);
+                            var vIndexText = Utils.findPropertyFromString(videoPathString, "index");
+                            var vIndex = vIndexText ? parseInt(vIndexText) : 0;
+                            if (vIndex < videoId.length)
+                            {
+                                try {
+                                    videoId = videoId.split(",")[vIndex];
+                                }
+                                catch(err) {
+                                    videoId = null;
+                                }
+                            }
+                        }
+
                     }
 
-                }
-
-                if (videoId)
-                {
-                    console.log("videoId, "  +videoId);
-                    if ($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
+                    if (videoId)
                     {
-                        isSideBar = true;
+                        console.log("videoId, " + videoId);
+                        if (el.classList.contains("video-list-item") || el.classList.contains("playlist-video-item"))
+                        {
+                            isSideBar = true;
+                        }
                     }
 
+                    // find play list id
+                    listId = Utils.findPropertyFromString(videoPathString, "list");
+
+                    //////
+
+                    if (listId && videoId)
+                    {
+                        listId = listId + " " + videoId;
+                    }
+
+                    if (listId || videoId)
+                    {
+                        var divGen = new DivGenerator();
+                        var div = divGen
+                            .setVideo(videoId)
+                            .setPlayList(listId)
+                            .setSideBar(isSideBar)
+                            .build();
+
+                        thisObject.addListeners(div);
+                        el.insertBefore(div, el.firstChild);
+                    }
+
+                    listId = null;
+                    videoId = null;
                 }
 
-                // find play list id
-                listId = Utils.findPropertyFromString(videoPathString, "list");
-
-                //////
-                if (listId || videoId)
-                {
-                    var divGen = new DivGenerator();
-                    var div = divGen
-                        .setVideo(videoId)
-                        .setPlayList(listId)
-                        .setSideBar(isSideBar)
-                        .build();
-
-                    $(this).prepend(div);
-                }
-
-                listId = null;
-                videoId = null;
             }
         });
 
-        $("#content").bind("DOMNodeInserted", function(event)
-        {
-            injectLinksWithDelay();
-        });
-    };
+    }
 
-    this.injectLinksWithDelay = function()
+    injectLinksWithDelay()
     {
-        clearTimeout(timer);
-        timer = setTimeout(function(){
+        clearTimeout(this.timerId);
+        this.timerId = setTimeout(() => {
 
-            injectLinks();
+            this.injectLinks();
             if (window.location.pathname == "/watch")
             {
                 console.log("video ID change.. inject watch link!");
-                addLinkToWatchPage();
+                this.addLinkToWatchPage();
             }
         }, 1000)
-    };
+    }
 
-
-    this.initListeners = function()
-    {
-        // click event listeners
-        $(document).on('click', '.xbmc_playlist', function(event)
-        {
-            console.log("playlist, " + $(this).attr("rel"));
-            var listId = $(this).attr("rel");
-
-            if (listId)
-            {
-                var listData = listId.split(" ");
-                rpc.playListOnXBMC(listData[0], listData[1]);
-                event.preventDefault();
-            }
-
-        });
-
-        $(document).on('click', '.xbmc_playNow', function(event)
-        {
-            console.log("play single video, " + $(this).attr("rel"));
-            rpc.playVideoOnXBMC($(this).attr("rel"));
-            event.preventDefault();
-
-        });
-
-        $(document).on('click', '.xbmc_queue', function(event)
-        {
-            console.log("queue single video, " + $(this).attr("rel"));
-            rpc.queueVideoToXBMC($(this).attr("rel"));
-            event.preventDefault();
-        });
-    };
-
-
-    this.addLinkToWatchPage = function()
+    addLinkToWatchPage()
     {
         console.log("addLinkToWatchPage, window.location, " + window.location);
-
+        let thisObject = this;
         let alreadyAdded = false;
-        $("#watch7-headline").find(".xbmc_control").each(function(xIndex)
+        let headLineDiv = document.getElementById("watch7-headline");
+
+        headLineDiv.querySelectorAll(".xbmc_control").forEach(function(el)
         {
             alreadyAdded = true;
             return false;
@@ -358,13 +401,10 @@ class Utils
         var videoId = Utils.findPropertyFromString(loc, "v");
         let listId = Utils.findPropertyFromString(loc, "list");
 
-        currentWatchPageVideoID = videoId;
-
-        // TODO: old had this. Check why?
-        /*if (listId && videoId)
+        if (listId && videoId)
         {
             listId = listId + " " + videoId;
-        }*/
+        }
 
         if (listId || videoId)
         {
@@ -374,22 +414,14 @@ class Utils
                 .setPlayList(listId)
                 .build();
 
-            $("#watch7-headline").prepend(div);
+            thisObject.addListeners(div);
+            headLineDiv.insertBefore(div, headLineDiv.firstChild);
         }
 
-    };
-
-    // MAIN /////////////////////////////
-
-    var currentWatchPageVideoID = "";
-    var rpc = new RpcService();
-    this.initListeners();
-
-
-    if (window.location.pathname == "/watch")
-    {
-        addLinkToWatchPage();
     }
-    injectLinks();
 
-}());
+
+
+}
+
+new Main();
