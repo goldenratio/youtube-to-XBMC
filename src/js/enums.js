@@ -8,7 +8,7 @@
  * @deprecated currently used in inject script and settings.js, will be replaced with debugMode flag
  * @type {boolean}
  */
-var ENABLE_CONSOLE = true;
+var ENABLE_CONSOLE = false;
 
 var Status = new function()
 {
