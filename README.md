@@ -6,9 +6,6 @@ Send YouTube videos to Kodi/XBMC Media Center (Web Extension)
 Chrome Web Store, https://chrome.google.com/webstore/detail/youtube-to-xbmc/gbghegmimhjemkhpimohkdopkeahldbh
 Firefox AddOn, https://addons.mozilla.org/en-US/firefox/addon/kassi-share/
 
-Chrome Extension: Send YouTube videos to XBMC.
-Adds "Play Now" and "Add to Queue" link to all youtube video content.
-
 **Features:**
 -------------
 1. "Play Now" and "Add to Queue" links are placed conveniently to contents in homepage, search pages and channel pages. 
