@@ -50,7 +50,7 @@ var Player = function()
     /*
      * Invoked when content script sends some message
      */
-    this.onMessage = function(request, sender, sendResponse)
+    this.onMessage = function(request, sender)
     {
         if (sender)
         {
@@ -66,7 +66,7 @@ var Player = function()
 
         if (rpc.isPending || gService.isPending)
         {
-            var requestData = {request: request, callback: sendResponse};
+            var requestData = {request: request};
             thisObject.pendingRequest.push(requestData);
             console.log("request queued!");
             return;
@@ -87,11 +87,7 @@ var Player = function()
                         {
                             thisObject.playCurrentVideoFromList(function(playResult)
                             {
-                                console.log("video play success!");
-
-                                if(sendResponse)
-                                    sendResponse(ResultData.OK);
-
+                                console.log("video play success! ");
                             });
                         }
                     });
@@ -100,10 +96,6 @@ var Player = function()
                 else
                 {
                     console.log("Error! Cannot clear play list");
-
-                    if(sendResponse)
-                        sendResponse(ResultData.ERROR);
-
                 }
 
             });
@@ -123,8 +115,7 @@ var Player = function()
                     {
                         thisObject.onQueue(request.videoId, function(response)
                         {
-                            if(sendResponse)
-                                sendResponse(response);
+                            // callback
                         });
                     });
                 }
@@ -132,8 +123,7 @@ var Player = function()
                 {
                     thisObject.onQueue(request.videoId, function(response)
                     {
-                        if(sendResponse)
-                            sendResponse(response);
+                        // callback
                     });
                 }
 
@@ -284,7 +274,7 @@ var Player = function()
         // check for pending requests
         if (thisObject.pendingRequest.length > 0)
         {
-            thisObject.onMessage(thisObject.pendingRequest[0].request, thisObject.pendingRequest[0].callback);
+            thisObject.onMessage(thisObject.pendingRequest[0].request);
             thisObject.pendingRequest.shift();
         }
 
@@ -610,27 +600,14 @@ rpc.init();
 /**
  * Invoked when content script sends message
  */
-messageFromContent.addListener(function(request, sender, sendResponse)
+messageFromContent.addListener(function(request, sender)
 {
     if (player)
     {
-        player.onMessage(request, sender, sendResponse);
+        player.onMessage(request, sender);
 
     }
 
     return true;
 
 });
-
-
-/**
- * Listen for any changes to the URL of any tab.
- */
-/*chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
-{
-    if (tab.url.indexOf('youtube.com') > -1)
-    {
-        chrome.pageAction.show(tabId);
-    }
-
-});*/
