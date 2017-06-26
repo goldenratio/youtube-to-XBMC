@@ -1,9 +1,10 @@
 Kassi Share
 =============
 
-Send YouTube videos to Kodi/XBMC Media Center (Chrome Extension)
+Send YouTube videos to Kodi/XBMC Media Center (Web Extension)
 
-Kassi Share (YouTube to XBMC) is available in Chrome Web Store, https://chrome.google.com/webstore/detail/youtube-to-xbmc/gbghegmimhjemkhpimohkdopkeahldbh
+Chrome Web Store, https://chrome.google.com/webstore/detail/youtube-to-xbmc/gbghegmimhjemkhpimohkdopkeahldbh
+Firefox AddOn, https://addons.mozilla.org/en-US/firefox/addon/kassi-share/
 
 Chrome Extension: Send YouTube videos to XBMC.
 Adds "Play Now" and "Add to Queue" link to all youtube video content.
