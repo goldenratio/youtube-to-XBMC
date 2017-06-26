@@ -50,7 +50,7 @@ var Player = function()
     /*
      * Invoked when content script sends some message
      */
-    this.onMessage = function(request, sender)
+    this.onMessage = function(request, sender, sendResponse)
     {
         if (sender)
         {
@@ -66,7 +66,7 @@ var Player = function()
 
         if (rpc.isPending || gService.isPending)
         {
-            var requestData = {request: request};
+            var requestData = {request: request, callback: sendResponse};
             thisObject.pendingRequest.push(requestData);
             console.log("request queued!");
             return;
@@ -87,7 +87,11 @@ var Player = function()
                         {
                             thisObject.playCurrentVideoFromList(function(playResult)
                             {
-                                console.log("video play success! ");
+                                console.log("video play success!");
+
+                                if(sendResponse)
+                                    sendResponse(ResultData.OK);
+
                             });
                         }
                     });
@@ -96,6 +100,10 @@ var Player = function()
                 else
                 {
                     console.log("Error! Cannot clear play list");
+
+                    if(sendResponse)
+                        sendResponse(ResultData.ERROR);
+
                 }
 
             });
@@ -115,7 +123,8 @@ var Player = function()
                     {
                         thisObject.onQueue(request.videoId, function(response)
                         {
-                            // callback
+                            if(sendResponse)
+                                sendResponse(response);
                         });
                     });
                 }
@@ -123,7 +132,8 @@ var Player = function()
                 {
                     thisObject.onQueue(request.videoId, function(response)
                     {
-                        // callback
+                        if(sendResponse)
+                            sendResponse(response);
                     });
                 }
 
@@ -161,6 +171,7 @@ var Player = function()
                         thisObject.playCurrentVideoFromList(function(playResult)
                         {
                             console.log("video play success!");
+
                         });
 
                     }
@@ -273,7 +284,7 @@ var Player = function()
         // check for pending requests
         if (thisObject.pendingRequest.length > 0)
         {
-            thisObject.onMessage(thisObject.pendingRequest[0].request);
+            thisObject.onMessage(thisObject.pendingRequest[0].request, thisObject.pendingRequest[0].callback);
             thisObject.pendingRequest.shift();
         }
 
@@ -482,14 +493,13 @@ var GDataService = function()
         xhr.send("");
     };
 
-    this.findPropertyFromString = function(str, property)
+    this.findPropertyFromString = function(str, key)
     {
-        property = property + "=";
+        var property = key + "=";
         var index = str.indexOf('?');
         str = str.substring(index + 1);
 
         var list = str.split('&');
-        //console.log("list.length, " + list.length);
         for (var i = 0; i < list.length; i++)
         {
             if (list[i].search(property) == 0)
@@ -497,7 +507,7 @@ var GDataService = function()
                 return list[i].replace(property, "");
             }
         }
-        return 0;
+        return null;
     };
 
 
@@ -599,11 +609,11 @@ rpc.init();
 /**
  * Invoked when content script sends message
  */
-messageFromContent.addListener(function(request, sender)
+messageFromContent.addListener(function(request, sender, sendResponse)
 {
     if (player)
     {
-        player.onMessage(request, sender);
+        player.onMessage(request, sender, sendResponse);
 
     }
 

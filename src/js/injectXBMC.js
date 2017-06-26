@@ -8,86 +8,187 @@ var console = console || {};
 console.log = console.log || function() {};
 console.logCopy = console.log.bind(console);
 
-var sendMessageToBackground = chrome.extension.sendMessage || chrome.runtime.sendMessage || function(){};
-
 // --------------
 if (ENABLE_CONSOLE == false)
 {
     console.log = function() {};
 }
 
+class RpcService
+{
+    constructor()
+    {
+        this.sendMessageToBackground = chrome.extension.sendMessage || chrome.runtime.sendMessage || function(){};
+    }
+
+    playVideoOnXBMC(vId)
+    {
+        console.log("sending message to background");
+        this.sendMessageToBackground({message: "playVideo", videoId: vId}, function(response) {});
+    }
+
+    queueVideoToXBMC(vId)
+    {
+        this.sendMessageToBackground({message: "queueVideo", videoId: vId}, function(response) {
+            console.log("inject script >> video sent! " + response);
+            if (response == ResultData.OK)
+            {
+                toastr.success("Added to Queue!");
+            }
+            else
+            {
+                toastr.error("Error! Can't Add to Queue!");
+            }
+        });
+    };
+
+    playListOnXBMC(listId, videoId)
+    {
+        this.sendMessageToBackground({message: "playList", listId: listId, videoId: videoId}, function(response) {
+            console.log("list sent! " + response);
+        });
+    };
+
+}
+
+class DivGenerator
+{
+    constructor()
+    {
+        this.playListId = null;
+        this.videoId = null;
+        this.isSideBar = false;
+    }
+
+    setSideBar(flag)
+    {
+        this.isSideBar = flag;
+        return this;
+    }
+
+    setPlayList(pId)
+    {
+        this.playListId = pId;
+        return this;
+    }
+
+    setVideo(vId)
+    {
+        this.videoId = vId;
+        return this;
+    }
+
+    build()
+    {
+        let domEl = document.createElement("div");
+        domEl.className = "xbmc_control";
+
+        if(this.isSideBar)
+        {
+            if(this.playListId)
+            {
+                let playListSpan = document.createElement("span");
+                playListSpan.setAttribute("rel", this.playListId);
+                playListSpan.setAttribute("class", "xbmc_playlist xbmc_link");
+                playListSpan.setAttribute("title", "Play All - Kassi Share");
+                playListSpan.setAttribute("onclick", "return false;");
+                playListSpan.appendChild(document.createTextNode("Play All"));
+
+                domEl.appendChild(playListSpan);
+                domEl.appendChild(document.createTextNode(" | "));
+            }
+
+            if(this.videoId)
+            {
+                let playSpan = document.createElement("span");
+                playSpan.setAttribute("rel", this.videoId);
+                playSpan.setAttribute("style", "padding-left: 180px;");
+                playSpan.setAttribute("class", "xbmc_playNow xbmc_link");
+                playSpan.setAttribute("title", "Play Now - Kassi Share");
+                playSpan.setAttribute("onclick", "return false;");
+                playSpan.appendChild(document.createTextNode("Play Now"));
+
+                let queueSpan = document.createElement("span");
+                queueSpan.setAttribute("rel", this.videoId);
+                queueSpan.setAttribute("class", "xbmc_queue xbmc_link");
+                queueSpan.setAttribute("title", "Add to Queue - Kassi Share");
+                queueSpan.setAttribute("onclick", "return false;");
+                queueSpan.appendChild(document.createTextNode("[+] Add to Queue"));
+
+                domEl.appendChild(playSpan);
+                domEl.appendChild(document.createTextNode(" | "));
+                domEl.appendChild(queueSpan);
+            }
+        }
+        else
+        {
+            if(this.playListId)
+            {
+                let listAnchor = document.createElement("a");
+                listAnchor.setAttribute("href", "#");
+                listAnchor.setAttribute("rel", this.playListId);
+                listAnchor.setAttribute("title", "Play All - Kassi Share");
+                listAnchor.setAttribute("onclick", "return false;");
+                listAnchor.className = "xbmc_playlist";
+                let listText = document.createTextNode("Play All");
+                listAnchor.appendChild(listText);
+
+                domEl.appendChild(listAnchor);
+                domEl.appendChild(document.createTextNode(" | "));
+            }
+
+            if(this.videoId)
+            {
+                let playAnchor = document.createElement("a");
+                playAnchor.setAttribute("href", "#");
+                playAnchor.setAttribute("rel", this.videoId);
+                playAnchor.setAttribute("title", "Play Now - Kassi Share");
+                playAnchor.setAttribute("onclick", "return false;");
+                playAnchor.className = "xbmc_playNow";
+                playAnchor.appendChild(document.createTextNode("Play Now"));
+
+                let queueAnchor = document.createElement("a");
+                queueAnchor.setAttribute("href", "#");
+                queueAnchor.setAttribute("rel", this.videoId);
+                queueAnchor.setAttribute("title", "Add to Queue - Kassi Share");
+                queueAnchor.setAttribute("onclick", "return false;");
+                queueAnchor.className = "xbmc_queue";
+                queueAnchor.appendChild(document.createTextNode("[+] Add to Queue"));
+
+                domEl.appendChild(playAnchor);
+                domEl.appendChild(document.createTextNode(" | "));
+                domEl.appendChild(queueAnchor);
+            }
+        }
+
+        return domEl;
+    }
+}
+
+class Utils
+{
+    static findPropertyFromString(str, key)
+    {
+        let property = key + "=";
+        var index = str.indexOf('?');
+        str = str.substring(index + 1);
+
+        var list = str.split('&');
+
+        for (var i = 0; i < list.length; i++)
+        {
+            if (list[i].search(property) == 0)
+            {
+                return list[i].replace(property, "");
+            }
+        }
+        return null;
+    }
+}
+
 ;(function() {
 
-    var pathName = window.location.pathname;
-    var template_main = '<div class="xbmc_control">$header $play_all $sep $play_now</div>';
-    var template_header = '';
-
-    // main
-    var template_playnow = '<a href="#" rel="$pid" class="xbmc_playNow" title="Play Now - Kassi Share" onclick="return false;">Play Now</a> | <a href="#" rel="$qid" class="xbmc_queue" title="Add to Queue - Kassi Share" onclick="return false;">[+] Add to Queue</a>';
-    var template_playall = '<a href="#" rel="$lid" class="xbmc_playlist" title="Play All - Kassi Share" onclick="return false;">Play All</a>';
-
-    // sidebar
-    var template_playnow_sidebar = '<span rel="$pid" class="xbmc_playNow xbmc_link" style="padding-left: 180px;" title="Play Now - Kassi Share" onclick="return false;">Play Now</span> | <span rel="$qid" class="xbmc_queue xbmc_link" title="Add to Queue - Kassi Share" onclick="return false;">[+] Add to Queue</span>';
-    var template_playall_sidebar = '<span rel="$lid" class="xbmc_playlist xbmc_link" title="Play All - Kassi Share" onclick="return false;">Play All</span>';
     var timer;
-
-    console.log("pathName, " + pathName);
-
-    var RpcService = function()
-    {
-        this.playVideoOnXBMC = function(vId)
-        {
-            console.log("sending message to background");
-            sendMessageToBackground({message: "playVideo", videoId: vId}, function(response) {});
-        };
-
-        this.queueVideoToXBMC = function(vId)
-        {
-            sendMessageToBackground({message: "queueVideo", videoId: vId}, function(response) {
-                console.log("inject script >> video sent! " + response);
-                if (response == ResultData.OK)
-                {
-                    toastr.success("Added to Queue!");
-                }
-                else
-                {
-                    toastr.error("Error! Can't Add to Queue!");
-                }
-            });
-        };
-        this.playListOnXBMC = function(listId, videoId)
-        {
-            sendMessageToBackground({message: "playList", listId: listId, videoId: videoId}, function(response) {
-                console.log("list sent! " + response);
-            });
-        };
-    };
-
-    var Utils = new function()
-    {
-        this.findPropertyFromString = function(str, property)
-        {
-            //console.log("findPropertyFromString, str = " + str);
-            //console.log("findPropertyFromString, property = " + property);
-            property = property + "=";
-            var index = str.indexOf('?');
-            str = str.substring(index + 1);
-            //console.log("index = " + index);
-            //console.log("str = " + str);
-
-            var list = str.split('&');
-            //console.log("list.length, " + list.length);
-            for (var i = 0; i < list.length; i++)
-            {
-                if (list[i].search(property) == 0)
-                {
-                    return list[i].replace(property, "");
-                }
-            }
-            return 0;
-        }
-    };
-
 
     this.injectLinks = function()
     {
@@ -110,9 +211,11 @@ if (ENABLE_CONSOLE == false)
             }
 
             console.log(index);
-            var videoPathString;
-            var listId;
-            var videoId;
+            let videoPathString;
+            let listId = null;
+            let videoId = null;
+            let isSideBar = false;
+
             // (home / subscription on home page), search page, video manager, (user page / user browse video / Popular on YouTube)
             $(this).find(".feed-video-title, .yt-uix-tile-link, .vm-video-title-content, .yt-uix-sessionlink, a").each(function(vIndex)
             {
@@ -124,103 +227,59 @@ if (ENABLE_CONSOLE == false)
             if (videoPathString)
             {
                 console.log("videoPathString, " + videoPathString);
-                var mainTemplate = template_main;
 
                 // just a single video
                 videoId = Utils.findPropertyFromString(videoPathString, "v");
-                if (videoId == 0)
+                if (!videoId)
                 {
                     videoId = Utils.findPropertyFromString(videoPathString, "video_id");
                 }
 
-                if (videoId == 0)
+                if (!videoId)
                 {
                     videoId = Utils.findPropertyFromString(videoPathString, "video_ids");
                     videoId = decodeURIComponent(videoId);
-                    var vIndex = Utils.findPropertyFromString(videoPathString, "index");
+                    var vIndexText = Utils.findPropertyFromString(videoPathString, "index");
+                    var vIndex = vIndexText ? parseInt(vIndexText) : 0;
                     if (vIndex < videoId.length)
                     {
-                        videoId = videoId.split(",")[vIndex];
+                        try
+                        {
+                            videoId = videoId.split(",")[vIndex];
+                        } catch(err) {}
                     }
 
                 }
 
-                var copyTemp = template_playnow;
-                var copyHeader = template_header;
-
-                if (videoId != 0)
+                if (videoId)
                 {
                     console.log("videoId, "  +videoId);
                     if ($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
                     {
-                        copyTemp = template_playnow_sidebar;
+                        isSideBar = true;
                     }
 
-                    if ($(this).hasClass("channels-content-item"))
-                    {
-                        copyHeader = "";
-                    }
-
-                    copyTemp = copyTemp.replace("$pid", videoId);
-                    copyTemp = copyTemp.replace("$qid", videoId);
-
-                    mainTemplate = mainTemplate.replace("$play_now", copyTemp);
-                    //mainTemplate = mainTemplate.replace("$sep", "|");
-                    //$(this).prepend(copyTemp);
-                }
-                else
-                {
-                    //mainTemplate = mainTemplate.replace("$sep", "");
-                    mainTemplate = mainTemplate.replace("$play_now", "");
                 }
 
                 // find play list id
                 listId = Utils.findPropertyFromString(videoPathString, "list");
-                var listTemp = template_playall;
-                if (listId)
-                {
-                    if ($(this).hasClass("video-list-item") || $(this).hasClass("playlist-video-item"))
-                    {
-                        listTemp = template_playall_sidebar;
-                    }
-                    // it is play list
-                    if (videoId != 0)
-                    {
-                        // there is video too
-                        listId = listId + " " + videoId;
-                        mainTemplate = mainTemplate.replace("$sep", "|");
-                    }
-                    else
-                    {
-                        // just play list
-                        mainTemplate = mainTemplate.replace("$sep", "");
-                    }
-                    listTemp = listTemp.replace("$lid", listId);
-
-                    mainTemplate = mainTemplate.replace("$play_all", listTemp);
-                    //$(this).prepend(copyTemp);
-
-                }
-                else
-                {
-                    mainTemplate = mainTemplate.replace("$sep", "");
-                    mainTemplate = mainTemplate.replace("$play_all", "");
-                }
-
-                mainTemplate = mainTemplate.replace("$header", copyHeader);
 
                 //////
-                if (listId != 0 || videoId !=0)
+                if (listId || videoId)
                 {
-                    $(this).prepend(mainTemplate);
+                    var divGen = new DivGenerator();
+                    var div = divGen
+                        .setVideo(videoId)
+                        .setPlayList(listId)
+                        .setSideBar(isSideBar)
+                        .build();
+
+                    $(this).prepend(div);
                 }
 
-                listId = 0;
-                videoId = 0;
-
-
+                listId = null;
+                videoId = null;
             }
-
         });
 
         $("#content").bind("DOMNodeInserted", function(event)
@@ -233,10 +292,8 @@ if (ENABLE_CONSOLE == false)
     {
         clearTimeout(timer);
         timer = setTimeout(function(){
-            //clearInterval(timer);
-            //$("#content").unbind('DOMNodeInserted');
+
             injectLinks();
-            //console.log("checkForVideoIdChangeInWatchPage " + checkForVideoIdChangeInWatchPage());
             if (window.location.pathname == "/watch")
             {
                 console.log("video ID change.. inject watch link!");
@@ -257,9 +314,6 @@ if (ENABLE_CONSOLE == false)
             if (listId)
             {
                 var listData = listId.split(" ");
-
-                //console.log(listData[0]);
-                //console.log(listData[1]);
                 rpc.playListOnXBMC(listData[0], listData[1]);
                 event.preventDefault();
             }
@@ -282,31 +336,12 @@ if (ENABLE_CONSOLE == false)
         });
     };
 
-    /**
-     * This method checks if the videoID was changed, i.e user has moved to another video.
-     * With recent changes in youtube, instead of loading a new page, URL param is changed and new
-     * video is loaded.
-     * This method is used to inject links again, once the URL param is changed.
-     * NB! only used in watch page
-     *
-     * @returns {boolean}
-     */
-    this.checkForVideoIdChangeInWatchPage = function()
-    {
-        console.log("checkForVideoIdChange");
-        var updatedVideoID = Utils.findPropertyFromString(window.location.toString(), "v");
-        if (currentWatchPageVideoID != updatedVideoID && currentWatchPageVideoID != "")
-        {
-            return true;
-        }
-        return false;
-    };
 
     this.addLinkToWatchPage = function()
     {
         console.log("addLinkToWatchPage, window.location, " + window.location);
 
-        var alreadyAdded = false;
+        let alreadyAdded = false;
         $("#watch7-headline").find(".xbmc_control").each(function(xIndex)
         {
             alreadyAdded = true;
@@ -319,105 +354,42 @@ if (ENABLE_CONSOLE == false)
             return;
         }
 
-        var loc = window.location.toString();
-        currentWatchPageVideoID = Utils.findPropertyFromString(loc, "v");
-        var mainVideoId = Utils.findPropertyFromString(loc, "v");
-        //alert("mainVideoId, " + mainVideoId);
-        var mainTemplate = template_main;
-        if (mainVideoId != 0)
-        {
-            var copyTemp = template_playnow.replace("$pid", mainVideoId);
-            copyTemp = copyTemp.replace("$qid", mainVideoId);
+        let loc = window.location.toString();
+        var videoId = Utils.findPropertyFromString(loc, "v");
+        let listId = Utils.findPropertyFromString(loc, "list");
 
-            mainTemplate = mainTemplate.replace("$play_now", copyTemp);
+        currentWatchPageVideoID = videoId;
 
-        }
-        else
+        // TODO: old had this. Check why?
+        /*if (listId && videoId)
         {
-            mainTemplate = mainTemplate.replace("$play_now", "");
-        }
+            listId = listId + " " + videoId;
+        }*/
 
-        var listId = Utils.findPropertyFromString(loc, "list");
-        if (listId != 0)
+        if (listId || videoId)
         {
-            if (mainVideoId != 0)
-            {
-                listId = listId + " " + mainVideoId;
-            }
-            copyTemp = template_playall.replace("$lid", listId);
-            mainTemplate = mainTemplate.replace("$play_all", copyTemp);
-            mainTemplate = mainTemplate.replace("$sep", "|");
-        }
-        else
-        {
-            mainTemplate = mainTemplate.replace("$sep", "");
-            mainTemplate = mainTemplate.replace("$play_all", "");
-        }
+            var divGen = new DivGenerator();
+            var div = divGen
+                .setVideo(videoId)
+                .setPlayList(listId)
+                .build();
 
-        mainTemplate = mainTemplate.replace("$header", template_header);
-
-        if (listId != 0 || videoId !=0)
-        {
-            $("#watch7-headline").prepend(mainTemplate);
+            $("#watch7-headline").prepend(div);
         }
 
     };
-/////////////////////////////
+
+    // MAIN /////////////////////////////
 
     var currentWatchPageVideoID = "";
     var rpc = new RpcService();
     this.initListeners();
 
-////////////////////////////
 
-    if (pathName == "/watch")
+    if (window.location.pathname == "/watch")
     {
         addLinkToWatchPage();
-        injectLinks();
-
     }
-    else if (pathName.indexOf("/embed") == 0)
-    {
-        var videoId = pathName.replace("/embed/", "");
-        console.log("videoId, " + videoId);
-
-        var copyTemp = template_playnow.replace("$pid", videoId);
-        copyTemp = copyTemp.replace("$qid", videoId);
-
-        var mainTemplate = template_main;
-        mainTemplate = mainTemplate.replace("$play_all", "");
-        mainTemplate = mainTemplate.replace("$sep", "");
-        mainTemplate = mainTemplate.replace("$play_now", copyTemp);
-        mainTemplate = mainTemplate.replace("$header", template_header);
-
-        $(".ytp-share-panel-inner-content").append(mainTemplate);
-        $(".xbmc_control").addClass("xbmc_control_embed");
-
-    }
-    else if (pathName == "/share_popup")
-    {
-        var loc = window.location.toString();
-        var mainVideoId = Utils.findPropertyFromString(loc, "v");
-
-        var mainTemplate = template_main;
-        if (mainVideoId != 0)
-        {
-            var copyTemp = template_playnow.replace("$pid", mainVideoId);
-            copyTemp = copyTemp.replace("$qid", mainVideoId);
-            mainTemplate = mainTemplate.replace("$play_now", copyTemp);
-
-            mainTemplate = mainTemplate.replace("$sep", "");
-            mainTemplate = mainTemplate.replace("$play_all", "");
-            mainTemplate = mainTemplate.replace("$header", template_header);
-
-            $("#page").prepend(mainTemplate);
-        }
-
-    }
-    else
-    {
-        injectLinks();
-    }
-
+    injectLinks();
 
 }());
