@@ -29,7 +29,7 @@
     {
       "matches": ["http://www.youtube.com/*", "https://www.youtube.com/*"],
       "css": ["css/toastr.css", "css/inject.css"],
-      "js": ["js/jquery-1.9.1.min.js", "js/toastr.js", "js/enums.js", "js/injectXBMC.js"],
+      "js": ["https://code.jquery.com/jquery-3.2.1.min.js", "js/toastr.js", "js/enums.js", "js/injectXBMC.js"],
       "run_at": "document_idle",
       "all_frames": true
     }

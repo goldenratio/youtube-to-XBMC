@@ -161,7 +161,6 @@ var Player = function()
                         thisObject.playCurrentVideoFromList(function(playResult)
                         {
                             console.log("video play success!");
-
                         });
 
                     }
