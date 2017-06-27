@@ -208,13 +208,7 @@ class Main
         this.timerId = -1;
         this.rpc = new RpcService();
 
-        let contentDiv = document.getElementById("content");
-        if(contentDiv)
-        {
-            contentDiv.addEventListener("DOMNodeInserted", (event) => {
-                this.injectLinksWithDelay();
-            });
-        }
+        this.assignDOMChangeListener();
 
         if (window.location.pathname == "/watch")
         {
@@ -222,6 +216,22 @@ class Main
         }
 
         this.injectLinks();
+    }
+
+    assignDOMChangeListener()
+    {
+        let contentDiv = document.getElementById("content");
+        if(!contentDiv)
+        {
+            setTimeout(() => {
+                this.assignDOMChangeListener();
+            }, 1000);
+            return;
+        }
+
+        contentDiv.addEventListener("DOMNodeInserted", (event) => {
+            this.injectLinksWithDelay();
+        });
     }
 
     addListeners(el)
@@ -269,116 +279,126 @@ class Main
 
     injectLinks()
     {
-        let thisObject = this;
         console.log("injectLinks ", this);
         // (home / subscription on home page), search page, video manager, user page, user browse video, Popular on YouTube, Popular on youtube right side, video list (on video page), play list page
         let classes = ".feed-item-content, .yt-lockup2-content, .vm-video-info-container, .yt-tile-visible, .channels-content-item, .lohp-category-shelf-item, .lohp-large-shelf-container, .lohp-medium-shelf-content, .lohp-vertical-shelf-item-content, .video-list-item, .playlist-video-item, .yt-lockup-content, .recent-activity-snippet, .playlist-actions, .pl-video-title";
+
         let divList = document.querySelectorAll(classes) || [];
-        divList.forEach(function(el)
+        const divListLen = divList.length;
+
+        for(let i = 0; i < divListLen; i++)
         {
-
-            let alreadyAdded = false;
-            el.querySelectorAll(".xbmc_control").forEach(function(innerEl)
-            {
-                alreadyAdded = true;
-                return false;
-            });
-
+            let el = divList[i];
+            //console.log(el);
+            const alreadyAdded = this.isControlAdded(el);
             if (alreadyAdded)
             {
                 console.log("Already added - injectLinks");
-                return; // continue
+                continue;
             }
 
             // (home / subscription on home page), search page, video manager, (user page / user browse video / Popular on YouTube)
             let df = el.querySelectorAll(".feed-video-title, .yt-uix-tile-link, .vm-video-title-content, .yt-uix-sessionlink, a");
             let len = df.length;
-            console.log(typeof df, df);
 
-            for (let i = 0; i < len; i++)
+            for (let j = 0; j < len; j++)
             {
-                let innerEl = df[i];
-
-                let videoPathString = innerEl.getAttribute("href");
-                let listId;
-                let videoId;
-                let isSideBar = false;
-
-                if (videoPathString)
+                let innerEl = df[j];
+                const result = this.insertDOMElement(el, innerEl);
+                if(result)
                 {
-                    console.log("videoPathString, " + videoPathString);
-
-                    // just a single video
-                    videoId = Utils.findPropertyFromString(videoPathString, "v");
-                    if (!videoId)
-                    {
-                        videoId = Utils.findPropertyFromString(videoPathString, "video_id");
-                    }
-
-                    if (!videoId)
-                    {
-                        videoId = Utils.findPropertyFromString(videoPathString, "video_ids");
-                        if(videoId)
-                        {
-                            videoId = decodeURIComponent(videoId);
-                            var vIndexText = Utils.findPropertyFromString(videoPathString, "index");
-                            var vIndex = vIndexText ? parseInt(vIndexText) : 0;
-                            if (vIndex < videoId.length)
-                            {
-                                try {
-                                    videoId = videoId.split(",")[vIndex];
-                                }
-                                catch(err) {
-                                    videoId = null;
-                                }
-                            }
-                        }
-
-                    }
-
-                    if (videoId)
-                    {
-                        console.log("videoId, " + videoId);
-                        if (el.classList.contains("video-list-item") || el.classList.contains("playlist-video-item"))
-                        {
-                            isSideBar = true;
-                        }
-                    }
-
-                    // find play list id
-                    listId = Utils.findPropertyFromString(videoPathString, "list");
-
-                    //////
-
-                    if (listId && videoId)
-                    {
-                        listId = listId + " " + videoId;
-                    }
-
-                    if (listId || videoId)
-                    {
-                        var divGen = new DivGenerator();
-                        var div = divGen
-                            .setVideo(videoId)
-                            .setPlayList(listId)
-                            .setSideBar(isSideBar)
-                            .build();
-
-                        thisObject.addListeners(div);
-                        el.insertBefore(div, el.firstChild);
-                        break;
-                    }
-
-                    listId = null;
-                    videoId = null;
+                    break;
                 }
-
             }
-        });
+        }
 
     }
 
-    injectLinksWithDelay()
+    isControlAdded(el)
+    {
+        let list = el.querySelectorAll(".xbmc_control") || [];
+        const len = list.length;
+        return len > 0;
+    }
+
+    insertDOMElement(el, innerEl)
+    {
+        let thisObject = this;
+        let videoPathString = innerEl.getAttribute("href");
+        let listId;
+        let videoId;
+        let isSideBar = false;
+
+        if (videoPathString)
+        {
+            console.log("videoPathString, " + videoPathString);
+
+            // just a single video
+            videoId = Utils.findPropertyFromString(videoPathString, "v");
+            if (!videoId)
+            {
+                videoId = Utils.findPropertyFromString(videoPathString, "video_id");
+            }
+
+            if (!videoId)
+            {
+                videoId = Utils.findPropertyFromString(videoPathString, "video_ids");
+                if(videoId)
+                {
+                    videoId = decodeURIComponent(videoId);
+                    var vIndexText = Utils.findPropertyFromString(videoPathString, "index");
+                    var vIndex = vIndexText ? parseInt(vIndexText) : 0;
+                    if (vIndex < videoId.length)
+                    {
+                        try {
+                            videoId = videoId.split(",")[vIndex];
+                        }
+                        catch(err) {
+                            videoId = null;
+                        }
+                    }
+                }
+
+            }
+
+            if (videoId)
+            {
+                console.log("videoId, " + videoId);
+                if (el.classList.contains("video-list-item") || el.classList.contains("playlist-video-item"))
+                {
+                    isSideBar = true;
+                }
+            }
+
+            // find play list id
+            listId = Utils.findPropertyFromString(videoPathString, "list");
+
+            //////
+
+            if (listId && videoId)
+            {
+                listId = listId + " " + videoId;
+            }
+
+            if (listId || videoId)
+            {
+                var divGen = new DivGenerator();
+                var div = divGen
+                    .setVideo(videoId)
+                    .setPlayList(listId)
+                    .setSideBar(isSideBar)
+                    .build();
+
+                thisObject.addListeners(div);
+                el.insertBefore(div, el.firstChild);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    injectLinksWithDelay(delay = 1000)
     {
         clearTimeout(this.timerId);
         this.timerId = setTimeout(() => {
@@ -389,23 +409,22 @@ class Main
                 console.log("video ID change.. inject watch link!");
                 this.addLinkToWatchPage();
             }
-        }, 1000)
+        }, delay)
     }
 
     addLinkToWatchPage()
     {
         console.log("addLinkToWatchPage, window.location, " + window.location);
         let thisObject = this;
-        let alreadyAdded = false;
-        let headLineDiv = document.getElementById("watch7-headline");
+        let headLineDiv = document.getElementById("watch7-headline")
+            || document.getElementsByClassName("ytd-video-primary-info-renderer")[0];
 
-        headLineDiv.querySelectorAll(".xbmc_control").forEach(function(el)
+        if(!headLineDiv)
         {
-            alreadyAdded = true;
-            return false;
-        });
+            return;
+        }
 
-        if (alreadyAdded)
+        if(this.isControlAdded(headLineDiv))
         {
             console.log("Already added - addLinkToWatchPage");
             return;
