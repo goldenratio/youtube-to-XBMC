@@ -28,8 +28,8 @@
   "content_scripts": [
     {
       "matches": ["http://www.youtube.com/*", "https://www.youtube.com/*"],
-      "css": ["css/iziToast.min.css", "css/inject.css"],
-      "js": ["js/iziToast.min.js", "js/enums.js", "js/injectXBMC.js"],
+      "css": ["css/iziToast.css", "css/inject.css"],
+      "js": ["js/iziToast.js", "js/enums.js", "js/injectXBMC.js"],
       "run_at": "document_idle",
       "all_frames": true
     }
