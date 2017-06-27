@@ -9,7 +9,7 @@ var console = console || {};
 console.log = console.log || function() {};
 console.logCopy = console.log.bind(console);
 
-var messageFromContent = chrome.extension.onMessage || chrome.runtime.onMessage || function(){};
+var onMessage = chrome.extension.onMessage || chrome.runtime.onMessage || function(){};
 
 // --------------------
 
@@ -88,9 +88,10 @@ var Player = function()
                             thisObject.playCurrentVideoFromList(function(playResult)
                             {
                                 console.log("video play success!");
-
                                 if(sendResponse)
+                                {
                                     sendResponse(ResultData.OK);
+                                }
 
                             });
                         }
@@ -100,10 +101,10 @@ var Player = function()
                 else
                 {
                     console.log("Error! Cannot clear play list");
-
                     if(sendResponse)
+                    {
                         sendResponse(ResultData.ERROR);
-
+                    }
                 }
 
             });
@@ -124,7 +125,9 @@ var Player = function()
                         thisObject.onQueue(request.videoId, function(response)
                         {
                             if(sendResponse)
+                            {
                                 sendResponse(response);
+                            }
                         });
                     });
                 }
@@ -133,7 +136,9 @@ var Player = function()
                     thisObject.onQueue(request.videoId, function(response)
                     {
                         if(sendResponse)
+                        {
                             sendResponse(response);
+                        }
                     });
                 }
 
@@ -493,24 +498,6 @@ var GDataService = function()
         xhr.send("");
     };
 
-    this.findPropertyFromString = function(str, key)
-    {
-        var property = key + "=";
-        var index = str.indexOf('?');
-        str = str.substring(index + 1);
-
-        var list = str.split('&');
-        for (var i = 0; i < list.length; i++)
-        {
-            if (list[i].search(property) == 0)
-            {
-                return list[i].replace(property, "");
-            }
-        }
-        return null;
-    };
-
-
     this.onLoad = function()
     {
         console.log("feed is loaded!");
@@ -599,6 +586,130 @@ var GDataService = function()
     };
 };
 
+
+class ContextMenu
+{
+    constructor()
+    {
+        const showForPages = ["http://www.youtube.com/*", "https://www.youtube.com/*"];
+
+        const playNow = {
+            title: "Play Now",
+            contexts:["link"],
+            onclick: this.onPlayNowClick,
+            documentUrlPatterns: showForPages
+        };
+
+        const addToQueue = {
+            title: "Add to Queue",
+            contexts:["link"],
+            onclick: this.onAddQueueClick,
+            documentUrlPatterns: showForPages
+        };
+
+        chrome.contextMenus.removeAll(() => {
+            // callback
+        });
+        chrome.contextMenus.create(playNow);
+        chrome.contextMenus.create(addToQueue);
+    }
+
+    onPlayNowClick(info, tab)
+    {
+        const linkUrl = info.linkUrl;
+        if(!linkUrl)
+        {
+            return;
+        }
+
+        const videoId = Utils.findPropertyFromString(linkUrl, "v");
+        let playListId = Utils.findPropertyFromString(linkUrl, "list");
+        if(playListId == "WL")
+        {
+            playListId = null;
+        }
+        const sender = null;
+
+        if(!playListId && !videoId)
+        {
+            const data = {message: "invalidUrl"};
+            sendMessageToContentScript(data);
+        }
+
+        if(playListId)
+        {
+            player.onMessage(
+                {message: "playList", listId: playListId, videoId: videoId},
+                sender,
+                (response) => {
+                    const data = {message: "playList", status: response};
+                    sendMessageToContentScript(data);
+                }
+            );
+        }
+        else if(videoId)
+        {
+            player.onMessage(
+                {message: "playVideo", videoId: videoId},
+                sender,
+                (response) => {
+                    const data = {message: "playVideo", status: response};
+                    sendMessageToContentScript(data);
+                }
+            );
+        }
+    }
+
+    onAddQueueClick(info, tab)
+    {
+        const linkUrl = info.linkUrl;
+        if(!linkUrl)
+        {
+            return;
+        }
+
+        const videoId = Utils.findPropertyFromString(linkUrl, "v");
+        if(!videoId)
+        {
+            const data = {message: "invalidUrl"};
+            sendMessageToContentScript(data);
+            return;
+        }
+
+        const sender = null;
+        const data = {message: "queueVideo", videoId: videoId};
+        player.onMessage(data, sender,
+            (response) => {
+
+                const data = {message: "queueVideo", status: response};
+                sendMessageToContentScript(data);
+            }
+        );
+    }
+}
+
+class Utils
+{
+    static findPropertyFromString(str, key)
+    {
+        let property = key + "=";
+        var index = str.indexOf('?');
+        str = str.substring(index + 1);
+
+        var list = str.split('&');
+
+        for (var i = 0; i < list.length; i++)
+        {
+            if (list[i].search(property) == 0)
+            {
+                return list[i].replace(property, "");
+            }
+        }
+        return null;
+    }
+}
+
+
 //////////////////////////////////////////////////////////////////////
 
 var player = new Player();
@@ -606,17 +717,26 @@ var gService = new GDataService();
 var rpc = new RPCService();
 rpc.init();
 
+new ContextMenu();
+
 /**
  * Invoked when content script sends message
  */
-messageFromContent.addListener(function(request, sender, sendResponse)
+onMessage.addListener(function(data, sender, sendResponse)
 {
     if (player)
     {
-        player.onMessage(request, sender, sendResponse);
-
+        player.onMessage(data, sender, sendResponse);
     }
-
     return true;
-
 });
+
+function sendMessageToContentScript(data)
+{
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, data, function(response) {
+            // message sent to contentScript
+        });
+    });
+
+}

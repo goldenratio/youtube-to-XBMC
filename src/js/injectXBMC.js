@@ -16,48 +16,106 @@ if (ENABLE_CONSOLE == false)
     console.log = function() {};
 }
 
+iziToast.settings({
+    timeout: 2000,
+    resetOnHover: false,
+    pauseOnHover: false,
+    messageLineHeight: 30
+});
+
+class ToastUtil
+{
+    static queueVideo(response)
+    {
+        if (response == ResultData.OK)
+        {
+            iziToast.success({
+                message: "Added to Queue"
+            });
+        }
+        else
+        {
+            iziToast.error({
+                message: "Error! Unable to Add to Queue"
+            });
+        }
+    }
+
+    static playVideo(response)
+    {
+        if (response == ResultData.OK)
+        {
+            iziToast.success({
+                message: "Video Playing Now"
+            });
+        }
+        else
+        {
+            iziToast.error({
+                message: "Error! Playing Video"
+            });
+        }
+    }
+
+    static playList(response)
+    {
+        if (response == ResultData.OK)
+        {
+            iziToast.success({
+                message: "Playlist Playing"
+            });
+        }
+        else
+        {
+            iziToast.error({
+                message: "Error! Unable to Play Playlist"
+            });
+        }
+    }
+
+    static invalidUrl()
+    {
+        iziToast.error({
+            message: "Error! Invalid URL"
+        });
+    }
+}
+
 class RpcService
 {
     constructor()
     {
-        this.sendMessageToBackground = chrome.extension.sendMessage || chrome.runtime.sendMessage || function(){};
-        iziToast.settings({
-            timeout: 2000,
-            resetOnHover: false,
-            pauseOnHover: false,
-            messageLineHeight: 30
-        });
+        this.sendMessage = chrome.extension.sendMessage || chrome.runtime.sendMessage || function(){};
     }
 
-    playVideoOnXBMC(vId)
+    playVideoOnXBMC(videoId)
     {
         console.log("sending message to background");
-        this.sendMessageToBackground({message: "playVideo", videoId: vId}, function(response) {});
+        this.sendMessage(
+            {message: "playVideo", videoId: videoId},
+            function(response)
+            {
+                ToastUtil.playVideo(response);
+            }
+        );
     }
 
-    queueVideoToXBMC(vId)
+    queueVideoToXBMC(videoId)
     {
-        this.sendMessageToBackground({message: "queueVideo", videoId: vId}, function(response) {
-            console.log("inject script >> video sent! " + response);
-            if (response == ResultData.OK)
-            {
-                iziToast.success({
-                    message: "Added to Queue!"
-                });
+        this.sendMessage(
+            {message: "queueVideo", videoId: videoId},
+            function(response) {
+                console.log("inject script >> video sent! " + response);
+                ToastUtil.queueVideo(response);
             }
-            else
-            {
-                iziToast.error({
-                    message: "Error! Unable to Add to Queue!"
-                });
-            }
-        });
+        );
     }
 
     playListOnXBMC(listId, videoId)
     {
-        this.sendMessageToBackground({message: "playList", listId: listId, videoId: videoId}, function(response) {
+        this.sendMessage({message: "playList", listId: listId, videoId: videoId}, function(response) {
             console.log("list sent! " + response);
+            ToastUtil.playList(response);
         });
     }
 
@@ -137,7 +195,7 @@ class DivGenerator
             if(this.playListId)
             {
                 let listAnchor = document.createElement("a");
-                listAnchor.setAttribute("href", "#");
+                listAnchor.setAttribute("href", "");
                 listAnchor.setAttribute("rel", this.playListId);
                 listAnchor.setAttribute("title", "Play All - Kassi Share");
                 listAnchor.setAttribute("onclick", "return false;");
@@ -152,7 +210,7 @@ class DivGenerator
             if(this.videoId)
             {
                 let playAnchor = document.createElement("a");
-                playAnchor.setAttribute("href", "#");
+                playAnchor.setAttribute("href", "");
                 playAnchor.setAttribute("rel", this.videoId);
                 playAnchor.setAttribute("title", "Play Now - Kassi Share");
                 playAnchor.setAttribute("onclick", "return false;");
@@ -160,7 +218,7 @@ class DivGenerator
                 playAnchor.appendChild(document.createTextNode("Play Now"));
 
                 let queueAnchor = document.createElement("a");
-                queueAnchor.setAttribute("href", "#");
+                queueAnchor.setAttribute("href", "");
                 queueAnchor.setAttribute("rel", this.videoId);
                 queueAnchor.setAttribute("title", "Add to Queue - Kassi Share");
                 queueAnchor.setAttribute("onclick", "return false;");
@@ -216,6 +274,31 @@ class Main
         }
 
         this.injectLinks();
+
+        const onMessage = chrome.extension.onMessage || chrome.runtime.onMessage || function(){};
+        onMessage.addListener(function(data, sender, sendResponse)
+        {
+            const messageType = data.message;
+            const status = data.status;
+
+            if(messageType == "playVideo")
+            {
+                ToastUtil.playVideo(status);
+            }
+            else if(messageType == "queueVideo")
+            {
+                ToastUtil.queueVideo(status);
+            }
+            else if(messageType == "playList")
+            {
+                ToastUtil.playList(status);
+            }
+            else if(messageType == "invalidUrl")
+            {
+                ToastUtil.invalidUrl();
+            }
+            return true;
+        });
     }
 
     assignDOMChangeListener()
