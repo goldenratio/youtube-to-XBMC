@@ -384,17 +384,20 @@ class ContextMenu
     getSiteFromLinkUrl(linkUrl)
     {
         let site = null;
-        Object.entries(this.siteFilters).some((item, index) =>
+        if(linkUrl)
         {
-            const key = item[0];
-            const value = item[1];
-            if(linkUrl.indexOf(key) >= 0)
+            linkUrl = linkUrl.toLowerCase();
+            Object.entries(this.siteFilters).some((item, index) =>
             {
-                site = value.site;
-                return true;
-            }
-        });
-
+                const key = item[0];
+                const value = item[1];
+                if(linkUrl.indexOf(key) >= 0)
+                {
+                    site = value.site;
+                    return true;
+                }
+            });
+        }
         return site;
     }
 }

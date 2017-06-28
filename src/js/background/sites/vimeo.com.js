@@ -6,9 +6,8 @@
         constructor()
         {
             console.log("Vimeo");
-            // https://vimeo.com/222111805
+            this.pluginURL = "plugin://plugin.video.vimeo/?action=play_video&videoid=";
             contextMenu.addFilters("vimeo.com", this, ["*://vimeo.com/*"]);
-            //contextMenu.addPlaylistFilters(["*://www.youtube.com/*list=*"]);
         }
 
         onPlayClick(url)
