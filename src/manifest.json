@@ -28,14 +28,23 @@
   },
 
   "background": {
-    "scripts": ["js/enums.js", "js/background.js"]
+    "scripts": [
+      "js/enums.js",
+      "js/utils.js",
+      "js/background/init.js",
+      "js/background/sites/youtube.com.js",
+      "js/background/sites/vimeo.com.js"
+    ]
   },
 
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/*"],
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://vimeo.com/*"
+      ],
       "css": ["css/iziToast.css", "css/inject.css"],
-      "js": ["js/iziToast.js", "js/enums.js", "js/injectXBMC.js"],
+      "js": ["js/iziToast.js", "js/enums.js", "js/inject.js"],
       "run_at": "document_idle",
       "all_frames": true
     }
