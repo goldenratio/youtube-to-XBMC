@@ -33,7 +33,7 @@
 
   "content_scripts": [
     {
-      "matches": ["http://www.youtube.com/*", "https://www.youtube.com/*"],
+      "matches": ["https://www.youtube.com/*"],
       "css": ["css/iziToast.css", "css/inject.css"],
       "js": ["js/iziToast.js", "js/enums.js", "js/injectXBMC.js"],
       "run_at": "document_idle",

@@ -563,44 +563,74 @@ class ContextMenu
 {
     constructor()
     {
-        const showForPages = ["http://www.youtube.com/*", "https://www.youtube.com/*"];
+        const videoUrls = ["*://www.youtube.com/*v=*"];
+        const listUrls = ["*://www.youtube.com/*list=*"];
 
         const playNow = {
-            title: "Play Now",
+            title: "Play",
             contexts:["link"],
-            onclick: this.onPlayNowClick,
-            documentUrlPatterns: showForPages
+            onclick: this.onPlayClick,
+            targetUrlPatterns: videoUrls
         };
 
         const addToQueue = {
-            title: "Add to Queue",
+            title: "Queue",
             contexts:["link"],
-            onclick: this.onAddQueueClick,
-            documentUrlPatterns: showForPages
+            onclick: this.onQueueClick,
+            targetUrlPatterns: videoUrls
+        };
+
+        const playAll = {
+            title: "Play All",
+            contexts:["link"],
+            targetUrlPatterns: listUrls,
+            onclick: this.onPlayAllClick
+        };
+
+        const queueAll = {
+            title: "Queue All",
+            contexts:["link"],
+            targetUrlPatterns: listUrls,
+            onclick: this.onQueueAllClick
         };
 
         contextMenus.removeAll(() => {
             // callback
         });
+
+        contextMenus.create(playAll);
+        contextMenus.create(queueAll);
         contextMenus.create(playNow);
         contextMenus.create(addToQueue);
     }
 
-    onPlayNowClick(info, tab)
+    onPlayClick(info, tab)
     {
         const linkUrl = info.linkUrl;
-        if(!linkUrl)
+        const videoId = Utils.findPropertyFromString(linkUrl, "v");
+        if(!videoId)
         {
-            return;
+            const data = {message: "invalidUrl"};
+            sendMessageToContentScript(data);
         }
+        const sender = null;
+        player.onMessage(
+            {message: "playVideo", videoId: videoId},
+            sender,
+            (response) => {
+                const data = {message: "playVideo", status: response};
+                sendMessageToContentScript(data);
+            }
+        );
+    }
+
+    onPlayAllClick(info, tab)
+    {
+        const linkUrl = info.linkUrl;
 
         const videoId = Utils.findPropertyFromString(linkUrl, "v");
         let playListId = Utils.findPropertyFromString(linkUrl, "list");
-        if(playListId == "WL")
-        {
-            playListId = null;
-        }
-        const sender = null;
+        playListId = (playListId != "WL") ? playListId : null;
 
         if(!playListId && !videoId)
         {
@@ -610,6 +640,7 @@ class ContextMenu
 
         if(playListId)
         {
+            const sender = null;
             player.onMessage(
                 {message: "playList", listId: playListId, videoId: videoId},
                 sender,
@@ -621,31 +652,38 @@ class ContextMenu
         }
         else if(videoId)
         {
-            player.onMessage(
-                {message: "playVideo", videoId: videoId},
-                sender,
-                (response) => {
-                    const data = {message: "playVideo", status: response};
-                    sendMessageToContentScript(data);
-                }
-            );
+            this.onPlayClick(info, tab);
         }
     }
 
-    onAddQueueClick(info, tab)
+    onQueueClick(info, tab)
     {
         const linkUrl = info.linkUrl;
-        if(!linkUrl)
+        const videoId = Utils.findPropertyFromString(linkUrl, "v");
+        if(!videoId)
         {
-            return;
+            const data = {message: "invalidUrl"};
+            sendMessageToContentScript(data);
         }
+
+        const sender = null;
+        const data = {message: "queueVideo", videoId: videoId};
+        player.onMessage(data, sender,
+            (response) => {
+
+                const data = {message: "queueVideo", status: response};
+                sendMessageToContentScript(data);
+            }
+        );
+    }
+
+    onQueueAllClick(info, tab)
+    {
+        const linkUrl = info.linkUrl;
 
         const videoId = Utils.findPropertyFromString(linkUrl, "v");
         let playListId = Utils.findPropertyFromString(linkUrl, "list");
-        if(playListId == "WL")
-        {
-            playListId = null;
-        }
+        playListId = (playListId != "WL") ? playListId : null;
 
         if(!videoId && !playListId)
         {
@@ -654,9 +692,9 @@ class ContextMenu
             return;
         }
 
-        const sender = null;
         if(playListId)
         {
+            const sender = null;
             player.onMessage(
                 {message: "queuePlayList", listId: playListId, videoId: videoId},
                 sender,
@@ -668,14 +706,7 @@ class ContextMenu
         }
         else if(videoId)
         {
-            const data = {message: "queueVideo", videoId: videoId};
-            player.onMessage(data, sender,
-                (response) => {
-
-                    const data = {message: "queueVideo", status: response};
-                    sendMessageToContentScript(data);
-                }
-            );
+            this.onQueueClick(info, tab);
         }
     }
 }
