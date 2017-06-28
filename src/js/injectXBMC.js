@@ -73,6 +73,22 @@ class ToastUtil
         }
     }
 
+    static queuePlayList(response)
+    {
+        if (response == ResultData.OK)
+        {
+            iziToast.success({
+                message: "Playlist Added to Queue"
+            });
+        }
+        else
+        {
+            iziToast.error({
+                message: "Error! Unable to Add Playlist to Queue"
+            });
+        }
+    }
+
     static invalidUrl()
     {
         iziToast.error({
@@ -259,7 +275,7 @@ class Utils
 
 
 
-class Main
+class ContentInjector
 {
     constructor()
     {
@@ -274,31 +290,6 @@ class Main
         }
 
         this.injectLinks();
-
-        const onMessage = chrome.extension.onMessage || chrome.runtime.onMessage || function(){};
-        onMessage.addListener(function(data, sender, sendResponse)
-        {
-            const messageType = data.message;
-            const status = data.status;
-
-            if(messageType == "playVideo")
-            {
-                ToastUtil.playVideo(status);
-            }
-            else if(messageType == "queueVideo")
-            {
-                ToastUtil.queueVideo(status);
-            }
-            else if(messageType == "playList")
-            {
-                ToastUtil.playList(status);
-            }
-            else if(messageType == "invalidUrl")
-            {
-                ToastUtil.invalidUrl();
-            }
-            return true;
-        });
     }
 
     assignDOMChangeListener()
@@ -538,4 +529,33 @@ class Main
 
 }
 
-new Main();
+new ContentInjector();
+
+const onMessage = chrome.extension.onMessage || chrome.runtime.onMessage || function(){};
+onMessage.addListener(function(data, sender, sendResponse)
+{
+    const messageType = data.message;
+    const status = data.status;
+
+    if(messageType == "playVideo")
+    {
+        ToastUtil.playVideo(status);
+    }
+    else if(messageType == "queueVideo")
+    {
+        ToastUtil.queueVideo(status);
+    }
+    else if(messageType == "playList")
+    {
+        ToastUtil.playList(status);
+    }
+    else if(messageType == "queuePlayList")
+    {
+        ToastUtil.queuePlayList(status);
+    }
+    else if(messageType == "invalidUrl")
+    {
+        ToastUtil.invalidUrl();
+    }
+    return true;
+});

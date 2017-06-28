@@ -52,6 +52,7 @@ var Player = function()
      */
     this.onMessage = function(request, sender, sendResponse)
     {
+        sendResponse = sendResponse || function() {};
         if (sender)
         {
             console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
@@ -88,11 +89,7 @@ var Player = function()
                             thisObject.playCurrentVideoFromList(function(playResult)
                             {
                                 console.log("video play success!");
-                                if(sendResponse)
-                                {
-                                    sendResponse(ResultData.OK);
-                                }
-
+                                sendResponse(ResultData.OK);
                             });
                         }
                     });
@@ -101,10 +98,7 @@ var Player = function()
                 else
                 {
                     console.log("Error! Cannot clear play list");
-                    if(sendResponse)
-                    {
-                        sendResponse(ResultData.ERROR);
-                    }
+                    sendResponse(ResultData.ERROR);
                 }
 
             });
@@ -124,10 +118,7 @@ var Player = function()
                     {
                         thisObject.onQueue(request.videoId, function(response)
                         {
-                            if(sendResponse)
-                            {
-                                sendResponse(response);
-                            }
+                            sendResponse(response);
                         });
                     });
                 }
@@ -135,20 +126,51 @@ var Player = function()
                 {
                     thisObject.onQueue(request.videoId, function(response)
                     {
-                        if(sendResponse)
-                        {
-                            sendResponse(response);
-                        }
+                        sendResponse(response);
                     });
                 }
 
             });
 
         }
-        else if (request.message == "playList")
+        else if (request.message == "playList" || request.message == "queuePlayList")
         {
-            console.log("playList, " + request.listId + ", videoId = " + request.videoId);
-            gService.loadFeed(request.listId, request.videoId, "");
+            const playVideo = (request.message == "playList");
+            const selectedVideoId = request.videoId;
+            gService.loadFeed(request.listId)
+                .then((videoList) => {
+                    console.log("feed load complete! " + videoList);
+
+                    if (videoList.length > 0)
+                    {
+                        // send this video list
+                        console.log("selectedVideoId, " + selectedVideoId);
+                        if (selectedVideoId)
+                        {
+                            const index = videoList.indexOf(selectedVideoId);
+                            if (index > 0)
+                            {
+                                var copyList = videoList.splice(index, 1);
+                                videoList = copyList.concat(videoList);
+                            }
+                        }
+
+                        for (let i = 0; i < videoList.length; i++)
+                        {
+                            var objData = {message: "queueVideo", videoId: videoList[i]};
+                            if (playVideo && i == 0)
+                            {
+                                objData.message = "playVideo";
+                            }
+                            player.onMessage(objData);
+                        }
+
+                        sendResponse(ResultData.OK)
+                    }
+
+                }).catch(() => {
+                    sendResponse(ResultData.ERROR);
+                });
         }
     };
 
@@ -438,154 +460,103 @@ var RPCService = function()
     };
 };
 
-var GDataService = function()
+class GService
 {
-    this.api_key = "AIzaSyD_GFTv0BYK2UqbuEmFuAb1PkJ1wHSjpaA";
-    this.feedPath = "https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails" +
-        "&maxResults=$max_results" +
-        "&pageToken=$next_page_token" +
-        "&playlistId=$list_id" +
-        "&key=$api_key";
-
-    this.isPending = false;
-    this.selectedVideoId;
-    this.playlistId;
-    this.context;
-    var videoList = [];
-    var xhr;
-    var thisObject = this;
-
-    this.loadFeed = function(playlistId, defaultVideoId, nextPageToken)
+    constructor()
     {
-        if (!playlistId)
-        {
-            console.log("playlist id can not be null");
-            return;
-        }
-        if (defaultVideoId)
-        {
-            thisObject.selectedVideoId = defaultVideoId;
-        }
+        const api_key = "AIzaSyD_GFTv0BYK2UqbuEmFuAb1PkJ1wHSjpaA";
+        this.feedPath = "https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails" +
+            "&maxResults=50" +
+            "&pageToken=$next_page_token" +
+            "&playlistId=$list_id" +
+            "&key=" + api_key;
 
-        thisObject.playlistId = playlistId;
+        this.videoIdList = [];
+        this.isPending = false;
+    }
 
-        if (videoList)
-        {
-            videoList.length = 0;
-        }
-        else
-        {
-            videoList = [];
-        }
-
-        thisObject.isPending = true;
-        sendPlayListRequest(nextPageToken);
-
-    };
-
-    var sendPlayListRequest = function(nextPageToken)
+    handleRequest(playlistId, pageToken = "")
     {
-        var path = thisObject.feedPath.replace("$list_id", thisObject.playlistId);
-        path = path.replace("$api_key", thisObject.api_key);
-        path = path.replace("$max_results", "50");
-        path = path.replace("$next_page_token", nextPageToken);
+        let path = this.feedPath.replace("$list_id", playlistId);
+        path = path.replace("$next_page_token", pageToken);
 
-        xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = thisObject.readResponse;
-        xhr.open("GET", path, true);
-        xhr.setRequestHeader("Content-type", "application/json");
-        xhr.onload = thisObject.onLoad;
-        xhr.send("");
-    };
+        let thisObject = this;
 
-    this.onLoad = function()
-    {
-        console.log("feed is loaded!");
-        thisObject.isPending = false;
-        if (this.status == 200)
-        {
-            // parse the feed
-            console.log("parse!");
-            var obj = JSON.parse(this.responseText);
-            var itemList = obj.items;
+        return new Promise((resolve, reject) => {
 
-            //console.log(JSON.stringify(obj));
-            console.log("total entries, " + itemList.length);
-            var i;
-            for (i = 0; i < itemList.length; i++)
-            {
-                var videoId = itemList[i]["contentDetails"]["videoId"];
-                console.log(videoId);
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", path, true);
+            xhr.setRequestHeader("Content-type", "application/json");
 
-                if (videoId)
+            xhr.onreadystatechange = function() {
+                //console.log("this.readyState, " + this.readyState + ", " + this.status);
+            };
+
+            xhr.onerror = function() {
+                reject();
+            };
+
+            xhr.onload = function () {
+                console.log("request done " + this.status);
+                const isSuccess = (this.status == 200);
+                if(isSuccess)
                 {
-                    videoList.push(videoId);
-                }
-            }
+                    let obj = JSON.parse(this.responseText);
+                    let itemList = obj.items;
 
-            var nextPageToken = obj["nextPageToken"];
+                    //console.log(JSON.stringify(obj));
+                    console.log("total entries, " + itemList.length);
 
-            if (nextPageToken != null && typeof nextPageToken === "string")
-            {
-                sendPlayListRequest(nextPageToken);
-                return;
-            }
-
-            if (videoList.length > 0)
-            {
-                // send this video list
-                console.log(videoList);
-                console.log("thisObject.selectedVideoId, " + thisObject.selectedVideoId);
-                if (thisObject.selectedVideoId)
-                {
-                    var index = videoList.indexOf(thisObject.selectedVideoId);
-                    console.log("index, " + index);
-                    if (index >= 0)
+                    for (let i = 0; i < itemList.length; i++)
                     {
-                        console.log("videoList = " + videoList);
-                        console.log("---------------------------------------");
-                        console.log("found first video, " + thisObject.selectedVideoId);
-                        var copyList = videoList.splice(index, videoList.length);
-                        console.log("copy = " + copyList);
-                        console.log("videoList = " + videoList);
-                        videoList = copyList.concat(videoList);
-                        console.log("---------------------------------------");
-                        console.log("videoList = " + videoList);
+                        var videoId = itemList[i]["contentDetails"]["videoId"];
+                        if (videoId)
+                        {
+                            thisObject.videoIdList.push(videoId);
+                        }
                     }
-                }
-                //{message: "playList", videoId: listId, path: path}
-                for (i = 0; i < videoList.length; i++)
-                {
-                    var objData = {message: "queueVideo", videoId: videoList[i]};
-                    if (i == 0)
+
+                    const nextPageToken = obj["nextPageToken"];
+                    const hasMoreItemsInNextPage = (nextPageToken != null && typeof nextPageToken === "string");
+
+                    if(hasMoreItemsInNextPage)
                     {
-                        objData.message = "playVideo";
+                        thisObject.handleRequest(playlistId, nextPageToken);
+                        return;
                     }
-                    player.onMessage(objData);
+
+                    console.log(thisObject.videoIdList);
+                    resolve(thisObject.videoIdList);
                 }
-            }
 
-        }
+                reject();
+            };
 
-    };
+            xhr.send("");
+        });
+    }
 
-    this.readResponse = function()
+    loadFeed(playlistId)
     {
-        console.log("this.readyState, " + this.readyState);
-        if (this.readyState == 4)
-        {
-            console.log("status, " + this.status);
-            if (this.status == 0)
-            {
-                thisObject.isPending = false;
-                alert("Error getting playlist data from Google Data!");
-            }
+        this.isPending = true;
+        this.videoIdList = [];
 
-        }
+        return new Promise((resolve, reject) => {
 
-    };
-};
+            this.handleRequest(playlistId)
+                .then((videoIdList) => {
+                    this.isPending = false;
+                    resolve(videoIdList);
+                })
+                .catch(() => {
+                    this.isPending = false;
+                    reject();
+                });
 
+        });
+
+    }
+}
 
 class ContextMenu
 {
@@ -669,7 +640,13 @@ class ContextMenu
         }
 
         const videoId = Utils.findPropertyFromString(linkUrl, "v");
-        if(!videoId)
+        let playListId = Utils.findPropertyFromString(linkUrl, "list");
+        if(playListId == "WL")
+        {
+            playListId = null;
+        }
+
+        if(!videoId && !playListId)
         {
             const data = {message: "invalidUrl"};
             sendMessageToContentScript(data);
@@ -677,14 +654,28 @@ class ContextMenu
         }
 
         const sender = null;
-        const data = {message: "queueVideo", videoId: videoId};
-        player.onMessage(data, sender,
-            (response) => {
+        if(playListId)
+        {
+            player.onMessage(
+                {message: "queuePlayList", listId: playListId, videoId: videoId},
+                sender,
+                (response) => {
+                    const data = {message: "queuePlayList", status: response};
+                    sendMessageToContentScript(data);
+                }
+            );
+        }
+        else if(videoId)
+        {
+            const data = {message: "queueVideo", videoId: videoId};
+            player.onMessage(data, sender,
+                (response) => {
 
-                const data = {message: "queueVideo", status: response};
-                sendMessageToContentScript(data);
-            }
-        );
+                    const data = {message: "queueVideo", status: response};
+                    sendMessageToContentScript(data);
+                }
+            );
+        }
     }
 }
 
@@ -713,7 +704,7 @@ class Utils
 //////////////////////////////////////////////////////////////////////
 
 var player = new Player();
-var gService = new GDataService();
+var gService = new GService();
 var rpc = new RPCService();
 rpc.init();
 
