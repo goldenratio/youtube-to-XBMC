@@ -10,6 +10,7 @@ console.log = console.log || function() {};
 console.logCopy = console.log.bind(console);
 
 var onMessage = chrome.extension.onMessage || chrome.runtime.onMessage || function(){};
+var contextMenus = chrome.contextMenus || browser.contextMenus || {};
 
 // --------------------
 
@@ -578,11 +579,11 @@ class ContextMenu
             documentUrlPatterns: showForPages
         };
 
-        chrome.contextMenus.removeAll(() => {
+        contextMenus.removeAll(() => {
             // callback
         });
-        chrome.contextMenus.create(playNow);
-        chrome.contextMenus.create(addToQueue);
+        contextMenus.create(playNow);
+        contextMenus.create(addToQueue);
     }
 
     onPlayNowClick(info, tab)
