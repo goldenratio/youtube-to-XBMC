@@ -10,7 +10,8 @@ function sendMessageToContentScript(data)
     return new Promise((resolve, reject) => {
 
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            if(tabs && tabs.length > 0)
+            const tabValid = tabs && tabs.length > 0;
+            if(tabValid)
             {
                 chrome.tabs.sendMessage(tabs[0].id, data, function(response) {
                     // message sent to contentScript
@@ -161,16 +162,26 @@ class Player
                         // check if no video is playing and start the first video in queue
                         if(result && result.length <= 0)
                         {
-                            this._playFromPlaylist();
+                            this._playFromPlaylist().then((response) => {
+                                resolve(response);
+                            }).catch(() => {
+                                reject();
+                            });
                         }
+                        else
+                        {
+                            resolve(response);
+                        }
+                    }).catch(() => {
+                        reject();
                     });
-
-                    resolve(response);
                 }
                 else
                 {
                     reject();
                 }
+            }).catch(() => {
+                reject();
             });
 
         });
