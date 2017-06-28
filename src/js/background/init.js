@@ -292,8 +292,6 @@ class ContextMenu
 
     updateMenuEntries()
     {
-        console.log("update menu entries ");
-
         contextMenus.removeAll(() => {
             // callback
         });
