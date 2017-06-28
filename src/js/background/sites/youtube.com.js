@@ -18,20 +18,24 @@
         {
             console.log("play click " + url);
 
-            const videoId = Utils.findPropertyFromString(url, "v");
-            const kodiYoutubeURL = this.pluginURL + videoId;
-
-            player.playVideo(kodiYoutubeURL);
+            const fileUrl = this._getFileFromUrl(url);
+            player.playVideo(fileUrl);
         }
 
         onQueueClick(url)
         {
             console.log("onQueueClick " + url);
 
-            const videoId = Utils.findPropertyFromString(url, "v");
-            const kodiYoutubeURL = this.pluginURL + videoId;
+            const fileUrl = this._getFileFromUrl(url);
+            player.queueVideo(fileUrl);
+        }
 
-            player.queueVideo(kodiYoutubeURL);
+        _getFileFromUrl(url)
+        {
+            const videoId = Utils.findPropertyFromString(url, "v");
+            const fileUrl = videoId ? this.pluginURL + videoId : null;
+
+            return fileUrl;
         }
     }
 

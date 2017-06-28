@@ -209,7 +209,7 @@ class Player
             this._addToPlaylist(file).then((response) => {
                 this._playFromPlaylist().then((response) => {
 
-                    console.log("video play success " + response);
+                    console.log("video playing, ", response);
                     const data = {message: "playVideo", status: ResultData.OK};
                     sendMessageToContentScript(data);
 
@@ -332,14 +332,6 @@ class ContextMenu
 
             contextMenus.create(playAll);
             contextMenus.create(queueAll);
-
-            const separator = {
-                type: "separator",
-                contexts:["link"],
-                targetUrlPatterns: playListFilters
-            };
-
-            contextMenus.create(separator);
         }
 
         if(videoFilters && videoFilters.length > 0)
