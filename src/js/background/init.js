@@ -275,6 +275,8 @@ class ContextMenu
     constructor()
     {
         this.siteFilters = {};
+        this.onPlayClick = this.onPlayClick.bind(this);
+        this.onQueueClick = this.onQueueClick.bind(this);
     }
 
     addFilters(siteName, site, videoFilters, playlistFilters = null)
@@ -286,8 +288,6 @@ class ContextMenu
         };
 
         this.updateMenuEntries();
-        this.onPlayClick = this.onPlayClick.bind(this);
-        this.onQueueClick = this.onQueueClick.bind(this);
     }
 
     updateMenuEntries()
