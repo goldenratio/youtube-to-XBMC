@@ -301,14 +301,6 @@ class ContextMenu
             // callback
         });
 
-        let playListFilters = Object.entries(this.siteFilters)
-            .map((item) => {
-                return item[1].playlistFilters;
-            })
-            .filter((data) => {
-                return data != null;
-            });
-        playListFilters = [].concat.apply([], playListFilters);
 
         let videoFilters = Object.entries(this.siteFilters)
             .map((item) => {
@@ -318,24 +310,6 @@ class ContextMenu
                 return data != null;
             });
         videoFilters = [].concat.apply([], videoFilters);
-
-        if(playListFilters && playListFilters.length > 0)
-        {
-            const playAll = {
-                title: "Play All",
-                contexts:["link"],
-                targetUrlPatterns: playListFilters
-            };
-
-            const queueAll = {
-                title: "Queue All",
-                contexts:["link"],
-                targetUrlPatterns: playListFilters
-            };
-
-            contextMenus.create(playAll);
-            contextMenus.create(queueAll);
-        }
 
         if(videoFilters && videoFilters.length > 0)
         {
@@ -355,6 +329,33 @@ class ContextMenu
 
             contextMenus.create(playNow);
             contextMenus.create(addToQueue);
+        }
+
+        let playListFilters = Object.entries(this.siteFilters)
+            .map((item) => {
+                return item[1].playlistFilters;
+            })
+            .filter((data) => {
+                return data != null;
+            });
+        playListFilters = [].concat.apply([], playListFilters);
+
+        if(playListFilters && playListFilters.length > 0)
+        {
+            const playAll = {
+                title: "Play All",
+                contexts:["link"],
+                targetUrlPatterns: playListFilters
+            };
+
+            const queueAll = {
+                title: "Queue All",
+                contexts:["link"],
+                targetUrlPatterns: playListFilters
+            };
+
+            contextMenus.create(playAll);
+            contextMenus.create(queueAll);
         }
     }
 
