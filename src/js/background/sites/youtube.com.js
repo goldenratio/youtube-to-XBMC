@@ -8,11 +8,47 @@
             super();
             console.log("youtube");
             this.pluginURL = "plugin://plugin.video.youtube/?action=play_video&videoid=%s";
+            this.gService = new GService();
 
             const videoFilters = ["*://www.youtube.com/*v=*"];
             const playlistFilters = ["*://www.youtube.com/*list=*"];
 
             contextMenu.addFilters("youtube.com", this, videoFilters, playlistFilters);
+        }
+
+
+        getPlaylistFromUrl(url)
+        {
+            return new Promise((resolve, reject) => {
+
+                const playListId = Utils.findPropertyFromString(url, "list");
+                const selectedVideoId = Utils.findPropertyFromString(url, "v");
+
+                this.gService.loadFeed(playListId).then((response) => {
+
+                    if (selectedVideoId)
+                    {
+                        let index = response.indexOf(selectedVideoId);
+                        if(index > 0)
+                        {
+                            response = response.splice(index, response.length);
+                        }
+                    }
+
+                    let fileList = response.map((videoId) => {
+
+                        return videoId ? sprintf(this.pluginURL, videoId) : null;
+                    }).filter((url) => {
+                        return url != null;
+                    });
+
+                    resolve(fileList);
+
+                }).catch(() => {
+                    resolve(null);
+                });
+
+            });
         }
 
         getFileFromUrl(url)
@@ -42,7 +78,7 @@
             this.isPending = false;
         }
 
-        handleRequest(playlistId, pageToken = "")
+        _handleRequest(playlistId, pageToken = "")
         {
 
             return new Promise((resolve, reject) => {
@@ -52,7 +88,7 @@
                 let urlRequest = new URLRequest(url);
                 urlRequest.send().then((response) => {
 
-                    let obj = JSON.parse(this.response);
+                    let obj = JSON.parse(response);
                     let itemList = obj.items;
 
                     console.log("total entries, " + itemList.length);
@@ -71,11 +107,11 @@
 
                     if(hasMoreItemsInNextPage)
                     {
-                        this.handleRequest(playlistId, nextPageToken);
+                        this._handleRequest(playlistId, nextPageToken);
                         return;
                     }
 
-                    console.log(this.videoIdList);
+                    //console.log(this.videoIdList);
 
                     this.isPending = false;
                     resolve(this.videoIdList);
@@ -98,7 +134,7 @@
 
             return new Promise((resolve, reject) => {
 
-                this.handleRequest(playlistId)
+                this._handleRequest(playlistId)
                     .then((videoIdList) => {
                         this.isPending = false;
                         resolve(videoIdList);

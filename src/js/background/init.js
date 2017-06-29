@@ -266,11 +266,12 @@ class Player
 
     playAll(files)
     {
-
+        console.log("play all ", files);
     }
 
     queueAll(files)
     {
+        console.log("queue all ", files);
 
     }
 }
@@ -503,15 +504,29 @@ class AbstractSite
     {
         console.log("play all click " + url);
 
+        this.getPlaylistFromUrl(url).then((fileList) => {
+            player.playAll(fileList);
+        });
+
     }
 
     onQueueAllClick(url)
     {
         console.log("queue all click " + url);
 
+        this.getPlaylistFromUrl(url).then((fileList) => {
+            player.queueAll(fileList);
+        });
     }
 
     getFileFromUrl(url)
+    {
+        return new Promise((resolve, reject) => {
+            resolve(null);
+        });
+    }
+
+    getPlaylistFromUrl(url)
     {
         return new Promise((resolve, reject) => {
             resolve(null);
