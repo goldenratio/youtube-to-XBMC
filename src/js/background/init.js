@@ -46,8 +46,6 @@ class RPCService
         var thisObject = this;
         return new Promise((resolve, reject) => {
 
-            console.log("send request >> " + method + ", params ", params);
-
             let data = {
                 jsonrpc: "2.0",
                 method: method,
@@ -59,38 +57,33 @@ class RPCService
                 data.params = params;
             }
 
+            console.log("<< " + method, data);
             thisObject.isPending = true;
 
             let strData = JSON.stringify(data);
-            let url = thisObject.kodiConf.url;
 
-            let xhr = new XMLHttpRequest();
-            xhr.open("POST", url, true);
-            xhr.setRequestHeader("Content-type", "application/json");
+            let urlRequest = new URLRequest(thisObject.kodiConf.url);
+            urlRequest.method = "POST";
 
-            xhr.onreadystatechange = function() {};
+            urlRequest.send(strData).then((response) => {
 
-            xhr.onerror = function() {
-                thisObject.isPending = false;
-                reject();
-            };
-
-            xhr.onload = function() {
-
-                console.log("<< " + this.responseText);
                 thisObject.isPending = false;
 
-                if (this.status == 200) {
-                    const data = JSON.parse(this.responseText);
-                    resolve(data);
+                const data = JSON.parse(response);
+                console.log(">> " + method, data);
+                if(data.error) {
+                    reject(data);
                 }
                 else {
-                    reject();
+                    resolve(data);
                 }
 
-            };
+            }).catch(() => {
+                thisObject.isPending = false;
+                reject();
+            });
 
-            xhr.send(strData);
+
         });
     }
 }
@@ -190,6 +183,7 @@ class Player
 
     _errorPlayingVideo()
     {
+        console.log("error playing video");
         const data = {message: "playVideo", status: ResultData.ERROR};
         sendMessageToContentScript(data);
     }
@@ -202,6 +196,8 @@ class Player
 
     playVideo(file)
     {
+        console.log("play video, " + file);
+
         // 1. Clear play list
         // 2. Add to playlist
         // 3. Play first index
@@ -213,8 +209,6 @@ class Player
             sendMessageToContentScript(data);
             return;
         }
-
-        console.log("play video, " + file);
 
         this._clearPlaylist().then((response) => {
             this._addToPlaylist(file).then((response) => {
@@ -231,14 +225,14 @@ class Player
 
     queueVideo(file)
     {
+        console.log("queue file " + file);
+
         if(!file)
         {
             const data = {message: "invalidUrl"};
             sendMessageToContentScript(data);
             return;
         }
-
-        console.log("queue file " + file);
 
         // Player.GetActivePlayers (if empty), Playlist.Clear, Playlist.Add(file), Player.GetActivePlayers (if empty), Player.Open(playlist)
         // Player.GetActivePlayers (if playing), Playlist.Add(file), Player.GetActivePlayers (if playing), do nothing
@@ -286,8 +280,8 @@ class ContextMenu
     constructor()
     {
         this.siteFilters = {};
-        this.onPlayClick = this.onPlayClick.bind(this);
-        this.onQueueClick = this.onQueueClick.bind(this);
+        this._onPlayClick = this._onPlayClick.bind(this);
+        this._onQueueClick = this._onQueueClick.bind(this);
     }
 
     addFilters(siteName, site, videoFilters, playlistFilters = null)
@@ -298,10 +292,10 @@ class ContextMenu
             site: site
         };
 
-        this.updateMenuEntries();
+        this._updateMenuEntries();
     }
 
-    updateMenuEntries()
+    _updateMenuEntries()
     {
         contextMenus.removeAll(() => {
             // callback
@@ -349,14 +343,14 @@ class ContextMenu
                 title: "Play",
                 contexts:["link"],
                 targetUrlPatterns: videoFilters,
-                onclick: this.onPlayClick
+                onclick: this._onPlayClick
             };
 
             const addToQueue = {
                 title: "Queue",
                 contexts:["link"],
                 targetUrlPatterns: videoFilters,
-                onclick: this.onQueueClick
+                onclick: this._onQueueClick
             };
 
             contextMenus.create(playNow);
@@ -364,25 +358,26 @@ class ContextMenu
         }
     }
 
-    onPlayClick(info, tab)
+    _onPlayClick(info, tab)
     {
-        let site = this.getSiteFromLinkUrl(info.linkUrl);
+        let site = this._getSiteFromLinkUrl(info.linkUrl);
+        console.log("onPlayClick " + typeof site["onPlayClick"]);
         if(site && typeof site["onPlayClick"] === "function")
         {
             site.onPlayClick(info.linkUrl);
         }
     }
 
-    onQueueClick(info, tab)
+    _onQueueClick(info, tab)
     {
-        let site = this.getSiteFromLinkUrl(info.linkUrl);
+        let site = this._getSiteFromLinkUrl(info.linkUrl);
         if(site && typeof site["onQueueClick"] === "function")
         {
             site.onQueueClick(info.linkUrl);
         }
     }
 
-    getSiteFromLinkUrl(linkUrl)
+    _getSiteFromLinkUrl(linkUrl)
     {
         let site = null;
         if(linkUrl)
@@ -400,6 +395,93 @@ class ContextMenu
             });
         }
         return site;
+    }
+}
+
+class URLRequest
+{
+    constructor(url)
+    {
+        this._url = url;
+        this._contentType = "application/json";
+        this._method = "GET";
+    }
+
+    set contentType(value)
+    {
+        this._contentType = value;
+    }
+
+    set method(value)
+    {
+        this._method = value;
+    }
+
+    send(data = "")
+    {
+        console.log("send url request " + this._url);
+        return new Promise((reslove, reject) => {
+
+            let xhr = new XMLHttpRequest();
+            xhr.open(this._method, this._url, true);
+            xhr.setRequestHeader("Content-type", this._contentType);
+
+            xhr.onreadystatechange = function() {
+                //console.log("this.readyState, " + this.readyState + ", " + this.status);
+            };
+
+            xhr.onerror = function() {
+                reject();
+            };
+
+            xhr.onload = function () {
+                const isSuccess = (this.status == 200);
+                if(isSuccess)
+                {
+                    reslove(this.responseText);
+                }
+                else
+                {
+                    reject();
+                }
+            };
+
+            xhr.send(data);
+        });
+    }
+}
+
+class AbstractSite
+{
+    constructor()
+    {
+
+    }
+
+    onPlayClick(url)
+    {
+        console.log("play click " + url);
+
+        this.getFileFromUrl(url).then((fileUrl) => {
+            player.playVideo(fileUrl);
+        });
+    }
+
+    onQueueClick(url)
+    {
+        console.log("onQueueClick " + url);
+
+        this.getFileFromUrl(url).then((fileUrl) => {
+            player.queueVideo(fileUrl);
+        });
+
+    }
+
+    getFileFromUrl(url)
+    {
+        return new Promise((resolve, reject) => {
+            resolve(null);
+        });
     }
 }
 

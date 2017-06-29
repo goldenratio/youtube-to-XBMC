@@ -1,12 +1,13 @@
 ;(function()
 {
 
-    class Youtube
+    class Youtube extends AbstractSite
     {
         constructor()
         {
+            super();
             console.log("youtube");
-            this.pluginURL = "plugin://plugin.video.youtube/?action=play_video&videoid=";
+            this.pluginURL = "plugin://plugin.video.youtube/?action=play_video&videoid=%s";
 
             const videoFilters = ["*://www.youtube.com/*v=*"];
             const playlistFilters = ["*://www.youtube.com/*list=*"];
@@ -14,28 +15,15 @@
             contextMenu.addFilters("youtube.com", this, videoFilters, playlistFilters);
         }
 
-        onPlayClick(url)
+        getFileFromUrl(url)
         {
-            console.log("play click " + url);
+            return new Promise((reslove, reject) => {
 
-            const fileUrl = this._getFileFromUrl(url);
-            player.playVideo(fileUrl);
-        }
+                const videoId = Utils.findPropertyFromString(url, "v");
+                const fileUrl = videoId ? sprintf(this.pluginURL, videoId) : null;
 
-        onQueueClick(url)
-        {
-            console.log("onQueueClick " + url);
-
-            const fileUrl = this._getFileFromUrl(url);
-            player.queueVideo(fileUrl);
-        }
-
-        _getFileFromUrl(url)
-        {
-            const videoId = Utils.findPropertyFromString(url, "v");
-            const fileUrl = videoId ? this.pluginURL + videoId : null;
-
-            return fileUrl;
+                reslove(fileUrl);
+            });
         }
     }
 
@@ -43,12 +31,12 @@
     {
         constructor()
         {
-            const api_key = "AIzaSyD_GFTv0BYK2UqbuEmFuAb1PkJ1wHSjpaA";
+            this.api_key = "AIzaSyD_GFTv0BYK2UqbuEmFuAb1PkJ1wHSjpaA";
             this.feedPath = "https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails" +
                 "&maxResults=50" +
-                "&pageToken=$next_page_token" +
-                "&playlistId=$list_id" +
-                "&key=" + api_key;
+                "&pageToken=%s" +
+                "&playlistId=%s" +
+                "&key=%s";
 
             this.videoIdList = [];
             this.isPending = false;
@@ -56,9 +44,7 @@
 
         handleRequest(playlistId, pageToken = "")
         {
-            let path = this.feedPath.replace("$list_id", playlistId);
-            path = path.replace("$next_page_token", pageToken);
-
+            let path = sprintf(this.feedPath, pageToken, playlistId, this.api_key);
             let thisObject = this;
 
             return new Promise((resolve, reject) => {

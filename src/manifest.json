@@ -29,6 +29,7 @@
 
   "background": {
     "scripts": [
+      "js/sprintf.js",
       "js/enums.js",
       "js/utils.js",
       "js/background/init.js",
@@ -42,7 +43,16 @@
     {
       "matches": [
         "https://www.youtube.com/*",
-        "https://vimeo.com/*"
+        "https://vimeo.com/*",
+
+        "http://etv.err.ee/*",
+        "https://etv.err.ee/*",
+
+        "http://etv2.err.ee/*",
+        "https://etv2.err.ee/*",
+
+        "http://etvpluss.err.ee/*",
+        "https://etvpluss.err.ee/*"
       ],
       "css": ["css/iziToast.css", "css/inject.css"],
       "js": ["js/iziToast.js", "js/enums.js", "js/inject.js"],
