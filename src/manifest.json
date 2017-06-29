@@ -54,7 +54,7 @@
         "http://etvpluss.err.ee/*",
         "https://etvpluss.err.ee/*"
       ],
-      "css": ["css/iziToast.css", "css/inject.css"],
+      "css": ["css/iziToast.css"],
       "js": ["js/iziToast.js", "js/enums.js", "js/inject.js"],
       "run_at": "document_idle",
       "all_frames": true
