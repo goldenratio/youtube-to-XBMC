@@ -44,60 +44,50 @@
 
         handleRequest(playlistId, pageToken = "")
         {
-            let path = sprintf(this.feedPath, pageToken, playlistId, this.api_key);
-            let thisObject = this;
 
             return new Promise((resolve, reject) => {
 
-                let xhr = new XMLHttpRequest();
-                xhr.open("GET", path, true);
-                xhr.setRequestHeader("Content-type", "application/json");
+                let url = sprintf(this.feedPath, pageToken, playlistId, this.api_key);
 
-                xhr.onreadystatechange = function() {
-                    //console.log("this.readyState, " + this.readyState + ", " + this.status);
-                };
+                let urlRequest = new URLRequest(url);
+                urlRequest.send().then((response) => {
 
-                xhr.onerror = function() {
-                    reject();
-                };
+                    let obj = JSON.parse(this.response);
+                    let itemList = obj.items;
 
-                xhr.onload = function () {
-                    console.log("request done " + this.status);
-                    const isSuccess = (this.status == 200);
-                    if(isSuccess)
+                    console.log("total entries, " + itemList.length);
+
+                    for (let i = 0; i < itemList.length; i++)
                     {
-                        let obj = JSON.parse(this.responseText);
-                        let itemList = obj.items;
-
-                        //console.log(JSON.stringify(obj));
-                        console.log("total entries, " + itemList.length);
-
-                        for (let i = 0; i < itemList.length; i++)
+                        var videoId = itemList[i]["contentDetails"]["videoId"];
+                        if (videoId)
                         {
-                            var videoId = itemList[i]["contentDetails"]["videoId"];
-                            if (videoId)
-                            {
-                                thisObject.videoIdList.push(videoId);
-                            }
+                            this.videoIdList.push(videoId);
                         }
-
-                        const nextPageToken = obj["nextPageToken"];
-                        const hasMoreItemsInNextPage = (nextPageToken != null && typeof nextPageToken === "string");
-
-                        if(hasMoreItemsInNextPage)
-                        {
-                            thisObject.handleRequest(playlistId, nextPageToken);
-                            return;
-                        }
-
-                        console.log(thisObject.videoIdList);
-                        resolve(thisObject.videoIdList);
                     }
 
-                    reject();
-                };
+                    const nextPageToken = obj["nextPageToken"];
+                    const hasMoreItemsInNextPage = (nextPageToken != null && typeof nextPageToken === "string");
 
-                xhr.send("");
+                    if(hasMoreItemsInNextPage)
+                    {
+                        this.handleRequest(playlistId, nextPageToken);
+                        return;
+                    }
+
+                    console.log(this.videoIdList);
+
+                    this.isPending = false;
+                    resolve(this.videoIdList);
+
+
+                }).catch((error) => {
+
+                    this.isPending = false;
+                    reject();
+
+                });
+
             });
         }
 
