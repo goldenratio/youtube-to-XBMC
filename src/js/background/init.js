@@ -282,6 +282,8 @@ class ContextMenu
         this.siteFilters = {};
         this._onPlayClick = this._onPlayClick.bind(this);
         this._onQueueClick = this._onQueueClick.bind(this);
+        this._onPlayAllClick = this._onPlayAllClick.bind(this);
+        this._onQueueAllClick = this._onQueueAllClick.bind(this);
     }
 
     addFilters(siteName, site, videoFilters, playlistFilters = null)
@@ -345,13 +347,15 @@ class ContextMenu
             const playAll = {
                 title: "Play All",
                 contexts:["link"],
-                targetUrlPatterns: playListFilters
+                targetUrlPatterns: playListFilters,
+                onclick: this._onPlayAllClick
             };
 
             const queueAll = {
                 title: "Queue All",
                 contexts:["link"],
-                targetUrlPatterns: playListFilters
+                targetUrlPatterns: playListFilters,
+                onclick: this._onQueueAllClick
             };
 
             contextMenus.create(playAll);
@@ -362,7 +366,6 @@ class ContextMenu
     _onPlayClick(info, tab)
     {
         let site = this._getSiteFromLinkUrl(info.linkUrl);
-        console.log("onPlayClick " + typeof site["onPlayClick"]);
         if(site && typeof site["onPlayClick"] === "function")
         {
             site.onPlayClick(info.linkUrl);
@@ -375,6 +378,24 @@ class ContextMenu
         if(site && typeof site["onQueueClick"] === "function")
         {
             site.onQueueClick(info.linkUrl);
+        }
+    }
+
+    _onPlayAllClick(info, tab)
+    {
+        let site = this._getSiteFromLinkUrl(info.linkUrl);
+        if(site && typeof site["onPlayAllClick"] === "function")
+        {
+            site.onPlayAllClick(info.linkUrl);
+        }
+    }
+
+    _onQueueAllClick(info, tab)
+    {
+        let site = this._getSiteFromLinkUrl(info.linkUrl);
+        if(site && typeof site["onQueueAllClick"] === "function")
+        {
+            site.onQueueAllClick(info.linkUrl);
         }
     }
 
@@ -475,6 +496,18 @@ class AbstractSite
         this.getFileFromUrl(url).then((fileUrl) => {
             player.queueVideo(fileUrl);
         });
+
+    }
+
+    onPlayAllClick(url)
+    {
+        console.log("play all click " + url);
+
+    }
+
+    onQueueAllClick(url)
+    {
+        console.log("queue all click " + url);
 
     }
 
