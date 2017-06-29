@@ -267,11 +267,27 @@ class Player
     playAll(files)
     {
         console.log("play all ", files);
+        if(!files || files.length == 0)
+        {
+            const data = {message: "invalidUrl"};
+            sendMessageToContentScript(data);
+            return;
+        }
+
+        //this.playVideo()
+
     }
 
     queueAll(files)
     {
         console.log("queue all ", files);
+        if(!files || files.length == 0)
+        {
+            const data = {message: "invalidUrl"};
+            sendMessageToContentScript(data);
+            return;
+        }
+
 
     }
 }
