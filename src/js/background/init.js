@@ -419,7 +419,7 @@ class URLRequest
 
     send(data = "")
     {
-        console.log("send url request " + this._url);
+        //console.log("send url request " + this._url);
         return new Promise((reslove, reject) => {
 
             let xhr = new XMLHttpRequest();
