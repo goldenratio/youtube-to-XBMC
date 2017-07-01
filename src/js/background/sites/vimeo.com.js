@@ -28,7 +28,11 @@
                 }
 
                 const fileUrl = videoId ? sprintf(this.pluginURL, videoId) : null;
-                reslove(fileUrl);
+                if(fileUrl) {
+                    reslove(fileUrl);
+                } else {
+                    reject();
+                }
 
             });
         }

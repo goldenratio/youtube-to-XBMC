@@ -26,10 +26,9 @@
                 const apiUrl = sprintf(this.contentApiUrl, videoId);
 
                 let urlRequest = new URLRequest(apiUrl);
-                urlRequest.send().then((response) => {
+                urlRequest.send().then(response => {
 
                     const responseData = JSON.parse(response);
-                    //console.log(responseData);
 
                     let mediaSources = responseData.MediaSources;
                     const len = mediaSources.length;
@@ -46,7 +45,11 @@
                         }
                     }
 
-                    resolve(mediaUrl);
+                    if(mediaUrl) {
+                        resolve(mediaUrl);
+                    } else {
+                        reject(null);
+                    }
 
                 }).catch(() => {
 

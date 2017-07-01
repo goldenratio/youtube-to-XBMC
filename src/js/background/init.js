@@ -11,12 +11,14 @@ function sendMessageToContentScript(data)
 
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
             const tabValid = tabs && tabs.length > 0;
-            if(tabValid)
-            {
+            if(tabValid) {
                 chrome.tabs.sendMessage(tabs[0].id, data, function(response) {
                     // message sent to contentScript
                     resolve(response);
                 });
+            }
+            else {
+                reject();
             }
         });
 
@@ -29,8 +31,24 @@ class KodiConfig
 {
     constructor()
     {
-        this.url = "http://openelec:8080/jsonrpc";
+        this.name = "kodi";
+        this.hostName = "localhost";
+        this.port = "8080";
+        this.username = "";
+        this.password = "";
     }
+
+    get _hasCredentials()
+    {
+        return this.username && this.password;
+    }
+
+    get url()
+    {
+        const credentials = this._hasCredentials ? `${this.username}:${this.password}@` : "";
+        return `http://${credentials}${this.hostName}:${this.port}/jsonrpc`;
+    }
+
 }
 
 class RPCService
@@ -65,7 +83,7 @@ class RPCService
             let urlRequest = new URLRequest(thisObject.kodiConf.url);
             urlRequest.method = "POST";
 
-            urlRequest.send(strData).then((response) => {
+            urlRequest.send(strData).then(response => {
 
                 thisObject.isPending = false;
 
@@ -144,151 +162,137 @@ class Player
                 return;
             }
 
-            this._addToPlaylist(file).then((response) => {
+            this._addToPlaylist(file)
+                .then(response => {
 
-                const result = response.result;
-                if(result == ResultData.OK)
-                {
-                    this._getActivePlayers().then((response) => {
+                    const result = response.result;
+                    if(result == ResultData.OK) {
+                        return this._getActivePlayers();
+                    }
+                    return reject();
+                })
+                .then(response => {
 
-                        const result = response.result;
-                        // check if no video is playing and start the first video in queue
-                        if(result && result.length <= 0)
-                        {
-                            this._playFromPlaylist().then((response) => {
-                                resolve(response);
-                            }).catch(() => {
-                                reject();
-                            });
-                        }
-                        else
-                        {
-                            resolve(response);
-                        }
-                    }).catch(() => {
-                        reject();
-                    });
-                }
-                else
-                {
+                    const result = response.result;
+                    // check if no video is playing and start the first video in queue
+                    if(result && result.length <= 0) {
+                        return this._playFromPlaylist();
+                    }
+                })
+                .then(response => {
+                    resolve(response);
+                })
+                .catch(() => {
                     reject();
-                }
-            }).catch(() => {
-                reject();
-            });
+                });
 
         });
 
     }
 
-    _errorPlayingVideo()
-    {
-        console.log("error playing video");
-        const data = {message: "playVideo", status: ResultData.ERROR};
-        sendMessageToContentScript(data);
-    }
-
-    _errorQueueVideo()
-    {
-        const data = {message: "queueVideo", status: ResultData.ERROR};
-        sendMessageToContentScript(data);
-    }
 
     playVideo(file)
     {
-        console.log("play video, " + file);
+        return new Promise((resolve, reject) => {
 
-        // 1. Clear play list
-        // 2. Add to playlist
-        // 3. Play first index
+            console.log("play video, " + file);
 
-        if(!file)
-        {
-            // error
-            const data = {message: "invalidUrl"};
-            sendMessageToContentScript(data);
-            return;
-        }
+            // 1. Clear play list
+            // 2. Add to playlist
+            // 3. Play first index
 
-        this._clearPlaylist().then((response) => {
-            this._addToPlaylist(file).then((response) => {
-                this._playFromPlaylist().then((response) => {
+            this._clearPlaylist()
+                .then(response => {
+                    return this._addToPlaylist(file);
+                })
+                .then(response => {
+                    return this._playFromPlaylist();
+                })
+                .then(response => {
 
-                    console.log("video playing, ", response);
-                    const data = {message: "playVideo", status: ResultData.OK};
-                    sendMessageToContentScript(data);
+                    resolve(response);
 
-                }).catch(this._errorPlayingVideo);
-            }).catch(this._errorPlayingVideo);
-        }).catch(this._errorPlayingVideo);
+                }).catch(() => {
+                    reject();
+                });
+
+        });
     }
 
     queueVideo(file)
     {
-        console.log("queue file " + file);
+        return new Promise((resolve, reject) => {
 
-        if(!file)
-        {
-            const data = {message: "invalidUrl"};
-            sendMessageToContentScript(data);
-            return;
-        }
+            console.log("queue file " + file);
 
-        // Player.GetActivePlayers (if empty), Playlist.Clear, Playlist.Add(file), Player.GetActivePlayers (if empty), Player.Open(playlist)
-        // Player.GetActivePlayers (if playing), Playlist.Add(file), Player.GetActivePlayers (if playing), do nothing
+            // Player.GetActivePlayers (if empty), Playlist.Clear, Playlist.Add(file), Player.GetActivePlayers (if empty), Player.Open(playlist)
+            // Player.GetActivePlayers (if playing), Playlist.Add(file), Player.GetActivePlayers (if playing), do nothing
 
-        this._getActivePlayers().then((response) => {
+            this._getActivePlayers()
+                .then(response => {
 
-            const result = response.result;
-            if(result && result.length <= 0)
-            {
-                this._clearPlaylist().then((response) => {
-                    this._queue(file).then((reponse) => {
+                    const result = response.result;
+                    if(result && result.length <= 0)
+                    {
+                        return this._clearPlaylist();
+                    }
+                })
+                .then(response => {
+                    return this._queue(file);
+                })
+                .then(response => {
 
-                        const data = {message: "queueVideo", status: ResultData.OK};
-                        sendMessageToContentScript(data);
+                    resolve(response);
+                })
+                .catch(() => {
 
-                    }).catch(this._errorQueueVideo);
-                }).catch(this._errorQueueVideo);
-            }
-            else
-            {
-                // add to queue
-                this._queue(file).then((reponse) => {
+                    reject();
+                });
 
-                    const data = {message: "queueVideo", status: ResultData.OK};
-                    sendMessageToContentScript(data);
+        });
 
-                }).catch(this._errorQueueVideo);
-            }
-        }).catch(this._errorQueueVideo);
     }
 
-    playAll(files)
+    async playAll(files)
     {
         console.log("play all ", files);
-        if(!files || files.length == 0)
-        {
-            const data = {message: "invalidUrl"};
-            sendMessageToContentScript(data);
-            return;
+
+        const len = files.length;
+        let res;
+        try {
+            res = await this.playVideo(files[0]);
+        } catch(err) {
+            return reject(err);
         }
 
-        //this.playVideo()
+        for (let i = 1; i < len; i++)
+        {
+            try {
+                res = await this.queueVideo(files[i]);
+            } catch(err) {
+                return reject(err);
+            }
+        }
 
+        return res;
     }
 
-    queueAll(files)
+    async queueAll(files)
     {
         console.log("queue all ", files);
-        if(!files || files.length == 0)
+
+        let res;
+        const len = files.length;
+        for (let i = 0; i < len; i++)
         {
-            const data = {message: "invalidUrl"};
-            sendMessageToContentScript(data);
-            return;
+            try {
+                res = await this.queueVideo(files[i]);
+            } catch(err) {
+                return reject(err);
+            }
         }
 
-
+        return res;
     }
 }
 
@@ -497,22 +501,60 @@ class AbstractSite
 
     }
 
+
+    _messagePlayVideo(status)
+    {
+        const data = {message: "playVideo", status: status};
+        sendMessageToContentScript(data);
+    }
+
+    _messageQueueVideo(status)
+    {
+        const data = {message: "queueVideo", status: status};
+        sendMessageToContentScript(data);
+    }
+
+    _messagePlaylist(status)
+    {
+        const data = {message: "playList", status: status};
+        sendMessageToContentScript(data);
+    }
+
+    _messageQueueAll(status)
+    {
+        const data = {message: "queuePlayList", status: status};
+        sendMessageToContentScript(data);
+    }
+
     onPlayClick(url)
     {
         console.log("play click " + url);
 
-        this.getFileFromUrl(url).then((fileUrl) => {
-            player.playVideo(fileUrl);
-        });
+        this.getFileFromUrl(url)
+            .then(fileUrl => {
+                return player.playVideo(fileUrl);
+            })
+            .then(response => {
+                this._messagePlayVideo(ResultData.OK);
+            }).catch(response => {
+                this._messagePlayVideo(ResultData.ERROR);
+            });
     }
 
     onQueueClick(url)
     {
         console.log("onQueueClick " + url);
 
-        this.getFileFromUrl(url).then((fileUrl) => {
-            player.queueVideo(fileUrl);
-        });
+        this.getFileFromUrl(url)
+            .then(fileUrl => {
+                return player.queueVideo(fileUrl);
+            })
+            .then(response => {
+                this._messageQueueVideo(ResultData.OK);
+            })
+            .catch(response => {
+                this._messageQueueVideo(ResultData.ERROR);
+            });
 
     }
 
@@ -520,9 +562,17 @@ class AbstractSite
     {
         console.log("play all click " + url);
 
-        this.getPlaylistFromUrl(url).then((fileList) => {
-            player.playAll(fileList);
-        });
+        this.getPlaylistFromUrl(url)
+            .then(fileList => {
+                return player.playAll(fileList);
+            })
+            .then(response => {
+                console.log(response);
+                this._messagePlaylist(ResultData.OK);
+            })
+            .catch(response => {
+                this._messagePlaylist(ResultData.ERROR);
+            });
 
     }
 
@@ -530,22 +580,29 @@ class AbstractSite
     {
         console.log("queue all click " + url);
 
-        this.getPlaylistFromUrl(url).then((fileList) => {
-            player.queueAll(fileList);
-        });
+        this.getPlaylistFromUrl(url)
+            .then(fileList => {
+                return player.queueAll(fileList);
+            })
+            .then(response => {
+                this._messageQueueAll(ResultData.OK);
+            })
+            .catch(response => {
+                this._messageQueueAll(ResultData.ERROR);
+            });
     }
 
     getFileFromUrl(url)
     {
         return new Promise((resolve, reject) => {
-            resolve(null);
+            reject();
         });
     }
 
     getPlaylistFromUrl(url)
     {
         return new Promise((resolve, reject) => {
-            resolve(null);
+            reject();
         });
     }
 }

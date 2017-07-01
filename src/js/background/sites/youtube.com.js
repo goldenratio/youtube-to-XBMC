@@ -24,29 +24,34 @@
                 const playListId = Utils.findPropertyFromString(url, "list");
                 const selectedVideoId = Utils.findPropertyFromString(url, "v");
 
-                this.gService.loadFeed(playListId).then((response) => {
+                this.gService.loadFeed(playListId)
+                    .then(response => {
 
-                    if (selectedVideoId)
-                    {
-                        let index = response.indexOf(selectedVideoId);
-                        if(index > 0)
-                        {
-                            response = response.splice(index, response.length);
+                        if (selectedVideoId) {
+                            let index = response.indexOf(selectedVideoId);
+                            if(index > 0) {
+                                response = response.splice(index, response.length);
+                            }
                         }
-                    }
 
-                    let fileList = response.map((videoId) => {
+                        let fileList = response.map(videoId => {
 
-                        return videoId ? sprintf(this.pluginURL, videoId) : null;
-                    }).filter((url) => {
-                        return url != null;
+                            return videoId ? sprintf(this.pluginURL, videoId) : null;
+                        }).filter((url) => {
+                            return url != null;
+                        });
+
+                        if(fileList && fileList.length > 0) {
+                            resolve(fileList);
+                        }
+                        else {
+                            reject();
+                        }
+
+                    })
+                    .catch(() => {
+                        resolve(null);
                     });
-
-                    resolve(fileList);
-
-                }).catch(() => {
-                    resolve(null);
-                });
 
             });
         }
@@ -58,7 +63,13 @@
                 const videoId = Utils.findPropertyFromString(url, "v");
                 const fileUrl = videoId ? sprintf(this.pluginURL, videoId) : null;
 
-                reslove(fileUrl);
+                if(fileUrl) {
+                    reslove(fileUrl);
+                }
+                else {
+                    reject();
+                }
+
             });
         }
     }
