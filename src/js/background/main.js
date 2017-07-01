@@ -185,6 +185,15 @@ class Player
 
     }
 
+    getPluginVersion(pluginId) {
+
+        const params = {
+            addonid: pluginId,
+            "properties": ["version"]
+        };
+
+        return this.rpc.send("Addons.GetAddonDetails", params);
+    }
 
     playVideo(file)
     {
