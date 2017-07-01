@@ -360,14 +360,14 @@ class ContextMenu
                 type: "checkbox",
                 checked: true,
                 enabled: false,
-                contexts:["link"],
+                contexts:["link", "video"],
                 targetUrlPatterns: filter
             };
             contextMenus.create(kodiName);
 
             const separator = {
                 type: "separator",
-                contexts:["link"],
+                contexts:["link", "video"],
                 targetUrlPatterns: filter
             };
             contextMenus.create(separator);
@@ -377,14 +377,14 @@ class ContextMenu
         if(hasVideo) {
             const playNow = {
                 title: "Play",
-                contexts:["link"],
+                contexts:["link", "video"],
                 targetUrlPatterns: videoFilters,
                 onclick: this._onPlayClick
             };
 
             const addToQueue = {
                 title: "Queue",
-                contexts:["link"],
+                contexts:["link", "video"],
                 targetUrlPatterns: videoFilters,
                 onclick: this._onQueueClick
             };
@@ -415,38 +415,43 @@ class ContextMenu
 
     _onPlayClick(info, tab)
     {
-        let site = this._getSiteFromLinkUrl(info.linkUrl);
+        //console.log("info.srcUrl "  + info.srcUrl, info);
+        let url = info.linkUrl || info.srcUrl;
+        let site = this._getSiteFromLinkUrl();
         //console.log("site ", site, typeof site["onPlayClick"]);
         if(site && typeof site["onPlayClick"] === "function")
         {
-            site.onPlayClick(info.linkUrl);
+            site.onPlayClick(url);
         }
     }
 
     _onQueueClick(info, tab)
     {
         let site = this._getSiteFromLinkUrl(info.linkUrl);
+        let url = info.linkUrl || info.srcUrl;
         if(site && typeof site["onQueueClick"] === "function")
         {
-            site.onQueueClick(info.linkUrl);
+            site.onQueueClick(url);
         }
     }
 
     _onPlayAllClick(info, tab)
     {
         let site = this._getSiteFromLinkUrl(info.linkUrl);
+        let url = info.linkUrl || info.srcUrl;
         if(site && typeof site["onPlayAllClick"] === "function")
         {
-            site.onPlayAllClick(info.linkUrl);
+            site.onPlayAllClick(url);
         }
     }
 
     _onQueueAllClick(info, tab)
     {
         let site = this._getSiteFromLinkUrl(info.linkUrl);
+        let url = info.linkUrl || info.srcUrl;
         if(site && typeof site["onQueueAllClick"] === "function")
         {
-            site.onQueueAllClick(info.linkUrl);
+            site.onQueueAllClick(url);
         }
     }
 

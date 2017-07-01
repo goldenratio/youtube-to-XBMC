@@ -8,13 +8,18 @@
             super();
             console.log("DefaultSite");
 
-            this.hello = "test";
-            contextMenu.addFilters("default", this, ["http://*/*.mp4", "https://*/*.mp4"]);
+            contextMenu.addFilters("default", this, [
+                "*://*/*.mp4",
+                "*://*/*.mov",
+                "*://*/*.webm",
+                "*://*/*.ogg",
+                "*://*/*.3gp",
+                "*://*/*.flv",
+            ]);
         }
 
         getFileFromUrl(url)
         {
-            console.log("brr " + url);
             return new Promise((resolve, reject) => {
                 resolve(url);
             });
