@@ -298,8 +298,9 @@ class Player
 
 class ContextMenu
 {
-    constructor()
+    constructor(kodiConfig)
     {
+        this.kodiConfig = kodiConfig;
         this.siteFilters = {};
         this._onPlayClick = this._onPlayClick.bind(this);
         this._onQueueClick = this._onQueueClick.bind(this);
@@ -334,8 +335,41 @@ class ContextMenu
             });
         videoFilters = [].concat.apply([], videoFilters);
 
-        if(videoFilters && videoFilters.length > 0)
-        {
+        let playListFilters = Object.entries(this.siteFilters)
+            .map((item) => {
+                return item[1].playlistFilters;
+            })
+            .filter((data) => {
+                return data != null;
+            });
+        playListFilters = [].concat.apply([], playListFilters);
+
+        const hasVideo = videoFilters && videoFilters.length > 0;
+        const hasPlaylist = playListFilters && playListFilters.length > 0;
+
+        if(hasVideo || hasPlaylist) {
+
+            let filter = videoFilters.concat(playListFilters);
+            const kodiName = {
+                title: this.kodiConfig.name,
+                type: "checkbox",
+                checked: true,
+                enabled: false,
+                contexts:["link"],
+                targetUrlPatterns: filter
+            };
+            contextMenus.create(kodiName);
+
+            const separator = {
+                type: "separator",
+                contexts:["link"],
+                targetUrlPatterns: filter
+            };
+            contextMenus.create(separator);
+        }
+
+
+        if(hasVideo) {
             const playNow = {
                 title: "Play",
                 contexts:["link"],
@@ -354,17 +388,7 @@ class ContextMenu
             contextMenus.create(addToQueue);
         }
 
-        let playListFilters = Object.entries(this.siteFilters)
-            .map((item) => {
-                return item[1].playlistFilters;
-            })
-            .filter((data) => {
-                return data != null;
-            });
-        playListFilters = [].concat.apply([], playListFilters);
-
-        if(playListFilters && playListFilters.length > 0)
-        {
+        if(hasPlaylist) {
             const playAll = {
                 title: "Play All",
                 contexts:["link"],
@@ -607,7 +631,7 @@ class AbstractSite
     }
 }
 
-let contextMenu = new ContextMenu();
 let kodiConf = new KodiConfig();
 
+let contextMenu = new ContextMenu(kodiConf);
 let player = new Player(kodiConf);
