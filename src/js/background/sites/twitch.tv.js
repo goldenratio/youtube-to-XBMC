@@ -7,7 +7,9 @@
         {
             super();
             console.log("twitch.tv");
+
             /*
+                https://github.com/MrSprigster/Twitch-on-Kodi/issues/303#issuecomment-301305636
                 the params for playing;
                 videos are { mode: play, video_id: <video_id> }
                 streams are { mode: play, name: <channel_name>, channel_id: <channel_id> }
@@ -17,10 +19,11 @@
              */
 
             this.videoPluginUrl = "plugin://plugin.video.twitch/?mode=play&ask=false&video_id=%s";
-            this.liveChannelsPluginUrl = "plugin://plugin.video.twitch/?mode=play&ask=false&name=%s&channel_id=%s";
-            this.clipPluginUrl = "plugin://plugin.video.twitch/?mode=play&ask=false&slug=%s&channel_id=%s";
+            // todo: get channel_id without content script
+            //this.liveChannelsPluginUrl = "plugin://plugin.video.twitch/?mode=play&ask=false&name=%s&channel_id=%s";
+            //this.clipPluginUrl = "plugin://plugin.video.twitch/?mode=play&ask=false&slug=%s&channel_id=%s";
 
-            contextMenu.addFilters("twitch.tv", this, ["*://*.twitch.tv/videos/*"]);
+            contextMenu.addFilters("twitch.tv", this, ["*://*.twitch.tv/*"]);
         }
 
         getFileFromUrl(url)
