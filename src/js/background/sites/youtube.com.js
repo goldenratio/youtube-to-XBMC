@@ -23,6 +23,10 @@
 
                 const playListId = Utils.findPropertyFromString(url, "list");
                 const selectedVideoId = Utils.findPropertyFromString(url, "v");
+                if(playListId == "WL") {
+                    reject();
+                    return;
+                }
 
                 this.gService.loadFeed(playListId)
                     .then(response => {
