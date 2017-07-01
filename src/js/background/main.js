@@ -7,21 +7,15 @@ var contextMenus = chrome.contextMenus || browser.contextMenus || {};
 
 function sendMessageToContentScript(data)
 {
-    return new Promise((resolve, reject) => {
-
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            const tabValid = tabs && tabs.length > 0;
-            if(tabValid) {
-                chrome.tabs.sendMessage(tabs[0].id, data, function(response) {
-                    // message sent to contentScript
-                    resolve(response);
-                });
-            }
-            else {
-                reject();
-            }
-        });
-
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        const tabValid = tabs && tabs.length > 0;
+        console.log("tabValid " + tabValid + ", ", tabs);
+        if(tabValid) {
+            chrome.tabs.sendMessage(tabs[0].id, data, function(response) {
+                // message sent to contentScript
+                console.log("message send to tab " + response);
+            });
+        }
     });
 }
 
