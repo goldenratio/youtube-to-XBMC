@@ -9,11 +9,12 @@ function sendMessageToContentScript(data)
 {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         const tabValid = tabs && tabs.length > 0;
-        console.log("tabValid " + tabValid + ", ", tabs);
+        //console.log("tabValid " + tabValid + ", ", tabs);
         if(tabValid) {
-            chrome.tabs.sendMessage(tabs[0].id, data, function(response) {
+            let selectedTab = tabs[0];
+            chrome.tabs.sendMessage(selectedTab.id, data, function(response) {
                 // message sent to contentScript
-                console.log("message send to tab " + response);
+                console.log("message send to tab ", selectedTab, " " + response);
             });
         }
     });
@@ -520,27 +521,27 @@ class AbstractSite
     }
 
 
-    _messagePlayVideo(status)
+    _messagePlayVideo(status, customMessage = "")
     {
-        const data = {message: "playVideo", status: status};
+        const data = {message: "playVideo", status: status, customMessage: customMessage};
         sendMessageToContentScript(data);
     }
 
-    _messageQueueVideo(status)
+    _messageQueueVideo(status, customMessage = "")
     {
-        const data = {message: "queueVideo", status: status};
+        const data = {message: "queueVideo", status: status, customMessage: customMessage};
         sendMessageToContentScript(data);
     }
 
-    _messagePlaylist(status)
+    _messagePlaylist(status, customMessage = "")
     {
-        const data = {message: "playList", status: status};
+        const data = {message: "playList", status: status, customMessage: customMessage};
         sendMessageToContentScript(data);
     }
 
-    _messageQueueAll(status)
+    _messageQueueAll(status, customMessage = "")
     {
-        const data = {message: "queuePlayList", status: status};
+        const data = {message: "queuePlayList", status: status, customMessage: customMessage};
         sendMessageToContentScript(data);
     }
 
@@ -553,9 +554,10 @@ class AbstractSite
                 return player.playVideo(fileUrl);
             })
             .then(response => {
-                this._messagePlayVideo(ResultData.OK);
+                this._messagePlayVideo(ResultData.OK, response.message);
             }).catch(response => {
-                this._messagePlayVideo(ResultData.ERROR);
+                console.log("err playing video ", response);
+                this._messagePlayVideo(ResultData.ERROR, response.message);
             });
     }
 
@@ -568,10 +570,10 @@ class AbstractSite
                 return player.queueVideo(fileUrl);
             })
             .then(response => {
-                this._messageQueueVideo(ResultData.OK);
+                this._messageQueueVideo(ResultData.OK, response.message);
             })
             .catch(response => {
-                this._messageQueueVideo(ResultData.ERROR);
+                this._messageQueueVideo(ResultData.ERROR, response.message);
             });
 
     }
@@ -586,10 +588,10 @@ class AbstractSite
             })
             .then(response => {
                 console.log(response);
-                this._messagePlaylist(ResultData.OK);
+                this._messagePlaylist(ResultData.OK, response.message);
             })
             .catch(response => {
-                this._messagePlaylist(ResultData.ERROR);
+                this._messagePlaylist(ResultData.ERROR, response.message);
             });
 
     }
@@ -603,10 +605,10 @@ class AbstractSite
                 return player.queueAll(fileList);
             })
             .then(response => {
-                this._messageQueueAll(ResultData.OK);
+                this._messageQueueAll(ResultData.OK, response.message);
             })
             .catch(response => {
-                this._messageQueueAll(ResultData.ERROR);
+                this._messageQueueAll(ResultData.ERROR, response.message);
             });
     }
 

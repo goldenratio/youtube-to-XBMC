@@ -91,8 +91,16 @@ onMessage.addListener(function(data, sender, sendResponse)
 {
     const messageType = data.message;
     const status = data.status;
+    const customMessage = data.customMessage;
 
-    if(messageType == "playVideo")
+    if(customMessage)
+    {
+        iziToast.info({
+            message: customMessage,
+            timeout: false
+        });
+    }
+    else if(messageType == "playVideo")
     {
         ToastUtil.playVideo(status);
     }

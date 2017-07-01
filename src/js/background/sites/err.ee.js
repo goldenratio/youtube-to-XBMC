@@ -9,6 +9,13 @@
             console.log("err.ee");
             this.contentApiUrl = "https://etv.err.ee/api/loader/GetTimeLineContent/%s";
             contextMenu.addFilters("err.ee", this, ["*://*.err.ee/v/*/*-*-*-*-*/*"]);
+
+            this.liveStreams = {
+                "etv": "http://etvstream.err.ee/live/smil:etv/playlist.m3u8",
+                "etv2": "http://etv2stream.err.ee/live/smil:etv2/playlist.m3u8",
+                "etv+": "http://striimid.err.ee/live/smil:etvpluss/playlist.m3u8"
+            };
+
         }
 
         _getVideoIdFromUrl(url)
@@ -48,13 +55,27 @@
                     if(mediaUrl) {
                         resolve(mediaUrl);
                     } else {
-                        reject(null);
+                        // check if we can play live video
+                        const scheduleTimeString = responseData.Updated;
+
+                        let scheduledDate = new Date(scheduleTimeString);
+                        let scheduledDateUTC = scheduledDate.getTime();
+                        let currentTimeUTC = new Date().getTime();
+
+                        const diff = currentTimeUTC - scheduledDateUTC;
+                        console.log(diff + " milliseconds");
+                        if(diff >= 0) {
+                            // probably it is a live video
+                            let portalName = responseData.Portal.PortalName.toLowerCase();
+                            resolve(this.liveStreams[portalName]);
+                        }
+                        else {
+                            reject({message: "Video will be available at " + scheduledDate.toString()});
+                        }
                     }
 
                 }).catch(() => {
-
                     resolve(null);
-
                 });
             });
         }

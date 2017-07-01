@@ -35,7 +35,8 @@
       "js/background/main.js",
       "js/background/sites/youtube.com.js",
       "js/background/sites/vimeo.com.js",
-      "js/background/sites/err.ee.js"
+      "js/background/sites/err.ee.js",
+      "js/background/sites/twitch.tv.js"
     ]
   },
 
@@ -52,7 +53,9 @@
         "https://etv2.err.ee/*",
 
         "http://etvpluss.err.ee/*",
-        "https://etvpluss.err.ee/*"
+        "https://etvpluss.err.ee/*",
+
+        "https://www.twitch.tv/*"
       ],
       "css": ["css/iziToast.css"],
       "js": ["js/iziToast.js", "js/enums.js", "js/inject.js"],
