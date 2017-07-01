@@ -115,6 +115,8 @@
         {
             ToastUtil.invalidUrl();
         }
+
+        sendResponse(true);
         return true;
     });
 

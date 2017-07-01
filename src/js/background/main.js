@@ -12,7 +12,10 @@ function sendMessageToContentScript(data)
         //console.log("tabValid " + tabValid + ", ", tabs);
         if(tabValid) {
             let selectedTab = tabs[0];
-            chrome.tabs.sendMessage(selectedTab.id, data, function(response) {
+            const options = {
+                frameId: 0
+            };
+            chrome.tabs.sendMessage(selectedTab.id, data, options, function(response) {
                 // message sent to contentScript
                 console.log("message send to tab ", selectedTab, " " + response);
             });
