@@ -70,7 +70,7 @@
                             resolve(this.liveStreams[portalName]);
                         }
                         else {
-                            reject({message: "Video will be available at " + scheduledDate.toString()});
+                            reject({message: "Video is scheduled for " + scheduledDate.toString()});
                         }
                     }
 
