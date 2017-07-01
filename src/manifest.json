@@ -32,7 +32,7 @@
       "js/sprintf.js",
       "js/enums.js",
       "js/utils.js",
-      "js/background/init.js",
+      "js/background/main.js",
       "js/background/sites/youtube.com.js",
       "js/background/sites/vimeo.com.js",
       "js/background/sites/err.ee.js"
