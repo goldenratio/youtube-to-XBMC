@@ -32,7 +32,8 @@
 
                 let videoId;
 
-                if(url.indexOf("/videos/") >= 0) {
+                const vod = url.indexOf("/videos/") >= 0;
+                if(vod) {
                     let parts = url.split("/");
                     videoId = parts[parts.length - 1];
                 }
