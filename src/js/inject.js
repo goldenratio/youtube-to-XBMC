@@ -97,7 +97,8 @@ onMessage.addListener(function(data, sender, sendResponse)
     {
         iziToast.info({
             message: customMessage,
-            timeout: false
+            timeout: 5000,
+            pauseOnHover: true
         });
     }
     else if(messageType == "playVideo")
