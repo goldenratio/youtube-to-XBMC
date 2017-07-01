@@ -320,6 +320,7 @@ class ContextMenu
             site: site
         };
 
+        //console.log(site instanceof AbstractSite, site);
         this._updateMenuEntries();
     }
 
@@ -415,6 +416,7 @@ class ContextMenu
     _onPlayClick(info, tab)
     {
         let site = this._getSiteFromLinkUrl(info.linkUrl);
+        //console.log("site ", site, typeof site["onPlayClick"]);
         if(site && typeof site["onPlayClick"] === "function")
         {
             site.onPlayClick(info.linkUrl);
@@ -450,7 +452,7 @@ class ContextMenu
 
     _getSiteFromLinkUrl(linkUrl)
     {
-        let site = null;
+        let site = this.siteFilters["default"].site;
         if(linkUrl)
         {
             linkUrl = linkUrl.toLowerCase();
