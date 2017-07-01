@@ -13,42 +13,37 @@ iziToast.settings({
 
 class ToastUtil
 {
-    static queueVideo(response)
+    static queueVideo(isSuccess)
     {
-        if (response == ResultData.OK)
-        {
+        if (isSuccess) {
             iziToast.success({
                 message: "Added to Queue"
             });
         }
-        else
-        {
+        else {
             iziToast.error({
                 message: "Error! Unable to Add to Queue"
             });
         }
     }
 
-    static playVideo(response)
+    static playVideo(isSuccess)
     {
-        if (response == ResultData.OK)
-        {
+        if (isSuccess) {
             iziToast.success({
                 message: "Video Playing Now"
             });
         }
-        else
-        {
+        else {
             iziToast.error({
                 message: "Error! Playing Video"
             });
         }
     }
 
-    static playList(response)
+    static playList(isSuccess)
     {
-        if (response == ResultData.OK)
-        {
+        if (isSuccess) {
             iziToast.success({
                 message: "Playlist Playing"
             });
@@ -61,16 +56,14 @@ class ToastUtil
         }
     }
 
-    static queuePlayList(response)
+    static queuePlayList(isSuccess)
     {
-        if (response == ResultData.OK)
-        {
+        if (isSuccess) {
             iziToast.success({
                 message: "Playlist Added to Queue"
             });
         }
-        else
-        {
+        else {
             iziToast.error({
                 message: "Error! Unable to Add Playlist to Queue"
             });
@@ -90,7 +83,7 @@ const onMessage = chrome.extension.onMessage || chrome.runtime.onMessage || func
 onMessage.addListener(function(data, sender, sendResponse)
 {
     const messageType = data.message;
-    const status = data.status;
+    const isSuccess = data.success;
     const customMessage = data.customMessage;
 
     if(customMessage)
@@ -103,19 +96,19 @@ onMessage.addListener(function(data, sender, sendResponse)
     }
     else if(messageType == "playVideo")
     {
-        ToastUtil.playVideo(status);
+        ToastUtil.playVideo(isSuccess);
     }
     else if(messageType == "queueVideo")
     {
-        ToastUtil.queueVideo(status);
+        ToastUtil.queueVideo(isSuccess);
     }
     else if(messageType == "playList")
     {
-        ToastUtil.playList(status);
+        ToastUtil.playList(isSuccess);
     }
     else if(messageType == "queuePlayList")
     {
-        ToastUtil.queuePlayList(status);
+        ToastUtil.queuePlayList(isSuccess);
     }
     else if(messageType == "invalidUrl")
     {

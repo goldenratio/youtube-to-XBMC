@@ -415,9 +415,9 @@ class ContextMenu
 
     _onPlayClick(info, tab)
     {
-        //console.log("info.srcUrl "  + info.srcUrl, info);
         let url = info.linkUrl || info.srcUrl;
-        let site = this._getSiteFromLinkUrl();
+        //console.log("info.srcUrl "  + info.srcUrl + ", info.linkUrl " + info.linkUrl + ", url " + url, info);
+        let site = this._getSiteFromLinkUrl(url);
         //console.log("site ", site, typeof site["onPlayClick"]);
         if(site && typeof site["onPlayClick"] === "function")
         {
@@ -427,8 +427,8 @@ class ContextMenu
 
     _onQueueClick(info, tab)
     {
-        let site = this._getSiteFromLinkUrl(info.linkUrl);
         let url = info.linkUrl || info.srcUrl;
+        let site = this._getSiteFromLinkUrl(url);
         if(site && typeof site["onQueueClick"] === "function")
         {
             site.onQueueClick(url);
@@ -437,8 +437,8 @@ class ContextMenu
 
     _onPlayAllClick(info, tab)
     {
-        let site = this._getSiteFromLinkUrl(info.linkUrl);
         let url = info.linkUrl || info.srcUrl;
+        let site = this._getSiteFromLinkUrl(url);
         if(site && typeof site["onPlayAllClick"] === "function")
         {
             site.onPlayAllClick(url);
@@ -447,8 +447,8 @@ class ContextMenu
 
     _onQueueAllClick(info, tab)
     {
-        let site = this._getSiteFromLinkUrl(info.linkUrl);
         let url = info.linkUrl || info.srcUrl;
+        let site = this._getSiteFromLinkUrl(url);
         if(site && typeof site["onQueueAllClick"] === "function")
         {
             site.onQueueAllClick(url);
@@ -458,6 +458,7 @@ class ContextMenu
     _getSiteFromLinkUrl(linkUrl)
     {
         let site = this.siteFilters["default"].site;
+        console.log("linkUrl " + linkUrl);
         if(linkUrl)
         {
             linkUrl = linkUrl.toLowerCase();
@@ -539,25 +540,29 @@ class AbstractSite
 
     _messagePlayVideo(status, customMessage = "")
     {
-        const data = {message: "playVideo", status: status, customMessage: customMessage};
+        const success = status == ResultData.OK;
+        const data = {message: "playVideo", success: success, customMessage: customMessage};
         sendMessageToContentScript(data);
     }
 
     _messageQueueVideo(status, customMessage = "")
     {
-        const data = {message: "queueVideo", status: status, customMessage: customMessage};
+        const success = status == ResultData.OK;
+        const data = {message: "queueVideo", success: success, customMessage: customMessage};
         sendMessageToContentScript(data);
     }
 
     _messagePlaylist(status, customMessage = "")
     {
-        const data = {message: "playList", status: status, customMessage: customMessage};
+        const success = status == ResultData.OK;
+        const data = {message: "playList", success: success, customMessage: customMessage};
         sendMessageToContentScript(data);
     }
 
     _messageQueueAll(status, customMessage = "")
     {
-        const data = {message: "queuePlayList", status: status, customMessage: customMessage};
+        const success = status == ResultData.OK;
+        const data = {message: "queuePlayList", success: success, customMessage: customMessage};
         sendMessageToContentScript(data);
     }
 

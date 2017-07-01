@@ -43,13 +43,9 @@
 
   "content_scripts": [
     {
-      "matches": [
-        "https://*/*",
-        "http://*/*"
-      ],
-
+      "matches": ["<all_urls>"],
       "css": ["css/iziToast.css"],
-      "js": ["js/iziToast.js", "js/enums.js", "js/inject.js"],
+      "js": ["js/content_scripts/iziToast.js", "js/content_scripts/main.js"],
       "run_at": "document_idle",
       "all_frames": true
     }
