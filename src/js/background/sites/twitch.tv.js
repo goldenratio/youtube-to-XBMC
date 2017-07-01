@@ -18,10 +18,10 @@
                 and player will use Kodi Player() instead of setResolvedUrl which can be useful from certain contexts.
              */
 
-            this.videoPluginUrl = "plugin://plugin.video.twitch/?mode=play&ask=false&video_id=%s";
-            // todo: get channel_id without content script
-            //this.liveChannelsPluginUrl = "plugin://plugin.video.twitch/?mode=play&ask=false&name=%s&channel_id=%s";
-            //this.clipPluginUrl = "plugin://plugin.video.twitch/?mode=play&ask=false&slug=%s&channel_id=%s";
+            this._pluginUrl = "plugin://plugin.video.twitch/?mode=play&ask=false&";
+            this.videoPluginUrl = this._pluginUrl + "video_id=%s";
+            this.liveChannelsPluginUrl = this._pluginUrl + "name=%s&channel_id=%s";
+            this.clipPluginUrl = this._pluginUrl + "slug=%s&channel_id=%s";
 
             contextMenu.addFilters("twitch.tv", this, ["*://*.twitch.tv/*"]);
         }
