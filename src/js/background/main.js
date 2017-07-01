@@ -554,8 +554,10 @@ class AbstractSite
                 return player.playVideo(fileUrl);
             })
             .then(response => {
+                response = response || {};
                 this._messagePlayVideo(ResultData.OK, response.message);
             }).catch(response => {
+                response = response || {};
                 console.log("err playing video ", response);
                 this._messagePlayVideo(ResultData.ERROR, response.message);
             });
@@ -570,9 +572,11 @@ class AbstractSite
                 return player.queueVideo(fileUrl);
             })
             .then(response => {
+                response = response || {};
                 this._messageQueueVideo(ResultData.OK, response.message);
             })
             .catch(response => {
+                response = response || {};
                 this._messageQueueVideo(ResultData.ERROR, response.message);
             });
 
@@ -587,10 +591,11 @@ class AbstractSite
                 return player.playAll(fileList);
             })
             .then(response => {
-                console.log(response);
+                response = response || {};
                 this._messagePlaylist(ResultData.OK, response.message);
             })
             .catch(response => {
+                response = response || {};
                 this._messagePlaylist(ResultData.ERROR, response.message);
             });
 
@@ -605,9 +610,11 @@ class AbstractSite
                 return player.queueAll(fileList);
             })
             .then(response => {
+                response = response || {};
                 this._messageQueueAll(ResultData.OK, response.message);
             })
             .catch(response => {
+                response = response || {};
                 this._messageQueueAll(ResultData.ERROR, response.message);
             });
     }
