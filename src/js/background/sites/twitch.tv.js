@@ -23,7 +23,7 @@
             this.liveChannelsPluginUrl = this._pluginUrl + "name=%s&channel_id=%s";
             this.clipPluginUrl = this._pluginUrl + "slug=%s&channel_id=%s";
 
-            contextMenu.addFilters("twitch.tv", this, ["*://*.twitch.tv/*"]);
+            contextMenu.addFilters("twitch.tv", this, ["*://*.twitch.tv/videos/*"]);
         }
 
         getFileFromUrl(url)
