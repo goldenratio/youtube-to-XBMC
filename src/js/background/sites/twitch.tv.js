@@ -17,7 +17,8 @@
              */
 
             this.videoPluginUrl = "plugin://plugin.video.twitch/?mode=play&ask=false&video_id=%s";
-            this.livePluginUrl = "plugin://plugin.video.twitch/?mode=play&ask=false&channel_id=%s&name=%s";
+            this.liveChannelsPluginUrl = "plugin://plugin.video.twitch/?mode=play&ask=false&name=%s&channel_id=%s";
+            this.clipPluginUrl = "plugin://plugin.video.twitch/?mode=play&ask=false&slug=%s&channel_id=%s";
 
             contextMenu.addFilters("twitch.tv", this, ["*://*.twitch.tv/videos/*"]);
         }
@@ -38,7 +39,7 @@
 
                 let mediaUrl = videoId ? sprintf(this.videoPluginUrl, videoId) : null;
 
-                //mediaUrl = "plugin://plugin.video.twitch/?mode=play&channel_id=124422593&name=eulcs1";
+                //mediaUrl = "plugin://plugin.video.twitch/?mode=play&name=eulcs1&channel_id=124422593";
                 //console.log("mediaUrl " + mediaUrl);
 
                 if(mediaUrl) {
