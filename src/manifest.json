@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Kassi Share - Send to Kodi",
-  "description": "Send YouTube videos to Kodi/XBMC Media Center",
+  "description": "Send videos to Kodi Media Center",
   "version": "4.0",
   "permissions": [
     "http://*/*",
