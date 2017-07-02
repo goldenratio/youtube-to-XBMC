@@ -20,7 +20,7 @@
             contextMenu.addSite("err.ee", this, ["*://*.err.ee/v/*/*-*-*-*-*/*"]);
             browserAction.addSite("err.ee", this, [
                 ".*err.ee/v/.*/.*-.*-.*-.*-.*/.*",
-                ".*otse.err.ee/k/.*"
+                ".*otse.err.ee/.*"
             ]);
         }
 
