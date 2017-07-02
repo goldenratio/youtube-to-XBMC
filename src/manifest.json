@@ -31,7 +31,6 @@
     "scripts": [
       "js/sprintf.js",
       "js/enums.js",
-      "js/utils.js",
       "js/shared.js",
       "js/background_scripts/main.js",
       "js/background_scripts/sites/youtube.com.js",
