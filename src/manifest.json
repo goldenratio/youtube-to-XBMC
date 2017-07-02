@@ -48,6 +48,10 @@
       "js": ["js/content_scripts/iziToast.js", "js/content_scripts/main.js"],
       "run_at": "document_idle",
       "all_frames": true
+    },
+    {
+      "matches": ["*://*.twitch.tv/*"],
+      "js": ["js/content_scripts/sites/twitch.tv.js"]
     }
   ],
 

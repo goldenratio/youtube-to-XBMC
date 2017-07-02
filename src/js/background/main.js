@@ -6,20 +6,40 @@
 var contextMenus = chrome.contextMenus || browser.contextMenus || {};
 var onMessage = chrome.extension.onMessage || chrome.runtime.onMessage || function(){};
 
-function sendMessageToContentScript(data)
+function _sendMessageToContentScript(data, callbackSuccessFn = null, callbackErrorFn = null)
 {
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    callbackSuccessFn = callbackSuccessFn || function() {};
+    callbackErrorFn = callbackErrorFn || function() {};
+
+    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+
         const tabValid = tabs && tabs.length > 0;
         if(tabValid) {
             let selectedTab = tabs[0];
             const options = {
                 frameId: 0
             };
+
             chrome.tabs.sendMessage(selectedTab.id, data, options, response => {
                 // message sent to contentScript
                 console.log("message send to tab ", selectedTab, " ", response);
+                callbackSuccessFn(response);
             });
         }
+        else {
+            callbackErrorFn();
+        }
+    });
+}
+
+function sendMessageToContentScript(data)
+{
+    return new Promise((resolve, reject) => {
+        _sendMessageToContentScript(data, response => {
+            resolve(response);
+        }, () => {
+            reject();
+        });
     });
 }
 
