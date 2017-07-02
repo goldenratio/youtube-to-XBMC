@@ -87,6 +87,8 @@
         const isSuccess = data.success;
         const customMessage = data.customMessage;
 
+        let valid = false;
+
         if(customMessage)
         {
             iziToast.info({
@@ -94,30 +96,37 @@
                 timeout: 5000,
                 pauseOnHover: true
             });
+            valid = true;
         }
         else if(messageType == "playVideo")
         {
             ToastUtil.playVideo(isSuccess);
+            valid = true;
         }
         else if(messageType == "queueVideo")
         {
             ToastUtil.queueVideo(isSuccess);
+            valid = true;
         }
         else if(messageType == "playList")
         {
             ToastUtil.playList(isSuccess);
+            valid = true;
         }
         else if(messageType == "queuePlayList")
         {
             ToastUtil.queuePlayList(isSuccess);
+            valid = true;
         }
         else if(messageType == "invalidUrl")
         {
             ToastUtil.invalidUrl();
+            valid = true;
         }
 
-        sendResponse({message: "roger that!"});
-        return true;
+        if(valid) {
+            sendResponse({message: "roger that!"});
+        }
     });
 
 })();

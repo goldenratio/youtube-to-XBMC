@@ -36,6 +36,7 @@ function sendMessageToContentScript(data)
 {
     return new Promise((resolve, reject) => {
         _sendMessageToContentScript(data, response => {
+            response = response || {};
             resolve(response);
         }, () => {
             reject();
