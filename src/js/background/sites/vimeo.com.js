@@ -9,7 +9,10 @@
             console.log("Vimeo");
             this.pluginURL = "plugin://plugin.video.vimeo/play/?video_id=%s";
             contextMenu.addSite("vimeo.com", this, ["*://vimeo.com/*"]);
-            browserAction.addSite("vimeo.com", this, ["^.*vimeo.com[^/]*/\\d+.*$"]);
+            browserAction.addSite("vimeo.com", this, [
+                "^.*vimeo.com[^/]*/\\d+.*$",
+                "^.*vimeo.com[^/]*/channels/staffpicks/\\d+.*$"
+            ]);
         }
 
         getFileFromUrl(url)
