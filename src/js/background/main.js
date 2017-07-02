@@ -587,37 +587,48 @@ class AbstractSite
     {
         console.log("play click " + url);
 
-        this.getFileFromUrl(url)
-            .then(fileUrl => {
-                return player.playVideo(fileUrl);
-            })
-            .then(response => {
-                response = response || {};
-                this._messagePlayVideo(ResultData.OK, response.message);
-            }).catch(response => {
-                response = response || {};
-                console.log("err playing video ", response);
-                this._messagePlayVideo(ResultData.ERROR, response.message);
-            });
+        return new Promise((resolve, reject) => {
+
+            this.getFileFromUrl(url)
+                .then(fileUrl => {
+                    return player.playVideo(fileUrl);
+                })
+                .then(response => {
+                    response = response || {};
+                    this._messagePlayVideo(ResultData.OK, response.message);
+                    resolve();
+                }).catch(response => {
+                    response = response || {};
+                    console.log("err playing video ", response);
+                    this._messagePlayVideo(ResultData.ERROR, response.message);
+                    reject();
+                });
+
+        });
+
     }
 
     onQueueClick(url)
     {
         console.log("onQueueClick " + url);
+        return new Promise((resolve, reject) => {
 
-        this.getFileFromUrl(url)
-            .then(fileUrl => {
-                return player.queueVideo(fileUrl);
-            })
-            .then(response => {
-                response = response || {};
-                this._messageQueueVideo(ResultData.OK, response.message);
-            })
-            .catch(response => {
-                response = response || {};
-                this._messageQueueVideo(ResultData.ERROR, response.message);
-            });
+            this.getFileFromUrl(url)
+                .then(fileUrl => {
+                    return player.queueVideo(fileUrl);
+                })
+                .then(response => {
+                    response = response || {};
+                    this._messageQueueVideo(ResultData.OK, response.message);
+                    resolve();
+                })
+                .catch(response => {
+                    response = response || {};
+                    this._messageQueueVideo(ResultData.ERROR, response.message);
+                    reject();
+                });
 
+        });
     }
 
     onPlayAllClick(url)
@@ -695,36 +706,27 @@ class BrowserAction
 
     play(tabUrl)
     {
-        return new Promise((resolve, reject) => {
+        let site = this._getSiteFromTabUrl(tabUrl);
+        console.log(site);
 
-            let site = this._getSiteFromTabUrl(tabUrl);
-            console.log(site);
-            if(site && typeof site["onPlayClick"] === "function") {
-                site.onPlayClick(tabUrl);
-                resolve();
-            }
-            else {
-                reject();
-            }
-
-        });
+        if(site && typeof site["onPlayClick"] === "function") {
+            return site.onPlayClick(tabUrl);
+        }
+        else {
+            return Promise.reject();
+        }
     }
 
     queue(tabUrl)
     {
-        return new Promise((resolve, reject) => {
-
-            let site = this._getSiteFromTabUrl(tabUrl);
-            console.log(site);
-            if(site && typeof site["onQueueClick"] === "function") {
-                site.onQueueClick(tabUrl);
-                resolve();
-            }
-            else {
-                reject();
-            }
-
-        });
+        let site = this._getSiteFromTabUrl(tabUrl);
+        console.log(site);
+        if(site && typeof site["onQueueClick"] === "function") {
+            return site.onQueueClick(tabUrl);
+        }
+        else {
+            return Promise.reject();
+        }
     }
 
     _getSiteFromTabUrl(tabUrl)
@@ -763,7 +765,7 @@ onMessage.addListener(function(data, sender, sendResponse)
     data = data || {};
     let message = data.message;
 
-    if(message == "popupOpened")
+    if(message == "getButtonStatus")
     {
         getCurrentTabUrl().then(url => {
             const enable = browserAction.canEnable(url);

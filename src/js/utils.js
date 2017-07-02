@@ -1,6 +1,9 @@
 class Utils
 {
     static findPropertyFromString(str, key) {
+        if(!str || !key) {
+            return null;
+        }
         let property = key + "=";
         var index = str.indexOf('?');
         str = str.substring(index + 1);

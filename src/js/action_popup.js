@@ -23,8 +23,8 @@
             this.settingsButton = document.getElementById("settings_button_js");
             this.settingsButton.addEventListener("click", this.onSettingsClick);
 
-            sendMessage({message: "popupOpened"}, response => {
-                console.log("popupOpened ", response);
+            sendMessage({message: "getButtonStatus"}, response => {
+                console.log("getButtonStatus ", response);
                 const disabled = !response.success;
                 this.playNowButton.disabled = disabled;
                 this.queueButton.disabled = disabled;
@@ -33,17 +33,20 @@
 
         onPlayNowClick()
         {
-            console.log("play click " + this.playNowButton);
+            console.log("play click ", this.playNowButton);
+            this.playNowButton.disabled = true;
             sendMessage({message: "playNowFromPopup"}, response => {
                 console.log("playNowFromPopup ", response);
+                this.playNowButton.disabled = false;
             });
         }
 
         onQueueClick()
         {
+            this.queueButton.disabled = true;
             sendMessage({message: "queueFromPopup"}, response => {
                 console.log("queueFromPopup ", response);
-
+                this.queueButton.disabled = false;
             });
         }
 
