@@ -6,12 +6,14 @@
 
     <style type="text/css">
         body {
-
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 13px;
+            background-color: #FFFFFF;
         }
 
         #container {
-            width: 140px;
-            height: 250px;
+            width: 154px;
+            min-height: 250px;
             text-align: center;
         }
     </style>
@@ -19,13 +21,25 @@
 <body>
 
 <div id="container">
-    <br><br>
-    <button type="button" id="playnow_button_js">Play Now</button><br><br>
-    <button type="button" id="queue_button_js">Queue</button>
+    <div style="padding-top: 10px;">
+        <select id="kodiList_js" style="width: 120px;">
+            <option>Living Room TV</option>
+            <option>Laptop</option>
+        </select>
+    </div>
 
+    <div style="margin-top: 40px; width: 154px; height: 120px;">
+        <span id="action_ui">
+            <button type="button" id="playnow_button_js">Play Now</button><br><br>
+            <button type="button" id="queue_button_js">Queue</button>
+        </span>
 
-    <br><br><br><br><br><br>
-    <a href="#" id="settings_button_js">Settings</a>
+    </div>
+
+    <div style="padding-top: 40px;">
+        <a href="#" id="settings_button_js">Settings</a>
+    </div>
+
 </div>
 
 <script src="js/action_popup.js"></script>
