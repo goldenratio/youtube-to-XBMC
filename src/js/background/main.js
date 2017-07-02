@@ -4,22 +4,38 @@
  */
 
 var contextMenus = chrome.contextMenus || browser.contextMenus || {};
+var onMessage = chrome.extension.onMessage || chrome.runtime.onMessage || function(){};
 
 function sendMessageToContentScript(data)
 {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         const tabValid = tabs && tabs.length > 0;
-        //console.log("tabValid " + tabValid + ", ", tabs);
         if(tabValid) {
             let selectedTab = tabs[0];
             const options = {
                 frameId: 0
             };
-            chrome.tabs.sendMessage(selectedTab.id, data, options, function(response) {
+            chrome.tabs.sendMessage(selectedTab.id, data, options, response => {
                 // message sent to contentScript
-                console.log("message send to tab ", selectedTab, " " + response);
+                console.log("message send to tab ", selectedTab, " ", response);
             });
         }
+    });
+}
+
+function getCurrentTabUrl() {
+    return new Promise((resolve, reject) => {
+
+        chrome.tabs.query({active: true, lastFocusedWindow: true, windowType: "normal"}, tabs => {
+            const url = tabs && tabs.length > 0 ? tabs[0].url : null;
+            if(url) {
+                resolve(url);
+            }
+            else {
+                reject();
+            }
+        });
+
     });
 }
 
@@ -323,7 +339,6 @@ class ContextMenu
             site: site
         };
 
-        //console.log(site instanceof AbstractSite, site);
         this._updateMenuEntries();
     }
 
@@ -419,9 +434,8 @@ class ContextMenu
     _onPlayClick(info, tab)
     {
         let url = info.linkUrl || info.srcUrl;
-        //console.log("info.srcUrl "  + info.srcUrl + ", info.linkUrl " + info.linkUrl + ", url " + url, info);
-        let site = this._getSiteFromLinkUrl(url);
-        //console.log("site ", site, typeof site["onPlayClick"]);
+        let site = this._getSiteFromLinkUrl(url) || this.siteFilters["default"].site;
+
         if(site && typeof site["onPlayClick"] === "function")
         {
             site.onPlayClick(url);
@@ -431,7 +445,7 @@ class ContextMenu
     _onQueueClick(info, tab)
     {
         let url = info.linkUrl || info.srcUrl;
-        let site = this._getSiteFromLinkUrl(url);
+        let site = this._getSiteFromLinkUrl(url) || this.siteFilters["default"].site;
         if(site && typeof site["onQueueClick"] === "function")
         {
             site.onQueueClick(url);
@@ -441,7 +455,7 @@ class ContextMenu
     _onPlayAllClick(info, tab)
     {
         let url = info.linkUrl || info.srcUrl;
-        let site = this._getSiteFromLinkUrl(url);
+        let site = this._getSiteFromLinkUrl(url) || this.siteFilters["default"].site;
         if(site && typeof site["onPlayAllClick"] === "function")
         {
             site.onPlayAllClick(url);
@@ -451,7 +465,7 @@ class ContextMenu
     _onQueueAllClick(info, tab)
     {
         let url = info.linkUrl || info.srcUrl;
-        let site = this._getSiteFromLinkUrl(url);
+        let site = this._getSiteFromLinkUrl(url) || this.siteFilters["default"].site;
         if(site && typeof site["onQueueAllClick"] === "function")
         {
             site.onQueueAllClick(url);
@@ -460,22 +474,22 @@ class ContextMenu
 
     _getSiteFromLinkUrl(linkUrl)
     {
-        let site = this.siteFilters["default"].site;
         console.log("linkUrl " + linkUrl);
-        if(linkUrl)
-        {
-            linkUrl = linkUrl.toLowerCase();
-            Object.entries(this.siteFilters).some((item, index) =>
-            {
-                const key = item[0];
-                const value = item[1];
-                if(linkUrl.indexOf(key) >= 0)
-                {
-                    site = value.site;
-                    return true;
-                }
-            });
+        if(!linkUrl) {
+            return null;
         }
+
+        let site = null;
+        linkUrl = linkUrl.toLowerCase();
+        Object.entries(this.siteFilters).some((item, index) => {
+            const key = item[0];
+            const value = item[1];
+            if(linkUrl.indexOf(key) >= 0)
+            {
+                site = value.site;
+                return true;
+            }
+        });
         return site;
     }
 }
@@ -658,7 +672,130 @@ class AbstractSite
     }
 }
 
-let kodiConf = new KodiConfig();
+class BrowserAction
+{
+    constructor()
+    {
+        this.siteFilters = {};
+    }
 
-let contextMenu = new ContextMenu(kodiConf);
-let player = new Player(kodiConf);
+    addSite(siteName, site, urlPatterns)
+    {
+        this.siteFilters[siteName] = {
+            urlPatterns: urlPatterns,
+            site: site
+        };
+    }
+
+    canEnable(tabUrl)
+    {
+        let site = this._getSiteFromTabUrl(tabUrl);
+        return site != null;
+    }
+
+    play(tabUrl)
+    {
+        return new Promise((resolve, reject) => {
+
+            let site = this._getSiteFromTabUrl(tabUrl);
+            console.log(site);
+            if(site && typeof site["onPlayClick"] === "function") {
+                site.onPlayClick(tabUrl);
+                resolve();
+            }
+            else {
+                reject();
+            }
+
+        });
+    }
+
+    queue(tabUrl)
+    {
+        return new Promise((resolve, reject) => {
+
+            let site = this._getSiteFromTabUrl(tabUrl);
+            console.log(site);
+            if(site && typeof site["onQueueClick"] === "function") {
+                site.onQueueClick(tabUrl);
+                resolve();
+            }
+            else {
+                reject();
+            }
+
+        });
+    }
+
+    _getSiteFromTabUrl(tabUrl)
+    {
+        //console.log("_getSiteFromTabUrl " + tabUrl);
+        if(!tabUrl) {
+            return null;
+        }
+
+        let site = null;
+        tabUrl = tabUrl.toLowerCase();
+        Object.entries(this.siteFilters).some((item, index) => {
+            const key = item[0];
+            const value = item[1];
+            const patterns = value.urlPatterns;
+
+            const matches = Utils.urlMatchesOneOfPatterns(tabUrl, patterns);
+            if(matches) {
+                site = value.site;
+                return true;
+            }
+        });
+        return site;
+    }
+}
+
+var kodiConf = new KodiConfig();
+
+var contextMenu = new ContextMenu(kodiConf);
+var browserAction = new BrowserAction();
+var player = new Player(kodiConf);
+
+onMessage.addListener(function(data, sender, sendResponse)
+{
+    //console.log(data);
+    data = data || {};
+    let message = data.message;
+
+    if(message == "popupOpened")
+    {
+        getCurrentTabUrl().then(url => {
+            const enable = browserAction.canEnable(url);
+            sendResponse({success: enable});
+        }).catch(response => {
+            sendResponse({success: false});
+        });
+    }
+    else if(message == "playNowFromPopup")
+    {
+        getCurrentTabUrl().then(url => {
+            return browserAction.play(url);
+        }).then(response => {
+            sendResponse({success: true});
+        }).catch(response => {
+            sendResponse({success: false});
+        });
+    }
+    else if(message == "queueFromPopup")
+    {
+        getCurrentTabUrl().then(url => {
+            return browserAction.queue(url);
+        }).then(response => {
+            sendResponse({success: true});
+        }).catch(response => {
+            sendResponse({success: false});
+        });
+    }
+    else if(message == "openSettings")
+    {
+        chrome.tabs.create({url: chrome.extension.getURL("settings.html")}, ()=> {});
+    }
+
+    return true;
+});

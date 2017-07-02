@@ -116,7 +116,7 @@
             ToastUtil.invalidUrl();
         }
 
-        sendResponse(true);
+        sendResponse({message: "roger that!"});
         return true;
     });
 

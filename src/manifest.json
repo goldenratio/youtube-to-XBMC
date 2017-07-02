@@ -23,8 +23,8 @@
       "19": "assets/icon_19.png",
       "38": "assets/icon_38.png"
     },
-    "default_title": "Kassi Share - Settings",
-    "default_popup": "settings.html"
+    "default_title": "Kassi Share",
+    "default_popup": "action_popup.html"
   },
 
   "background": {
