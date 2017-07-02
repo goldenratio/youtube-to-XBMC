@@ -14,7 +14,7 @@
             const playlistFilters = ["*://www.youtube.com/*list=*"];
 
             contextMenu.addFilters("youtube.com", this, videoFilters, playlistFilters);
-            browserAction.addSite("youtube.com", this, [".*youtube.com/watch.*"]);
+            browserAction.addSite("youtube.com", this, [".*youtube.com/watch.*");
         }
 
 
@@ -96,7 +96,6 @@
 
         _handleRequest(playlistId, pageToken = "")
         {
-
             return new Promise((resolve, reject) => {
 
                 let url = sprintf(this.feedPath, pageToken, playlistId, this.api_key);
@@ -109,8 +108,7 @@
 
                     console.log("total entries, " + itemList.length);
 
-                    for (let i = 0; i < itemList.length; i++)
-                    {
+                    for (let i = 0; i < itemList.length; i++) {
                         var videoId = itemList[i]["contentDetails"]["videoId"];
                         if (videoId)
                         {
@@ -121,23 +119,16 @@
                     const nextPageToken = obj["nextPageToken"];
                     const hasMoreItemsInNextPage = (nextPageToken != null && typeof nextPageToken === "string");
 
-                    if(hasMoreItemsInNextPage)
-                    {
+                    if(hasMoreItemsInNextPage) {
                         this._handleRequest(playlistId, nextPageToken);
                         return;
                     }
 
-                    //console.log(this.videoIdList);
-
-                    this.isPending = false;
                     resolve(this.videoIdList);
 
 
-                }).catch((error) => {
-
-                    this.isPending = false;
+                }).catch(error => {
                     reject();
-
                 });
 
             });
@@ -145,13 +136,17 @@
 
         loadFeed(playlistId)
         {
+            if(this.isPending) {
+                console.log("gService is busy");
+                return;
+            }
             this.isPending = true;
             this.videoIdList = [];
 
             return new Promise((resolve, reject) => {
 
                 this._handleRequest(playlistId)
-                    .then((videoIdList) => {
+                    .then(videoIdList => {
                         this.isPending = false;
                         resolve(videoIdList);
                     })
