@@ -14,7 +14,7 @@
             const playlistFilters = ["*://www.youtube.com/*list=*"];
 
             contextMenu.addFilters("youtube.com", this, videoFilters, playlistFilters);
-            browserAction.addSite("youtube.com", this, [".*youtube.com/watch.*");
+            browserAction.addSite("youtube.com", this, [".*youtube.com/watch.*"]);
         }
 
 
