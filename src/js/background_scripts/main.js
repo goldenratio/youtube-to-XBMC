@@ -773,7 +773,9 @@ onMessage.addListener(function(data, sender, sendResponse)
     }
     else if(message == "openSettings")
     {
-        chrome.tabs.create({url: chrome.extension.getURL("settings.html")}, ()=> {});
+        chrome.tabs.create({url: chrome.extension.getURL("settings.html")}, ()=> {
+            safeFn(sendResponse, {success: true});
+        });
     }
 
     return true;

@@ -24,7 +24,9 @@
             this.settingsButton.addEventListener("click", this.onSettingsClick);
 
             sendMessage({message: "getButtonStatus"}, response => {
+
                 console.log("getButtonStatus ", response);
+
                 const disabled = !response.success;
                 this.playNowButton.disabled = disabled;
                 this.queueButton.disabled = disabled;
@@ -37,7 +39,13 @@
             this.playNowButton.disabled = true;
             sendMessage({message: "playNowFromPopup"}, response => {
                 console.log("playNowFromPopup ", response);
+                const success = response.success;
                 this.playNowButton.disabled = false;
+
+                if(success) {
+                    window.close();
+                }
+
             });
         }
 
@@ -46,14 +54,20 @@
             this.queueButton.disabled = true;
             sendMessage({message: "queueFromPopup"}, response => {
                 console.log("queueFromPopup ", response);
+                const success = response.success;
                 this.queueButton.disabled = false;
+
+                if(success) {
+                    window.close();
+                }
+
             });
         }
 
         onSettingsClick()
         {
             sendMessage({message: "openSettings"}, response => {
-
+                window.close();
             });
         }
 
