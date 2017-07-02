@@ -52,10 +52,11 @@
     {
       "matches": ["*://*.twitch.tv/*"],
       "js": ["js/content_scripts/sites/twitch.tv.js"]
+    },
+    {
+      "matches": ["*://*.err.ee/*"],
+      "js": ["js/content_scripts/sites/err.ee.js"]
     }
-  ],
-
-  "web_accessible_resources": [
   ],
 
   "options_page": "settings.html",
