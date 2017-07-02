@@ -340,7 +340,7 @@ class ContextMenu
         this._onQueueAllClick = this._onQueueAllClick.bind(this);
     }
 
-    addFilters(siteName, site, videoFilters, playlistFilters = null)
+    addSite(siteName, site, videoFilters, playlistFilters = null)
     {
         this.siteFilters[siteName] = {
             videoFilters: videoFilters,

@@ -8,7 +8,7 @@
             super();
             console.log("DefaultSite");
 
-            contextMenu.addFilters("default", this, [
+            contextMenu.addSite("default", this, [
                 "*://*/*.mp4",
                 "*://*/*.mov",
                 "*://*/*.webm",

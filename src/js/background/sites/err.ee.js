@@ -14,7 +14,7 @@
                 "etv+": "http://striimid.err.ee/live/smil:etvpluss/playlist.m3u8"
             };
 
-            contextMenu.addFilters("err.ee", this, ["*://*.err.ee/v/*/*-*-*-*-*/*"]);
+            contextMenu.addSite("err.ee", this, ["*://*.err.ee/v/*/*-*-*-*-*/*"]);
             browserAction.addSite("err.ee", this, [".*err.ee/v/.*/.*-.*-.*-.*-.*/.*"]);
         }
 

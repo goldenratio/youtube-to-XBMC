@@ -13,7 +13,7 @@
             const videoFilters = ["*://www.youtube.com/*v=*"];
             const playlistFilters = ["*://www.youtube.com/*list=*"];
 
-            contextMenu.addFilters("youtube.com", this, videoFilters, playlistFilters);
+            contextMenu.addSite("youtube.com", this, videoFilters, playlistFilters);
             browserAction.addSite("youtube.com", this, [".*youtube.com/watch.*"]);
         }
 

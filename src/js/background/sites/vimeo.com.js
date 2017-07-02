@@ -8,7 +8,7 @@
             super();
             console.log("Vimeo");
             this.pluginURL = "plugin://plugin.video.vimeo/play/?video_id=%s";
-            contextMenu.addFilters("vimeo.com", this, ["*://vimeo.com/*"]);
+            contextMenu.addSite("vimeo.com", this, ["*://vimeo.com/*"]);
             browserAction.addSite("vimeo.com", this, ["^.*vimeo.com[^/]*/\\d+.*$"]);
         }
 
