@@ -32,12 +32,12 @@
       "js/sprintf.js",
       "js/enums.js",
       "js/utils.js",
-      "js/background/main.js",
-      "js/background/sites/youtube.com.js",
-      "js/background/sites/vimeo.com.js",
-      "js/background/sites/err.ee.js",
-      "js/background/sites/twitch.tv.js",
-      "js/background/sites/default.js"
+      "js/background_scripts/main.js",
+      "js/background_scripts/sites/youtube.com.js",
+      "js/background_scripts/sites/vimeo.com.js",
+      "js/background_scripts/sites/err.ee.js",
+      "js/background_scripts/sites/twitch.tv.js",
+      "js/background_scripts/sites/default.js"
     ]
   },
 
