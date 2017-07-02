@@ -39,6 +39,15 @@ function getCurrentTabUrl() {
     });
 }
 
+function safeFn(fn, data)
+{
+    try {
+        fn(data);
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 // ---------------------
 
 class KodiConfig
@@ -769,9 +778,9 @@ onMessage.addListener(function(data, sender, sendResponse)
     {
         getCurrentTabUrl().then(url => {
             const enable = browserAction.canEnable(url);
-            sendResponse({success: enable});
+            safeFn(sendResponse, {success: enable});
         }).catch(response => {
-            sendResponse({success: false});
+            safeFn(sendResponse, {success: false});
         });
     }
     else if(message == "playNowFromPopup")
@@ -779,9 +788,9 @@ onMessage.addListener(function(data, sender, sendResponse)
         getCurrentTabUrl().then(url => {
             return browserAction.play(url);
         }).then(response => {
-            sendResponse({success: true});
+            safeFn(sendResponse, {success: true});
         }).catch(response => {
-            sendResponse({success: false});
+            safeFn(sendResponse, {success: false});
         });
     }
     else if(message == "queueFromPopup")
@@ -789,9 +798,9 @@ onMessage.addListener(function(data, sender, sendResponse)
         getCurrentTabUrl().then(url => {
             return browserAction.queue(url);
         }).then(response => {
-            sendResponse({success: true});
+            safeFn(sendResponse, {success: true});
         }).catch(response => {
-            sendResponse({success: false});
+            safeFn(sendResponse, {success: false});
         });
     }
     else if(message == "openSettings")

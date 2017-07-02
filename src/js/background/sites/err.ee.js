@@ -8,14 +8,14 @@
             super();
             console.log("err.ee");
             this.contentApiUrl = "https://etv.err.ee/api/loader/GetTimeLineContent/%s";
-            contextMenu.addFilters("err.ee", this, ["*://*.err.ee/v/*/*-*-*-*-*/*"]);
-
             this.liveStreams = {
                 "etv": "http://etvstream.err.ee/live/smil:etv/playlist.m3u8",
                 "etv2": "http://etv2stream.err.ee/live/smil:etv2/playlist.m3u8",
                 "etv+": "http://striimid.err.ee/live/smil:etvpluss/playlist.m3u8"
             };
 
+            contextMenu.addFilters("err.ee", this, ["*://*.err.ee/v/*/*-*-*-*-*/*"]);
+            browserAction.addSite("err.ee", this, [".*err.ee/v/.*/.*-.*-.*-.*-.*/.*"]);
         }
 
         _getVideoIdFromUrl(url)

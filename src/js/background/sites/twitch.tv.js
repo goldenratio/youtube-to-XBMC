@@ -24,6 +24,7 @@
             this.clipPluginUrl = this._pluginUrl + "slug=%s&channel_id=%s";
 
             contextMenu.addFilters("twitch.tv", this, ["*://*.twitch.tv/videos/*"]);
+            browserAction.addSite("twitch.tv", this, ["^(https|http)://(www\.)?twitch.tv/([^&/#\?]+).+$"]);
         }
 
         getFileFromUrl(url)
