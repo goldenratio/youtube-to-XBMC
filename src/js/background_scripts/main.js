@@ -105,7 +105,6 @@ class RPCService
 
     send(method, params = null)
     {
-        var thisObject = this;
         return new Promise((resolve, reject) => {
 
             let data = {
@@ -120,16 +119,16 @@ class RPCService
             }
 
             console.log("<< " + method, data);
-            thisObject.isPending = true;
+            this.isPending = true;
 
             let strData = JSON.stringify(data);
 
-            let urlRequest = new URLRequest(thisObject.kodiConf.url);
+            let urlRequest = new URLRequest(this.kodiConf.url);
             urlRequest.method = "POST";
 
             urlRequest.send(strData).then(response => {
 
-                thisObject.isPending = false;
+                this.isPending = false;
 
                 const data = JSON.parse(response);
                 console.log(">> " + method, data);
@@ -141,7 +140,7 @@ class RPCService
                 }
 
             }).catch(() => {
-                thisObject.isPending = false;
+                this.isPending = false;
                 reject();
             });
 
