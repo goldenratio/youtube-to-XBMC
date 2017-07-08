@@ -42,6 +42,7 @@
       "js/background_scripts/sites/vimeo.com.js",
       "js/background_scripts/sites/err.ee.js",
       "js/background_scripts/sites/twitch.tv.js",
+      "js/background_scripts/sites/facebook.com.js",
       "js/background_scripts/sites/default.js"
     ]
   },
@@ -61,6 +62,10 @@
     {
       "matches": ["*://*.twitch.tv/*"],
       "js": ["js/content_scripts/sites/twitch.tv.js"]
+    },
+    {
+      "matches": ["*://*.facebook.com/*"],
+      "js": ["js/content_scripts/sites/facebook.com.js"]
     }
   ],
 

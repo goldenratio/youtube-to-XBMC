@@ -155,7 +155,7 @@ function _sendMessageToContentScript(data, callbackSuccessFn = null, callbackErr
 
             chrome.tabs.sendMessage(selectedTab.id, data, options, response => {
                 // message sent to contentScript
-                console.log("message send to tab ", selectedTab, " ", response);
+                console.log("response from content tab << ", response);
                 callbackSuccessFn(response);
             });
         }
