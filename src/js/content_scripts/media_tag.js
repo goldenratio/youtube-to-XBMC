@@ -40,7 +40,7 @@
     var onMessage = chrome.extension.onMessage || chrome.runtime.onMessage || function(){};
     onMessage.addListener(function(data, sender, sendResponse) {
 
-        console.log(data , sender);
+        //console.log(data , sender);
         sendResponse = sendResponse || function() {};
         data = data || {};
         let message = data.message;
@@ -48,7 +48,7 @@
         if(message == "getPageMediaTagSource") {
 
             const mediaUrl = geMediaSrcUrl();
-            console.log("got " + message, mediaUrl);
+            //console.log("got " + message, mediaUrl);
             sendResponse({mediaUrl: mediaUrl})
         }
 
