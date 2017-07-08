@@ -12,6 +12,8 @@
         }
         return null;
     }
+
+
     function getVideoSrcUrl() {
         let videoTagCollection = document.getElementsByTagName("video");
         for(let video of videoTagCollection) {
