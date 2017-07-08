@@ -22,7 +22,7 @@
                 "*://*/*.mp3*"
             ]);
 
-            browserAction.addSite("youtube.com", this, [
+            browserAction.addSite("default", this, [
                 ".*.mp4.*",
                 ".*.mov.*",
                 ".*.webm.*",
