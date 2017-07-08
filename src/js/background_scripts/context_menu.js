@@ -72,14 +72,14 @@ class ContextMenu
                 type: "checkbox",
                 checked: true,
                 enabled: false,
-                contexts:["link", "video"],
+                contexts:["link", "video", "audio"],
                 targetUrlPatterns: filter
             };
             this.kodiNameId = chromeContextMenus.create(kodiName);
 
             const separator = {
                 type: "separator",
-                contexts:["link", "video"],
+                contexts:["link", "video", "audio"],
                 targetUrlPatterns: filter
             };
             chromeContextMenus.create(separator);
@@ -89,14 +89,14 @@ class ContextMenu
         if(hasVideo) {
             const playNow = {
                 title: "Play",
-                contexts:["link", "video"],
+                contexts:["link", "video", "audio"],
                 targetUrlPatterns: videoFilters,
                 onclick: this._onPlayClick
             };
 
             const addToQueue = {
                 title: "Add to Queue",
-                contexts:["link", "video"],
+                contexts:["link", "video", "audio"],
                 targetUrlPatterns: videoFilters,
                 onclick: this._onQueueClick
             };

@@ -14,16 +14,19 @@
     }
 
 
-    function getVideoSrcUrl() {
+    function geMediaSrcUrl() {
         let videoTagCollection = document.getElementsByTagName("video");
-        for(let video of videoTagCollection) {
+        let audioTagCollection = document.getElementsByTagName("audio");
 
-            const srcUrl = getSrcFromTag(video);
+        let mediaTags = [...videoTagCollection, ...audioTagCollection];
+        for(let media of mediaTags) {
+
+            const srcUrl = getSrcFromTag(media);
             if(srcUrl) {
                 return srcUrl;
             }
 
-            let sourceTags = video.getElementsByTagName("source");
+            let sourceTags = media.getElementsByTagName("source");
             for (let source of sourceTags) {
                 const srcUrl = getSrcFromTag(source);
                 if(srcUrl) {
@@ -37,16 +40,16 @@
     var onMessage = chrome.extension.onMessage || chrome.runtime.onMessage || function(){};
     onMessage.addListener(function(data, sender, sendResponse) {
 
-        //console.log(data , sender);
+        console.log(data , sender);
         sendResponse = sendResponse || function() {};
         data = data || {};
         let message = data.message;
 
-        if(message == "getPageVideoTagSource") {
+        if(message == "getPageMediaTagSource") {
 
-            const videoUrl = getVideoSrcUrl();
-            //console.log("got getPageVideoTagSource ", videoUrl);
-            sendResponse({videoUrl: videoUrl})
+            const mediaUrl = geMediaSrcUrl();
+            console.log("got " + message, mediaUrl);
+            sendResponse({mediaUrl: mediaUrl})
         }
 
     });

@@ -53,7 +53,7 @@
       "js": [
         "js/content_scripts/iziToast.js",
         "js/content_scripts/toast_message.js",
-        "js/content_scripts/video_tag.js"
+        "js/content_scripts/media_tag.js"
       ],
       "run_at": "document_end",
       "all_frames": true

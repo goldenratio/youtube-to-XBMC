@@ -24,12 +24,13 @@
         });
     }
 
-    function getPageVideoTagSrcUrl() {
+    function getPageMediaTagSrcUrl() {
         return new Promise((resolve, reject) => {
-            sendMessageToContentScript({message: "getPageVideoTagSource"}).then(response => {
+            sendMessageToContentScript({message: "getPageMediaTagSource"}).then(response => {
                 response = response || {};
-                const hasVideoTag = response.videoUrl != null;
-                hasVideoTag ? resolve(response.videoUrl) : reject();
+                const mediaUrl = response.mediaUrl;
+                const hasMedia = typeof mediaUrl === "string";
+                hasMedia ? resolve(mediaUrl) : reject();
             });
         });
     }
@@ -41,18 +42,19 @@
         data = data || {};
         let message = data.message;
 
+        console.log("message received " + message);
         if(message == "getButtonStatus")
         {
             getCurrentTabUrl()
                 .then(url => {
                     const enable = browserAction.canEnable(url);
                     if(!enable) {
-                        return getPageVideoTagSrcUrl();
+                        return getPageMediaTagSrcUrl();
                     }
                     safeFn(sendResponse, {success: enable});
                 })
                 .catch(response => {
-                    return getPageVideoTagSrcUrl();
+                    return getPageMediaTagSrcUrl();
                 })
                 .then(url => {
                     safeFn(sendResponse, {success: true});
@@ -71,7 +73,7 @@
                     safeFn(sendResponse, {success: true});
                 })
                 .catch(response => {
-                    return getPageVideoTagSrcUrl();
+                    return getPageMediaTagSrcUrl();
                 }).then(url => {
                     return browserAction.play(url);
                 })
