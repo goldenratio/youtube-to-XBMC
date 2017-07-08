@@ -95,7 +95,7 @@ class ContextMenu
             };
 
             const addToQueue = {
-                title: "Queue",
+                title: "Add to Queue",
                 contexts:["link", "video"],
                 targetUrlPatterns: videoFilters,
                 onclick: this._onQueueClick
@@ -114,7 +114,7 @@ class ContextMenu
             };
 
             const queueAll = {
-                title: "Queue All",
+                title: "Add All to Queue",
                 contexts:["link"],
                 targetUrlPatterns: playListFilters,
                 onclick: this._onQueueAllClick

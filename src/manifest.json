@@ -32,7 +32,7 @@
       "js/sprintf.js",
       "js/enums.js",
       "js/shared.js",
-      "js/background_scripts/content_menu.js",
+      "js/background_scripts/context_menu.js",
       "js/background_scripts/player.js",
       "js/background_scripts/browser_action.js",
       "js/background_scripts/main.js",
@@ -50,8 +50,12 @@
     {
       "matches": ["<all_urls>"],
       "css": ["css/iziToast.css"],
-      "js": ["js/content_scripts/iziToast.js", "js/content_scripts/main.js"],
-      "run_at": "document_idle",
+      "js": [
+        "js/content_scripts/iziToast.js",
+        "js/content_scripts/toast_message.js",
+        "js/content_scripts/video_tag.js"
+      ],
+      "run_at": "document_end",
       "all_frames": true
     },
     {

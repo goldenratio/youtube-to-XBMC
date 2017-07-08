@@ -24,41 +24,73 @@
         });
     }
 
-    var onMessage = chrome.extension.onMessage || chrome.runtime.onMessage || function(){};
+    function getPageVideoTagSrcUrl() {
+        return new Promise((resolve, reject) => {
+            sendMessageToContentScript({message: "getPageVideoTagSource"}).then(response => {
+                response = response || {};
+                const hasVideoTag = response.videoUrl != null;
+                hasVideoTag ? resolve(response.videoUrl) : reject();
+            });
+        });
+    }
+
+    const onMessage = chrome.extension.onMessage || chrome.runtime.onMessage || function(){};
     onMessage.addListener(function(data, sender, sendResponse)
     {
-        //console.log(data);
+        sendResponse = sendResponse || function() {};
         data = data || {};
         let message = data.message;
 
         if(message == "getButtonStatus")
         {
-            getCurrentTabUrl().then(url => {
-                const enable = browserAction.canEnable(url);
-                safeFn(sendResponse, {success: enable});
-            }).catch(response => {
-                safeFn(sendResponse, {success: false});
-            });
+            getCurrentTabUrl()
+                .then(url => {
+                    const enable = browserAction.canEnable(url);
+                    if(!enable) {
+                        return getPageVideoTagSrcUrl();
+                    }
+                    safeFn(sendResponse, {success: enable});
+                })
+                .catch(response => {
+                    return getPageVideoTagSrcUrl();
+                })
+                .then(url => {
+                    safeFn(sendResponse, {success: true});
+                })
+                .catch(response => {
+                    safeFn(sendResponse, {success: false});
+                });
         }
         else if(message == "playNowFromPopup")
         {
-            getCurrentTabUrl().then(url => {
-                return browserAction.play(url);
-            }).then(response => {
-                safeFn(sendResponse, {success: true});
-            }).catch(response => {
-                safeFn(sendResponse, {success: false});
-            });
+            getCurrentTabUrl()
+                .then(url => {
+                    return browserAction.play(url);
+                })
+                .then(response => {
+                    safeFn(sendResponse, {success: true});
+                })
+                .catch(response => {
+                    return getPageVideoTagSrcUrl();
+                }).then(url => {
+                    return browserAction.play(url);
+                })
+                .catch(response => {
+                    safeFn(sendResponse, {success: false});
+                });
         }
         else if(message == "queueFromPopup")
         {
-            getCurrentTabUrl().then(url => {
-                return browserAction.queue(url);
-            }).then(response => {
-                safeFn(sendResponse, {success: true});
-            }).catch(response => {
-                safeFn(sendResponse, {success: false});
-            });
+            getCurrentTabUrl()
+                .then(url => {
+                    return browserAction.queue(url);
+                })
+                .then(response => {
+                    safeFn(sendResponse, {success: true});
+                })
+                .catch(response => {
+                    safeFn(sendResponse, {success: false});
+                });
         }
         else if(message == "openSettings")
         {
@@ -66,14 +98,10 @@
                 safeFn(sendResponse, {success: true});
             });
         }
-        /*else if(message == "settingsChanged")
+        else
         {
-            console.log("settings changed");
-            let conf = data.kodiConf;
-            updateConf(conf);
-
-            safeFn(sendResponse, {success: true});
-        }*/
+            console.info("unknown message received " + message, data);
+        }
 
         return true;
     });

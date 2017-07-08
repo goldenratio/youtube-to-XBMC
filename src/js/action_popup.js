@@ -1,6 +1,6 @@
 ;(function()
 {
-    var sendMessage = chrome.extension.sendMessage || chrome.runtime.sendMessage || function(){};
+    const sendMessage = chrome.extension.sendMessage || chrome.runtime.sendMessage || function(){};
 
     class ActionPopup
     {
@@ -13,11 +13,11 @@
             this.onSettingsClick = this.onSettingsClick.bind(this);
 
             this.playNowButton = document.getElementById("playnow_button_js");
-            this.playNowButton.disabled = false;
+            this.playNowButton.disabled = true;
             this.playNowButton.addEventListener("click", this.onPlayNowClick);
 
             this.queueButton = document.getElementById("queue_button_js");
-            this.queueButton.disabled = false;
+            this.queueButton.disabled = true;
             this.queueButton.addEventListener("click", this.onQueueClick);
 
             this.settingsButton = document.getElementById("settings_button_js");
@@ -25,6 +25,7 @@
 
             sendMessage({message: "getButtonStatus"}, response => {
 
+                response = response || {};
                 console.log("getButtonStatus ", response);
 
                 const disabled = !response.success;

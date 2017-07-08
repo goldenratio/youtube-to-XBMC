@@ -4,6 +4,9 @@
     const onMessage = chrome.extension.onMessage || chrome.runtime.onMessage || function(){};
     onMessage.addListener(function(data, sender, sendResponse)
     {
+        data = data || {};
+        sendResponse = sendResponse || function() {};
+
         const messageType = data.message;
 
         if(messageType == "getContentId") {
