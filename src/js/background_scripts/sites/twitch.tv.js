@@ -1,11 +1,11 @@
-;(function()
+;(function(player)
 {
 
     class TwitchTV extends AbstractSite
     {
-        constructor()
+        constructor(player)
         {
-            super();
+            super(player);
             console.log("twitch.tv");
 
             /*
@@ -82,5 +82,5 @@
 
     }
 
-    new TwitchTV()
-})();
+    new TwitchTV(player)
+})(player);

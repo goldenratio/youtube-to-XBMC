@@ -1,24 +1,36 @@
-;(function()
+;(function(player)
 {
 
     class DefaultSite extends AbstractSite
     {
-        constructor()
+        constructor(player)
         {
-            super();
+            super(player);
             console.log("DefaultSite");
 
             contextMenu.addSite("default", this, [
-                "*://*/*.mp4",
-                "*://*/*.mov",
-                "*://*/*.webm",
-                "*://*/*.ogg",
-                "*://*/*.3gp",
-                "*://*/*.flv",
-                "*://*/*.avi",
-                "*://*/*.mpeg",
-                "*://*/*.m4a",
-                "*://*/*.ogv"
+                "*://*/*.mp4*",
+                "*://*/*.mov*",
+                "*://*/*.webm*",
+                "*://*/*.ogg*",
+                "*://*/*.3gp*",
+                "*://*/*.flv*",
+                "*://*/*.avi*",
+                "*://*/*.mpeg*",
+                "*://*/*.m4a*",
+                "*://*/*.ogv*"
+            ]);
+
+            browserAction.addSite("youtube.com", this, [
+                ".*.mp4.*",
+                ".*.mov.*",
+                ".*.webm.*",
+                ".*.ogg.*",
+                ".*.flv.*",
+                ".*.avi.*",
+                ".*.mpeg.*",
+                ".*.m4a.*",
+                ".*.ogv.*"
             ]);
         }
 
@@ -31,5 +43,5 @@
 
     }
 
-    new DefaultSite()
-})();
+    new DefaultSite(player)
+})(player);

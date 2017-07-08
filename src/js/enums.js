@@ -21,6 +21,7 @@ var Status = new function()
 
 var SettingsData = new function()
 {
+    this.KODI_NAME = "kodiName";
     this.HOST = "host";
     this.PORT = "port";
     this.USERNAME = "username";
@@ -35,8 +36,7 @@ var ButtonData = new function()
     this.CLEAR = "clearButton";
 };
 
-var ResultData = new function()
-{
-    this.OK = "OK";
-    this.ERROR = "ERROR";
+const ResultData = {
+    OK: "OK",
+    ERROR: "ERROR"
 };

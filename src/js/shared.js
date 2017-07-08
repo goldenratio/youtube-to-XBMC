@@ -48,6 +48,86 @@ class URLRequest
     }
 }
 
+class RPCService
+{
+    constructor(kodiConf)
+    {
+        this.kodiConf = kodiConf;
+        this.isPending = false;
+    }
+
+    send(method, params = null)
+    {
+        return new Promise((resolve, reject) => {
+
+            let data = {
+                jsonrpc: "2.0",
+                method: method,
+                id: 1
+            };
+
+            if(params)
+            {
+                data.params = params;
+            }
+
+            console.log("<< " + method, data);
+            this.isPending = true;
+
+            let strData = JSON.stringify(data);
+
+            console.log("this.kodiConf.url " + this.kodiConf.url);
+            let urlRequest = new URLRequest(this.kodiConf.url);
+            urlRequest.method = "POST";
+
+            urlRequest.send(strData).then(response => {
+
+                this.isPending = false;
+
+                const data = JSON.parse(response);
+                console.log(">> " + method, data);
+                if(data.error) {
+                    reject(data);
+                }
+                else {
+                    resolve(data);
+                }
+
+            }).catch(() => {
+                this.isPending = false;
+                reject();
+            });
+
+
+        });
+    }
+}
+
+class KodiConfig
+{
+    constructor()
+    {
+        this.name = "Kodi";
+        this.hostName = "";
+        this.port = "";
+        this.username = "";
+        this.password = "";
+    }
+
+    get _hasCredentials()
+    {
+        return this.username && this.password;
+    }
+
+    get url()
+    {
+        const credentials = this._hasCredentials ? `${this.username}:${this.password}@` : "";
+        return `http://${credentials}${this.hostName}:${this.port}/jsonrpc`;
+    }
+
+}
+
+
 class Utils
 {
     static findPropertyFromString(str, key) {
@@ -80,4 +160,5 @@ class Utils
 
         return false;
     }
+
 }

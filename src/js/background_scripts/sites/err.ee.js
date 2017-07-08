@@ -1,11 +1,11 @@
-;(function()
+;(function(player)
 {
 
     class Err extends AbstractSite
     {
-        constructor()
+        constructor(player)
         {
-            super();
+            super(player);
             console.log("err.ee");
             this.contentApiUrl = "https://etv.err.ee/api/loader/GetTimeLineContent/%s";
             this.liveStreams = {
@@ -109,5 +109,5 @@
         }
     }
 
-    new Err()
-})();
+    new Err(player)
+})(player);

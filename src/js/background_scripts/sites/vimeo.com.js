@@ -1,11 +1,11 @@
-;(function()
+;(function(player)
 {
 
     class Vimeo extends AbstractSite
     {
-        constructor()
+        constructor(player)
         {
-            super();
+            super(player);
             console.log("Vimeo");
             this.pluginURL = "plugin://plugin.video.vimeo/play/?video_id=%s";
             contextMenu.addSite("vimeo.com", this, ["*://vimeo.com/*"]);
@@ -42,5 +42,5 @@
         }
     }
 
-    new Vimeo()
-})();
+    new Vimeo(player)
+})(player);

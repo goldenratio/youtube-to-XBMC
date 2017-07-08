@@ -1,11 +1,12 @@
-;(function()
+;(function(player)
 {
 
     class Youtube extends AbstractSite
     {
         constructor()
         {
-            super();
+            super(player);
+
             console.log("youtube");
             this.pluginURL = "plugin://plugin.video.youtube/?action=play_video&videoid=%s";
             this.gService = new GService();
@@ -160,5 +161,5 @@
         }
     }
 
-    new Youtube()
-})();
+    new Youtube(player)
+})(player);

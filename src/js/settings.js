@@ -9,8 +9,10 @@ console.logCopy = console.log.bind(console);
 
 if (ENABLE_CONSOLE == false)
 {
-    console.log = function() {};
+    //console.log = function() {};
 }
+
+var sendMessage = chrome.extension.sendMessage || chrome.runtime.sendMessage || function(){};
 
 var Options = function()
 {
@@ -23,6 +25,7 @@ var Options = function()
      */
     this.init = function()
     {
+        var kodiNameTextField = document.getElementById(SettingsData.KODI_NAME);
         var hostTextField = document.getElementById(SettingsData.HOST);
         var portTextField = document.getElementById(SettingsData.PORT);
         var userNameTextField = document.getElementById(SettingsData.USERNAME);
@@ -57,6 +60,12 @@ var Options = function()
             if (item.password)
             {
                 pwdTextField.value = item.password;
+            }
+
+            console.log("item.name " + item.name);
+            if(item.name)
+            {
+                kodiNameTextField.value = item.name;
             }
 
             if (item.debugMode)
@@ -125,6 +134,7 @@ var Options = function()
         console.log("update local storage");
         chrome.storage.local.set({'host': connectionData.host, 'port': connectionData.port,
             'userName': connectionData.userName, 'password': connectionData.password,
+            'name': connectionData.kodiName,
             'xbmcURL': connectionData.url,
             'debugMode' : connectionData.debugMode}, function()
         {
@@ -230,6 +240,7 @@ var ConnectionData = function()
     this.port;
     this.userName;
     this.password;
+    this.kodiName;
     this.debugMode;
 
     this.canConnect = function(context)
@@ -240,6 +251,7 @@ var ConnectionData = function()
         var user = document.getElementById(SettingsData.USERNAME).value;
         var pwd = document.getElementById(SettingsData.PASSWORD).value;
         var debugChecked = document.getElementById(SettingsData.DEBUG_MODE).checked;
+        var kodiName = document.getElementById(SettingsData.KODI_NAME).value;
 
         if (portData == "")
         {
@@ -258,18 +270,25 @@ var ConnectionData = function()
         }
         this.url = "http://" + loginDetails + hostData + ":" + portData + "/jsonrpc";
 
-        //var params = '{ "item" : {"file" : "plugin://plugin.video.youtube/?action=play_video&videoid=iQOHRKKNNLQ"}}';
-        //rpc.sendRequest(this, "Player.Open", params);
-
         this.host = hostData;
         this.port = portData;
         this.userName = user;
         this.password = pwd;
         this.debugMode = debugChecked;
+        this.kodiName = kodiName;
 
-        rpc.setURL(this.url);
-        rpc.setDebugMode(this.debugMode);
-        rpc.sendRequest(this, "JSONRPC.Ping", null);
+        kodiConf.hostName = hostData;
+        kodiConf.port = portData;
+        kodiConf.username = user;
+        kodiConf.password = pwd;
+
+        rpc.send("JSONRPC.Ping")
+            .then(response => {
+                this.responseData(response);
+            })
+            .catch(error => {
+                this.responseData(null);
+            });
 
         return true;
     };
@@ -280,15 +299,16 @@ var ConnectionData = function()
         document.getElementById(SettingsData.PORT).value = "";
         document.getElementById(SettingsData.USERNAME).value = "";
         document.getElementById(SettingsData.PASSWORD).value = "";
+        document.getElementById(SettingsData.KODI_NAME).value = "";
         document.getElementById(SettingsData.DEBUG_MODE).checked = false;
     };
 
-    this.responseData = function(text)
+    this.responseData = function(obj)
     {
-        var obj = JSON.parse(text);
+        //var obj = JSON.parse(text);
         //console.log(text);
-        console.log(JSON.stringify(obj));
-        if (obj.error)
+        //console.log(JSON.stringify(obj));
+        if (!obj || obj.error)
         {
             thisObject.context.onConnectionFail();
         }
@@ -318,7 +338,8 @@ var ConnectionData = function()
 
 var statusMessage = new StatusMessage();
 var connectionData = new ConnectionData();
-var rpc = chrome.extension.getBackgroundPage().rpc;
+var kodiConf = new KodiConfig();
+var rpc = new RPCService(kodiConf);
 var options = new Options();
 
 window.addEventListener("load", loadComplete, false);
