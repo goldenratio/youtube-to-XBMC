@@ -74,7 +74,8 @@
                 })
                 .catch(response => {
                     return getPageMediaTagSrcUrl();
-                }).then(url => {
+                })
+                .then(url => {
                     return browserAction.play(url);
                 })
                 .catch(response => {
@@ -89,6 +90,12 @@
                 })
                 .then(response => {
                     safeFn(sendResponse, {success: true});
+                })
+                .catch(response => {
+                    return getPageMediaTagSrcUrl();
+                })
+                .then(url => {
+                    return browserAction.queue(url);
                 })
                 .catch(response => {
                     safeFn(sendResponse, {success: false});
