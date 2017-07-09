@@ -47,7 +47,10 @@
 
         if(message == "getPageMediaTagSource") {
 
-            const mediaUrl = geMediaSrcUrl();
+            let mediaUrl = geMediaSrcUrl();
+            if(mediaUrl && mediaUrl.indexOf("//") == 0) {
+                mediaUrl = window.location.protocol + mediaUrl;
+            }
             //console.log("got " + message, mediaUrl);
             sendResponse({mediaUrl: mediaUrl})
         }
