@@ -13,7 +13,7 @@
             let scriptList = [...document.scripts];
 
             for (let script of scriptList) {
-                const scriptSource = script.innerText;
+                const scriptSource = script.textContent;
                 if(scriptSource.indexOf("hd_src_no_ratelimit:") >= 0 || scriptSource.indexOf("sd_src_no_ratelimit:") >= 0)
                 {
                     let url = _getUrl(scriptSource, "hd_src_no_ratelimit:");
