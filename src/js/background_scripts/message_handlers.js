@@ -78,6 +78,9 @@
                 .then(url => {
                     return browserAction.play(url);
                 })
+                .then(response => {
+                    safeFn(sendResponse, {success: true});
+                })
                 .catch(response => {
                     safeFn(sendResponse, {success: false});
                 });
@@ -96,6 +99,9 @@
                 })
                 .then(url => {
                     return browserAction.queue(url);
+                })
+                .then(response => {
+                    safeFn(sendResponse, {success: true});
                 })
                 .catch(response => {
                     safeFn(sendResponse, {success: false});
