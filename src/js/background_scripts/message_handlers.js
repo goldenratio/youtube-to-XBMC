@@ -58,7 +58,8 @@
                     return getPageMediaTagSrcUrl();
                 })
                 .then(url => {
-                    safeFn(sendResponse, {success: true});
+                    const enable = browserAction.canEnable(url);
+                    safeFn(sendResponse, {success: enable});
                 })
                 .catch(response => {
                     safeFn(sendResponse, {success: false});
