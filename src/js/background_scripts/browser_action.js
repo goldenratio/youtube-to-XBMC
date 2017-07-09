@@ -21,9 +21,7 @@ class BrowserAction
 
     play(tabUrl)
     {
-        let site = this._getSiteFromTabUrl(tabUrl);
-        console.log(site);
-
+        const site = this._getSiteFromTabUrl(tabUrl);
         if(site && typeof site["onPlayClick"] === "function") {
             return site.onPlayClick(tabUrl);
         }
@@ -46,24 +44,21 @@ class BrowserAction
 
     _getSiteFromTabUrl(tabUrl)
     {
-        //console.log("_getSiteFromTabUrl " + tabUrl);
-        if(!tabUrl) {
-            return null;
-        }
-
         let site = null;
-        tabUrl = tabUrl.toLowerCase();
-        Object.entries(this.siteFilters).some((item, index) => {
-            const key = item[0];
-            const value = item[1];
-            const patterns = value.urlPatterns;
+        if(tabUrl) {
+            tabUrl = tabUrl.toLowerCase();
+            Object.entries(this.siteFilters).some((item, index) => {
+                const key = item[0];
+                const value = item[1];
+                const patterns = value.urlPatterns;
 
-            const matches = Utils.urlMatchesOneOfPatterns(tabUrl, patterns);
-            if(matches) {
-                site = value.site;
-                return true;
-            }
-        });
+                const matches = Utils.urlMatchesOneOfPatterns(tabUrl, patterns);
+                if(matches) {
+                    site = value.site;
+                    return true;
+                }
+            });
+        }
         return site;
     }
 }

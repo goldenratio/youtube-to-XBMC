@@ -29,6 +29,7 @@
             sendMessageToContentScript({message: "getPageMediaTagSource"}).then(response => {
                 response = response || {};
                 const mediaUrl = response.mediaUrl;
+                console.log("getPageMediaTagSrcUrl " + mediaUrl);
                 const hasMedia = typeof mediaUrl === "string";
                 hasMedia ? resolve(mediaUrl) : reject();
             });
