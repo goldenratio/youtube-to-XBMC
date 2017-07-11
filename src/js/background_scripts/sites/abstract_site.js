@@ -150,12 +150,11 @@ function _sendMessageToContentScript(data, callbackSuccessFn = null, callbackErr
         if(tabValid) {
             let selectedTab = tabs[0];
             const options = {
-                frameId: 0
             };
 
             chrome.tabs.sendMessage(selectedTab.id, data, options, response => {
                 // message sent to contentScript
-                console.log("response from content tab << ", response);
+                console.log("response from content tab << ", response + " from tab ", selectedTab);
                 callbackSuccessFn(response);
             });
         }

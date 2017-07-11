@@ -51,7 +51,8 @@
             if(mediaUrl && mediaUrl.indexOf("//") == 0) {
                 mediaUrl = window.location.protocol + mediaUrl;
             }
-            //console.log("got " + message, mediaUrl);
+            //console.log("got " + message, mediaUrl + ", tabURL " + window.location.href);
+            //console.log(sender);
             sendResponse({mediaUrl: mediaUrl})
         }
 
