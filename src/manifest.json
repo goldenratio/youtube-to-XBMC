@@ -57,19 +57,28 @@
         "js/content_scripts/media_tag.js"
       ],
       "run_at": "document_end",
+      "all_frames": false
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["js/content_scripts/media_tag.js"],
+      "run_at": "document_end",
       "all_frames": true
     },
     {
       "matches": ["*://*.twitch.tv/*"],
-      "js": ["js/content_scripts/sites/twitch.tv.js"]
+      "js": ["js/content_scripts/sites/twitch.tv.js"],
+      "run_at": "document_end",
+      "all_frames": true
     },
     {
       "matches": ["*://*.facebook.com/*"],
-      "js": ["js/content_scripts/sites/facebook.com.js"]
+      "js": ["js/content_scripts/sites/facebook.com.js"],
+      "run_at": "document_end",
+      "all_frames": true
     }
   ],
 
   "options_page": "settings.html",
-
   "short_name": "Kassi Share"
 }
