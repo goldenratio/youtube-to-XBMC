@@ -170,10 +170,10 @@
      * Create a fragment DOM elements
      * @private
      */
-    var createFragElem = function(htmlStr) {
+    var createFragElem = function(toastText) {
         var frag = document.createDocumentFragment(),
             temp = document.createElement('div');
-        temp.innerHTML = htmlStr;
+        temp.textContent = toastText;
         while (temp.firstChild) {
             frag.appendChild(temp.firstChild);
         }
