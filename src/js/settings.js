@@ -62,7 +62,6 @@ var Options = function()
                 pwdTextField.value = item.password;
             }
 
-            console.log("item.name " + item.name);
             if(item.name)
             {
                 kodiNameTextField.value = item.name;
@@ -247,17 +246,11 @@ var ConnectionData = function()
     {
         this.context = context;
         var hostData = document.getElementById(SettingsData.HOST).value;
-        var portData = document.getElementById(SettingsData.PORT).value;
+        var portData = document.getElementById(SettingsData.PORT).value || document.getElementById(SettingsData.PORT).placeholder;
         var user = document.getElementById(SettingsData.USERNAME).value;
         var pwd = document.getElementById(SettingsData.PASSWORD).value;
         var debugChecked = document.getElementById(SettingsData.DEBUG_MODE).checked;
-        var kodiName = document.getElementById(SettingsData.KODI_NAME).value;
-
-        if (portData == "")
-        {
-            // default port
-            portData = "8080";
-        }
+        var kodiName = document.getElementById(SettingsData.KODI_NAME).value || document.getElementById(SettingsData.KODI_NAME).placeholder;
 
         if(hostData == "")
             return false;
