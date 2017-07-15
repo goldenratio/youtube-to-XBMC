@@ -27,10 +27,17 @@
             return new Promise((resolve, reject) => {
 
                 const playListId = Utils.findPropertyFromString(url, "list");
-                const selectedVideoId = Utils.findPropertyFromString(url, "v");
                 if(playListId == "WL") {
                     reject();
                     return;
+                }
+
+                let selectedVideoId = Utils.findPropertyFromString(url, "v");
+                if(!selectedVideoId) {
+                    let parts = url.split("/");
+                    if(parts && parts.length > 1) {
+                        selectedVideoId = parts[parts.length - 1];
+                    }
                 }
 
                 this.gService.loadFeed(playListId)
