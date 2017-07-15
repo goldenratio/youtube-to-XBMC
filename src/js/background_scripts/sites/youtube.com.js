@@ -179,5 +179,5 @@
         }
     }
 
-    new Youtube(player)
+    sites.youtube = new Youtube(player)
 })(player);

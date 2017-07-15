@@ -65,6 +65,24 @@
                     safeFn(sendResponse, {success: false});
                 });
         }
+        else if(message == "playNowFromContent")
+        {
+            const siteName = data.site;
+            const url = data.url;
+            sites[siteName].onPlayClick(url);
+        }
+        else if(message == "queueFromContent")
+        {
+            const siteName = data.site;
+            const url = data.url;
+            sites[siteName].onQueueClick(url);
+        }
+        else if(message == "playAllFromContent")
+        {
+            const siteName = data.site;
+            const url = data.url;
+            sites[siteName].onPlayAllClick(url);
+        }
         else if(message == "playNowFromPopup")
         {
             getCurrentTabUrl()

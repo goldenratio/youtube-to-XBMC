@@ -9,7 +9,7 @@ var browserAction = new BrowserAction();
 var kodiConf = new KodiConfig();
 var player = new Player(kodiConf);
 var contextMenu = new ContextMenu(kodiConf);
-
+var sites = {};
 
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "install") {
