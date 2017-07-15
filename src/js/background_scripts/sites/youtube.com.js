@@ -11,13 +11,14 @@
             this.pluginURL = "plugin://plugin.video.youtube/?action=play_video&videoid=%s";
             this.gService = new GService();
 
-            contextMenu.addSite("youtube.com", this,
-                ["*://www.youtube.com/*v=*"],
-                ["*://www.youtube.com/*list=*"]);
+            contextMenu.addSite("youtube.com", this, ["*://www.youtube.com/*v=*"], ["*://www.youtube.com/*list=*"]);
 
             contextMenu.addSite("youtu.be", this, ["*://youtu.be/*"], []);
 
-            browserAction.addSite("youtube.com", this, [".*youtube.com/watch.*"]);
+            browserAction.addSite("youtube.com", this, [
+                ".*youtube.com/watch.*",
+                ".*youtube.com/embed/.*"
+            ]);
         }
 
 
@@ -69,13 +70,14 @@
             return new Promise((reslove, reject) => {
 
                 let videoId = Utils.findPropertyFromString(url, "v");
-                if(!videoId && url.indexOf("youtu.be/")) {
+                if(!videoId) {
                     let parts = url.split("/");
                     if(parts && parts.length > 1) {
                         videoId = parts[parts.length - 1];
                     }
                 }
 
+                console.log("videoId " + videoId);
                 const fileUrl = videoId ? sprintf(this.pluginURL, videoId) : null;
 
                 if(fileUrl) {
