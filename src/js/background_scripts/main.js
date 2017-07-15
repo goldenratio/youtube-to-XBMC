@@ -11,6 +11,17 @@ var player = new Player(kodiConf);
 var contextMenu = new ContextMenu(kodiConf);
 
 
+chrome.runtime.onInstalled.addListener(function (details) {
+    if (details.reason == "install") {
+        console.log("extension installed");
+        // open settings
+        chrome.tabs.create({url: chrome.extension.getURL("settings.html")}, ()=> {
+
+        });
+    }
+});
+
+
 function updateConf()
 {
     chrome.storage.local.get(conf => {
