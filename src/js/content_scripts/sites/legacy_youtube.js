@@ -267,14 +267,17 @@
             for(let i = 0; i < divListLen; i++)
             {
                 let el = divList[i];
-                const alreadyAdded = this.isControlAdded(el);
+                //console.log(el);
+                const tagName = el.tagName.toLowerCase();
+                const addInParentNode = tagName == "ytd-thumbnail";
+                const checkInParentNode = addInParentNode;
+
+                const alreadyAdded = this.isControlAdded(el, checkInParentNode);
                 if (alreadyAdded)
                 {
                     //console.log("Already added - injectLinks");
                     continue;
                 }
-
-                const newDesign = el.tagName.toUpperCase() == "YTD-THUMBNAIL";
 
                 // (home / subscription on home page), search page, video manager, (user page / user browse video / Popular on YouTube)
                 let df = el.querySelectorAll(".feed-video-title, .yt-uix-tile-link, .vm-video-title-content, " +
@@ -284,7 +287,7 @@
                 for (let j = 0; j < len; j++)
                 {
                     let innerEl = df[j];
-                    const result = this.insertDOMElement(el, innerEl, newDesign);
+                    const result = this.insertDOMElement(el, innerEl, addInParentNode);
                     if(result)
                     {
                         break;
@@ -294,15 +297,20 @@
 
         }
 
-        isControlAdded(el)
+        isControlAdded(el, checkParent = false)
         {
-            let list = el.querySelectorAll(".xbmc_control") || [];
-            if(list.length > 0) {
-                return true;
+            if(!checkParent) {
+                let list = el.querySelectorAll(".xbmc_control") || [];
+                if(list.length > 0) {
+                    return true;
+                }
+            }
+            else if(checkParent) {
+                let list = el.parentNode.querySelectorAll(".xbmc_control") || [];
+                return list.length > 0;
             }
 
-            list = el.parentNode.querySelectorAll(".xbmc_control");
-            return list.length > 0;
+            return false;
         }
 
         insertDOMElement(el, innerEl, newDesign = false)
