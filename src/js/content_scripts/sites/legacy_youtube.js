@@ -255,7 +255,11 @@
         {
             //console.log("injectLinks ", this);
             // (home / subscription on home page), search page, video manager, user page, user browse video, Popular on YouTube, Popular on youtube right side, video list (on video page), play list page
-            let classes = ".feed-item-content, .yt-lockup2-content, .vm-video-info-container, .yt-tile-visible, .channels-content-item, .lohp-category-shelf-item, .lohp-large-shelf-container, .lohp-medium-shelf-content, .lohp-vertical-shelf-item-content, .video-list-item, .playlist-video-item, .yt-lockup-content, .recent-activity-snippet, .playlist-actions, .pl-video-title";
+            let classes = ".feed-item-content, .yt-lockup2-content, .vm-video-info-container, " +
+                ".yt-tile-visible, .channels-content-item, .lohp-category-shelf-item, " +
+                ".lohp-large-shelf-container, .lohp-medium-shelf-content, .lohp-vertical-shelf-item-content, " +
+                ".video-list-item, .playlist-video-item, .yt-lockup-content, .recent-activity-snippet, " +
+                ".playlist-actions, .pl-video-title, ytd-thumbnail";
 
             let divList = document.querySelectorAll(classes) || [];
             const divListLen = divList.length;
@@ -263,7 +267,6 @@
             for(let i = 0; i < divListLen; i++)
             {
                 let el = divList[i];
-                //console.log(el);
                 const alreadyAdded = this.isControlAdded(el);
                 if (alreadyAdded)
                 {
@@ -271,14 +274,17 @@
                     continue;
                 }
 
+                const newDesign = el.tagName.toUpperCase() == "YTD-THUMBNAIL";
+
                 // (home / subscription on home page), search page, video manager, (user page / user browse video / Popular on YouTube)
-                let df = el.querySelectorAll(".feed-video-title, .yt-uix-tile-link, .vm-video-title-content, .yt-uix-sessionlink, a");
+                let df = el.querySelectorAll(".feed-video-title, .yt-uix-tile-link, .vm-video-title-content, " +
+                    ".yt-uix-sessionlink, a");
                 let len = df.length;
 
                 for (let j = 0; j < len; j++)
                 {
                     let innerEl = df[j];
-                    const result = this.insertDOMElement(el, innerEl);
+                    const result = this.insertDOMElement(el, innerEl, newDesign);
                     if(result)
                     {
                         break;
@@ -291,11 +297,15 @@
         isControlAdded(el)
         {
             let list = el.querySelectorAll(".xbmc_control") || [];
-            const len = list.length;
-            return len > 0;
+            if(list.length > 0) {
+                return true;
+            }
+
+            list = el.parentNode.querySelectorAll(".xbmc_control");
+            return list.length > 0;
         }
 
-        insertDOMElement(el, innerEl)
+        insertDOMElement(el, innerEl, newDesign = false)
         {
             let thisObject = this;
             let videoPathString = innerEl.getAttribute("href");
@@ -364,7 +374,12 @@
                         .build();
 
                     thisObject.addListeners(div);
-                    el.insertBefore(div, el.firstChild);
+                    if(newDesign) {
+                        el.parentNode.insertBefore(div, el.nextSibling);
+                    }
+                    else {
+                        el.insertBefore(div, el.firstChild);
+                    }
                     return true;
                 }
             }
