@@ -404,7 +404,7 @@
                 return;
             }
 
-            let loc = window.location.toString();
+            let loc = window.location.href.toString();
             var videoId = Utils.findPropertyFromString(loc, "v");
             let listId = Utils.findPropertyFromString(loc, "list");
 
