@@ -15,7 +15,7 @@ var SettingsData = new function()
     this.USERNAME = "username";
     this.PASSWORD = "pwd";
     this.DEBUG_MODE = "debugMode";
-    this.HIDE_INPAGE_LINKS = "hide_inpage_links";
+    this.SHOW_INPAGE_LINKS = "show_inpage_links";
 };
 
 

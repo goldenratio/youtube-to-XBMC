@@ -22,7 +22,7 @@ var Options = function()
         var userNameTextField = document.getElementById(SettingsData.USERNAME);
         var pwdTextField = document.getElementById(SettingsData.PASSWORD);
         var debugModeCheckbox = document.getElementById(SettingsData.DEBUG_MODE);
-        var hideInPageLinksCheckbox = document.getElementById(SettingsData.HIDE_INPAGE_LINKS);
+        var showInPageLinksCheckbox = document.getElementById(SettingsData.SHOW_INPAGE_LINKS);
 
         var connectButton = document.getElementById(ButtonData.CONNECT);
         connectButton.addEventListener("click", thisObject.onConnectHandler);
@@ -64,9 +64,9 @@ var Options = function()
                 debugModeCheckbox.checked = true;
             }
 
-            if(item.hideInPage && item.hideInPage == true)
+            if(item.showInPage && item.showInPage == true)
             {
-                hideInPageLinksCheckbox.checked = true;
+                showInPageLinksCheckbox.checked = true;
             }
 
             if (item.host && item.port)
@@ -130,7 +130,7 @@ var Options = function()
             'name': connectionData.kodiName,
             'xbmcURL': connectionData.url,
             'debugMode' : connectionData.debugMode,
-            'hideInPage': connectionData.hideInPage
+            'showInPage': connectionData.showInPage
         },
         function()
         {
@@ -238,7 +238,7 @@ var ConnectionData = function()
     this.password;
     this.kodiName;
     this.debugMode;
-    this.hideInPage;
+    this.showInPage;
 
     this.canConnect = function(context)
     {
@@ -248,7 +248,7 @@ var ConnectionData = function()
         var user = document.getElementById(SettingsData.USERNAME).value;
         var pwd = document.getElementById(SettingsData.PASSWORD).value;
         var debugChecked = document.getElementById(SettingsData.DEBUG_MODE).checked;
-        var hideInPageChecked = document.getElementById(SettingsData.HIDE_INPAGE_LINKS).checked;
+        var showInPageChecked = document.getElementById(SettingsData.SHOW_INPAGE_LINKS).checked;
         var kodiName = document.getElementById(SettingsData.KODI_NAME).value || document.getElementById(SettingsData.KODI_NAME).placeholder;
 
         if(hostData == "")
@@ -267,7 +267,7 @@ var ConnectionData = function()
         this.userName = user;
         this.password = pwd;
         this.debugMode = debugChecked;
-        this.hideInPage = hideInPageChecked;
+        this.showInPage = showInPageChecked;
         this.kodiName = kodiName;
 
         kodiConf.hostName = hostData;
