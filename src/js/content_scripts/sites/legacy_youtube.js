@@ -455,7 +455,7 @@
 
     chrome.storage.local.get(function(item)
     {
-        if(item.showInPage && item.showInPage == true)
+        if(!item.showInPage || (item.showInPage && item.showInPage == true))
         {
             new ContentInjector();
         }
