@@ -3,15 +3,6 @@
  * @author: Karthik VJ
  */
 
-var console = console || {};
-console.log = console.log || function() {};
-console.logCopy = console.log.bind(console);
-
-if (ENABLE_CONSOLE == false)
-{
-    //console.log = function() {};
-}
-
 var sendMessage = chrome.extension.sendMessage || chrome.runtime.sendMessage || function(){};
 
 var Options = function()
@@ -31,6 +22,7 @@ var Options = function()
         var userNameTextField = document.getElementById(SettingsData.USERNAME);
         var pwdTextField = document.getElementById(SettingsData.PASSWORD);
         var debugModeCheckbox = document.getElementById(SettingsData.DEBUG_MODE);
+        var hideInPageLinksCheckbox = document.getElementById(SettingsData.HIDE_INPAGE_LINKS);
 
         var connectButton = document.getElementById(ButtonData.CONNECT);
         connectButton.addEventListener("click", thisObject.onConnectHandler);
@@ -67,12 +59,14 @@ var Options = function()
                 kodiNameTextField.value = item.name;
             }
 
-            if (item.debugMode)
+            if (item.debugMode && item.debugMode == true)
             {
-                if (item.debugMode == true)
-                {
-                    debugModeCheckbox.checked = true;
-                }
+                debugModeCheckbox.checked = true;
+            }
+
+            if(item.hideInPage && item.hideInPage == true)
+            {
+                hideInPageLinksCheckbox.checked = true;
             }
 
             if (item.host && item.port)
@@ -135,7 +129,10 @@ var Options = function()
             'userName': connectionData.userName, 'password': connectionData.password,
             'name': connectionData.kodiName,
             'xbmcURL': connectionData.url,
-            'debugMode' : connectionData.debugMode}, function()
+            'debugMode' : connectionData.debugMode,
+            'hideInPage': connectionData.hideInPage
+        },
+        function()
         {
             console.log("data saved");
         });
@@ -241,6 +238,7 @@ var ConnectionData = function()
     this.password;
     this.kodiName;
     this.debugMode;
+    this.hideInPage;
 
     this.canConnect = function(context)
     {
@@ -250,6 +248,7 @@ var ConnectionData = function()
         var user = document.getElementById(SettingsData.USERNAME).value;
         var pwd = document.getElementById(SettingsData.PASSWORD).value;
         var debugChecked = document.getElementById(SettingsData.DEBUG_MODE).checked;
+        var hideInPageChecked = document.getElementById(SettingsData.HIDE_INPAGE_LINKS).checked;
         var kodiName = document.getElementById(SettingsData.KODI_NAME).value || document.getElementById(SettingsData.KODI_NAME).placeholder;
 
         if(hostData == "")
@@ -268,6 +267,7 @@ var ConnectionData = function()
         this.userName = user;
         this.password = pwd;
         this.debugMode = debugChecked;
+        this.hideInPage = hideInPageChecked;
         this.kodiName = kodiName;
 
         kodiConf.hostName = hostData;

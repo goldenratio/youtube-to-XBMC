@@ -1,15 +1,3 @@
-/**
- * This file contains element ID
- * @author: Karthik VJ
- */
-
-// enable / disable console log
-/**
- * @deprecated currently used in inject script and settings.js, will be replaced with debugMode flag
- * @type {boolean}
- */
-var ENABLE_CONSOLE = false;
-
 var Status = new function()
 {
     this.SUCCESS = "success_status";
@@ -27,6 +15,7 @@ var SettingsData = new function()
     this.USERNAME = "username";
     this.PASSWORD = "pwd";
     this.DEBUG_MODE = "debugMode";
+    this.HIDE_INPAGE_LINKS = "hide_inpage_links";
 };
 
 

@@ -452,7 +452,14 @@
 
     }
 
-    new ContentInjector();
+
+    chrome.storage.local.get(function(item)
+    {
+        if(!item.hideInPage)
+        {
+            new ContentInjector();
+        }
+    });
 
 
 })();
