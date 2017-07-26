@@ -43,6 +43,7 @@
       "js/background_scripts/sites/err.ee.js",
       "js/background_scripts/sites/twitch.tv.js",
       "js/background_scripts/sites/facebook.com.js",
+      "js/background_scripts/sites/postimees.ee.js",
       "js/background_scripts/sites/default.js"
     ]
   },
@@ -80,6 +81,12 @@
       "matches": ["*://*.youtube.com/*"],
       "css": ["css/legacy_youtube.css"],
       "js": ["js/content_scripts/sites/legacy_youtube.js"],
+      "run_at": "document_end",
+      "all_frames": true
+    },
+    {
+      "matches": ["*://*.postimees.ee/*"],
+      "js": ["js/content_scripts/sites/postimees.ee.js"],
       "run_at": "document_end",
       "all_frames": true
     }

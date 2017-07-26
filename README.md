@@ -13,4 +13,4 @@ Supported websites:
 3. Twitch.tv
 4. Vimeo.com
 5. err.ee (etv, etv2, etv+)
-
+6. Postimees.ee
