@@ -1,26 +1,16 @@
 Kassi Share
 =============
 
-Send YouTube videos to Kodi/XBMC Media Center (Web Extension)
+Send videos to Kodi Media Center (Web Extension)
 
 Chrome Web Store, https://chrome.google.com/webstore/detail/youtube-to-xbmc/gbghegmimhjemkhpimohkdopkeahldbh
 Firefox AddOn, https://addons.mozilla.org/en-US/firefox/addon/kassi-share/
 
-**Features:**
--------------
-1. "Play Now" and "Add to Queue" links are placed conveniently to contents in homepage, search pages and channel pages. 
-2. Performs connection test when host is configured.
-3. YouTube videos that are placed in other websites can also be shared to XBMC. Click on share icon to see the controls.
-4. Supports playlist.
+Supported websites:
 
-
-**How To Load the Extension**
------------------------------
-
-1. Download the extension https://github.com/goldenratio/youtube-to-XBMC/archive/master.zip, and unzip it.
-2. Visit chrome://extensions in your browser (or open up the Chrome menu by clicking the icon to the far right of the Omnibox:  . and select Extensions under the Tools menu to get to the same place).
-3. Ensure that the Developer Mode checkbox in the top right-hand corner is checked.
-4. Click Load unpacked extension… to pop up a file-selection dialog.
-5. Navigate to the directory in which your extension files live, and select "src" folder.
-
+1. Youtube.com
+2. Facebook.com
+3. Twitch.tv
+4. Vimeo.com
+5. err.ee (etv, etv2, etv+)
 
