@@ -26,13 +26,17 @@
 
     function getPageMediaTagSrcUrl() {
         return new Promise((resolve, reject) => {
-            sendMessageToContentScript({message: "getPageMediaTagSource"}).then(response => {
-                response = response || {};
-                const mediaUrl = response.mediaUrl;
-                console.log("getPageMediaTagSrcUrl " + mediaUrl);
-                const hasMedia = typeof mediaUrl === "string";
-                hasMedia ? resolve(mediaUrl) : reject();
-            });
+            sendMessageToContentScript({message: "getPageMediaTagSource"})
+                .then(response => {
+                    response = response || {};
+                    const mediaUrl = response.mediaUrl;
+                    console.log("getPageMediaTagSrcUrl " + mediaUrl);
+                    const hasMedia = typeof mediaUrl === "string";
+                    hasMedia ? resolve(mediaUrl) : reject();
+                })
+                .catch(err => {
+                    reject();
+                });
         });
     }
 
@@ -47,18 +51,18 @@
         if(message == "getButtonStatus")
         {
             getCurrentTabUrl()
-                .then(url => {
-                    const enable = browserAction.canEnable(url);
+                .then(webPageUrl => {
+                    const enable = browserAction.canEnable(webPageUrl);
                     if(!enable) {
-                        return getPageMediaTagSrcUrl();
+                        throw new Error("");
                     }
-                    safeFn(sendResponse, {success: enable});
+                    safeFn(sendResponse, {success: true});
                 })
                 .catch(response => {
                     return getPageMediaTagSrcUrl();
                 })
-                .then(url => {
-                    const enable = browserAction.canEnable(url);
+                .then(mediaUrl => {
+                    const enable = browserAction.canEnable(mediaUrl);
                     safeFn(sendResponse, {success: enable});
                 })
                 .catch(response => {

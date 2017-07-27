@@ -51,9 +51,14 @@
             if(mediaUrl && mediaUrl.indexOf("//") == 0) {
                 mediaUrl = window.location.protocol + mediaUrl;
             }
-            //console.log("got " + message, mediaUrl + ", tabURL " + window.location.href);
-            //console.log(sender);
-            sendResponse({mediaUrl: mediaUrl})
+
+            let timeOutVal = mediaUrl ? 0 : 50;
+            setTimeout(() => {
+                //console.log("got " + message, mediaUrl + ", tabURL " + window.location.href);
+                sendResponse({mediaUrl: mediaUrl});
+            }, timeOutVal);
+
+            return true;
         }
 
     });
