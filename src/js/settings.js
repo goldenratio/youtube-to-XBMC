@@ -59,14 +59,15 @@ var Options = function()
                 kodiNameTextField.value = item.name;
             }
 
-            if (item.debugMode && item.debugMode == true)
+            if (typeof item.debugMode == "boolean")
             {
-                debugModeCheckbox.checked = true;
+                debugModeCheckbox.checked = item.debugMode;
             }
 
-            if(item.showInPage && item.showInPage == true)
+
+            if(typeof item.showInPage == "boolean")
             {
-                showInPageLinksCheckbox.checked = true;
+                showInPageLinksCheckbox.checked = item.showInPage;
             }
 
             if (item.host && item.port)
