@@ -45,6 +45,7 @@
       "js/background_scripts/sites/facebook.com.js",
       "js/background_scripts/sites/postimees.ee.js",
       "js/background_scripts/sites/crunchyroll.com.js",
+      "js/background_scripts/sites/tv3play.js",
       "js/background_scripts/sites/default.js"
     ]
   },

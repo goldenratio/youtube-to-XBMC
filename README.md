@@ -13,6 +13,7 @@ Supported websites:
 - err.ee (etv, etv2, etv+)
 - Facebook.com
 - Postimees.ee
+- tv3play.tv3.ee
 - Twitch.tv
 - Vimeo.com
 - Youtube.com
