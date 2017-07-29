@@ -10,6 +10,7 @@
 
             this.pluginURL = "plugin://plugin.video.crunchyroll-takeout/?mode=videoplay&url=%s";
 
+            contextMenu.addSite("crunchyroll.com", this, ["*://www.crunchyroll.com/*"]);
             browserAction.addSite("crunchyroll.com", this, [
                 ".*crunchyroll.com/.*-\\d+"
             ]);
