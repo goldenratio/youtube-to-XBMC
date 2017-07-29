@@ -16,3 +16,4 @@ Supported websites:
 - Twitch.tv
 - Vimeo.com
 - Youtube.com
+- HTML video tags (non-blob URLs)
