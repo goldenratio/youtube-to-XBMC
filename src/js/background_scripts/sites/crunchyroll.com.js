@@ -8,7 +8,7 @@
             super(player);
             console.log("CrunchyRoll");
 
-            this.pluginURL = "plugin://plugin.video.crunchyroll-takeout/?mode=videoplay&url=%s";
+            this.pluginURL = "plugin://plugin.video.crunchyroll-takeout/?mode=videoplay&id=%s&url=%s&name=%s&season=0&icon=None&duration=0";
 
             contextMenu.addSite("crunchyroll.com", this, ["*://www.crunchyroll.com/*"]);
             browserAction.addSite("crunchyroll.com", this, [
@@ -20,8 +20,13 @@
         {
             return new Promise((resolve, reject) => {
 
-                let mediaUrl = sprintf(this.pluginURL, url);
-                console.log("mediaUrl " + mediaUrl);
+                let mediaId = url.split("-").pop();
+                if(!mediaId) {
+                    reject();
+                    return;
+                }
+                let mediaName = url.split("/").pop() || "Video";
+                let mediaUrl = sprintf(this.pluginURL, mediaId, url, mediaName);
                 resolve(mediaUrl);
             });
         }
