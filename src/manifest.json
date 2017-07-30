@@ -46,6 +46,7 @@
       "js/background_scripts/sites/postimees.ee.js",
       "js/background_scripts/sites/crunchyroll.com.js",
       "js/background_scripts/sites/tv3play.js",
+      "js/background_scripts/sites/ted.com.js",
       "js/background_scripts/sites/default.js"
     ]
   },
@@ -95,6 +96,12 @@
     {
       "matches": ["*://*.tv3play.tv3.ee/sisu/*"],
       "js": ["js/content_scripts/sites/tv3play.js"],
+      "run_at": "document_end",
+      "all_frames": true
+    },
+    {
+      "matches": ["*://*.ted.com/talks/*"],
+      "js": ["js/content_scripts/sites/ted.com.js"],
       "run_at": "document_end",
       "all_frames": true
     }
