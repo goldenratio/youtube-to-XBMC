@@ -14,7 +14,6 @@ var SettingsData = new function()
     this.PORT = "port";
     this.USERNAME = "username";
     this.PASSWORD = "pwd";
-    this.DEBUG_MODE = "debugMode";
     this.SHOW_INPAGE_LINKS = "show_inpage_links";
 };
 

@@ -21,7 +21,6 @@ var Options = function()
         var portTextField = document.getElementById(SettingsData.PORT);
         var userNameTextField = document.getElementById(SettingsData.USERNAME);
         var pwdTextField = document.getElementById(SettingsData.PASSWORD);
-        var debugModeCheckbox = document.getElementById(SettingsData.DEBUG_MODE);
         var showInPageLinksCheckbox = document.getElementById(SettingsData.SHOW_INPAGE_LINKS);
 
         var connectButton = document.getElementById(ButtonData.CONNECT);
@@ -58,12 +57,6 @@ var Options = function()
             {
                 kodiNameTextField.value = item.name;
             }
-
-            if (typeof item.debugMode == "boolean")
-            {
-                debugModeCheckbox.checked = item.debugMode;
-            }
-
 
             if(typeof item.showInPage == "boolean")
             {
@@ -130,7 +123,6 @@ var Options = function()
             'userName': connectionData.userName, 'password': connectionData.password,
             'name': connectionData.kodiName,
             'xbmcURL': connectionData.url,
-            'debugMode' : connectionData.debugMode,
             'showInPage': connectionData.showInPage
         },
         function()
@@ -238,7 +230,6 @@ var ConnectionData = function()
     this.userName;
     this.password;
     this.kodiName;
-    this.debugMode;
     this.showInPage;
 
     this.canConnect = function(context)
@@ -248,7 +239,6 @@ var ConnectionData = function()
         var portData = document.getElementById(SettingsData.PORT).value || document.getElementById(SettingsData.PORT).placeholder;
         var user = document.getElementById(SettingsData.USERNAME).value;
         var pwd = document.getElementById(SettingsData.PASSWORD).value;
-        var debugChecked = document.getElementById(SettingsData.DEBUG_MODE).checked;
         var showInPageChecked = document.getElementById(SettingsData.SHOW_INPAGE_LINKS).checked;
         var kodiName = document.getElementById(SettingsData.KODI_NAME).value || document.getElementById(SettingsData.KODI_NAME).placeholder;
 
@@ -267,7 +257,6 @@ var ConnectionData = function()
         this.port = portData;
         this.userName = user;
         this.password = pwd;
-        this.debugMode = debugChecked;
         this.showInPage = showInPageChecked;
         this.kodiName = kodiName;
 
@@ -294,7 +283,6 @@ var ConnectionData = function()
         document.getElementById(SettingsData.USERNAME).value = "";
         document.getElementById(SettingsData.PASSWORD).value = "";
         document.getElementById(SettingsData.KODI_NAME).value = "";
-        document.getElementById(SettingsData.DEBUG_MODE).checked = false;
     };
 
     this.responseData = function(obj)
