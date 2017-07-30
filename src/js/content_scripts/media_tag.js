@@ -5,7 +5,7 @@
     function getSrcFromTag(tag) {
         if(tag) {
             const srcUrl = tag.getAttribute("data-hd-src") || tag.getAttribute("src");
-            const validUrl = srcUrl && srcUrl.indexOf("blob:") < 0;
+            const validUrl = srcUrl && srcUrl.indexOf("blob:") == -1;
             if(validUrl) {
                 return srcUrl;
             }
