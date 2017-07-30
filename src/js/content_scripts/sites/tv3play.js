@@ -11,7 +11,7 @@
 
         if(messageType == "getVideoId") {
             let playerDiv = document.getElementById("video-player");
-            let videoId = playerDiv.getAttribute("data-video-id");
+            let videoId = playerDiv ? playerDiv.getAttribute("data-video-id") : null;
             sendResponse({videoId: videoId});
         }
     });

@@ -24,6 +24,8 @@
                 return videoValue;
             }
         }
+
+        return null;
     }
 
 })();

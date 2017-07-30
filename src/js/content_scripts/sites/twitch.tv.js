@@ -11,7 +11,7 @@
 
         if(messageType == "getContentId") {
             let div = document.querySelectorAll("figure[data-id]")[0];
-            let contentId = div ? div.getAttribute("data-id") : "";
+            let contentId = div ? div.getAttribute("data-id") : null;
             sendResponse({contentId: contentId});
         }
     });
