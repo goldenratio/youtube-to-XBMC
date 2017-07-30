@@ -91,6 +91,12 @@
       "js": ["js/content_scripts/sites/postimees.ee.js"],
       "run_at": "document_end",
       "all_frames": true
+    },
+    {
+      "matches": ["*://*.tv3play.tv3.ee/sisu/*"],
+      "js": ["js/content_scripts/sites/tv3play.js"],
+      "run_at": "document_end",
+      "all_frames": true
     }
   ],
 

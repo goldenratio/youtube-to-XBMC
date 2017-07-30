@@ -8,7 +8,6 @@ Firefox AddOn, https://addons.mozilla.org/en-US/firefox/addon/kassi-share/
 
 Supported websites:
 
-
 - Crunchyroll (Premium membership needed)
 - err.ee (etv, etv2, etv+)
 - Facebook.com
