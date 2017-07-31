@@ -137,6 +137,16 @@
                 safeFn(sendResponse, {success: true});
             });
         }
+        else if(message == "kodiOnline")
+        {
+            player.ping()
+                .then(response => {
+                    safeFn(sendResponse, {success: true});
+                })
+                .catch(err => {
+                    safeFn(sendResponse, {success: false});
+                });
+        }
         else
         {
             console.info("unknown message received " + message, data);

@@ -457,7 +457,15 @@
     {
         if(typeof item.showInPage === "undefined" || (item.showInPage && item.showInPage == true))
         {
-            new ContentInjector();
+            sendMessage({
+                message: "kodiOnline"
+            }, response => {
+                response = response || {};
+                const online = response.success || false;
+                if(online) {
+                    new ContentInjector();
+                }
+            });
         }
     });
 

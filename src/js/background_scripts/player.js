@@ -95,6 +95,11 @@ class Player
         return this.rpc.send("Addons.GetAddonDetails", params);
     }
 
+    ping()
+    {
+        return this.rpc.send("JSONRPC.Ping");
+    }
+
     /**
      * @param file {string}
      * @returns {Promise}
