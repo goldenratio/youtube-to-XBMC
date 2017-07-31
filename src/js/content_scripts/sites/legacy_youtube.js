@@ -455,7 +455,7 @@
 
     chrome.storage.local.get(function(item)
     {
-        if(typeof item.showInPage === "undefined" || (item.showInPage && item.showInPage == true))
+        if(typeof item.showInPage === "undefined" || item.showInPage == true)
         {
             sendMessage({
                 message: "kodiOnline"
