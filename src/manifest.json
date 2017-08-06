@@ -47,6 +47,7 @@
       "js/background_scripts/sites/crunchyroll.com.js",
       "js/background_scripts/sites/tv3play.js",
       "js/background_scripts/sites/ted.com.js",
+      "js/background_scripts/sites/dailymotion.com.js",
       "js/background_scripts/sites/default.js"
     ]
   },
