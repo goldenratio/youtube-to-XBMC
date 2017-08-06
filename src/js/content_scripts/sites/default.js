@@ -3,9 +3,14 @@
     "use strict";
 
     function getSrcFromTag(tag) {
-        if(tag) {
+        const tagVisible = tag && tag.offsetWidth > 0 && tag.offsetHeight > 0;
+        if(tagVisible) {
+            let mediaType = tag.getAttribute("type") || "video";
+            mediaType = mediaType.toLowerCase();
+            const isMedia = mediaType.indexOf("video") >= 0 || mediaType.indexOf("audio") >= 0;
+
             const srcUrl = tag.getAttribute("data-hd-src") || tag.getAttribute("src");
-            const validUrl = srcUrl && srcUrl.indexOf("blob:") == -1;
+            const validUrl = isMedia && srcUrl && srcUrl.indexOf("blob:") == -1;
             if(validUrl) {
                 return srcUrl;
             }
@@ -26,7 +31,8 @@
                 return srcUrl;
             }
 
-            let sourceTags = media.getElementsByTagName("source");
+            let sourceTags = [... media.getElementsByTagName("source")];
+            sourceTags = sourceTags.reverse();
             for (let source of sourceTags) {
                 const srcUrl = getSrcFromTag(source);
                 if(srcUrl) {

@@ -56,15 +56,14 @@
       "matches": ["<all_urls>"],
       "css": ["css/iziToast.css"],
       "js": [
-        "js/content_scripts/iziToast.js",
-        "js/content_scripts/toast_message.js"
+        "js/content_scripts/iziToast.js"
       ],
       "run_at": "document_end",
       "all_frames": false
     },
     {
       "matches": ["<all_urls>"],
-      "js": ["js/content_scripts/media_tag.js"],
+      "js": ["js/content_scripts/sites/default.js"],
       "run_at": "document_end",
       "all_frames": true
     },
