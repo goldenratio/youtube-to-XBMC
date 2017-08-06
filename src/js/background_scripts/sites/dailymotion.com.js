@@ -8,11 +8,17 @@
             super(player);
             console.log("DailyMotion");
 
-            this.pluginURL = "plugin://plugin.video.dailymotion_com/?url=%s&mode=playVideo";
+            this.pluginVodUrl = "plugin://plugin.video.dailymotion_com/?url=%s&mode=playVideo";
+            this.pluginLiveUrl = "plugin://plugin.video.dailymotion_com/?url=%s&mode=playLiveVideo";
 
-            contextMenu.addSite("dailymotion.com", this, ["*://www.dailymotion.com/video/*"]);
+            contextMenu.addSite("dailymotion.com", this, [
+                "*://www.dailymotion.com/video/*",
+                "*://www.dailymotion.com/live/*"
+            ]);
+
             browserAction.addSite("dailymotion.com", this, [
-                ".*dailymotion.com/video/.*"
+                ".*dailymotion.com/video/.*",
+                ".*dailymotion.com/live/.*"
             ]);
         }
 
@@ -25,7 +31,9 @@
                     reject();
                     return;
                 }
-                let mediaUrl = sprintf(this.pluginURL, videoId);
+                const isLive = url.indexOf("/live/") >= 0;
+                const pluginUrl = isLive ? this.pluginLiveUrl : this.pluginVodUrl;
+                let mediaUrl = sprintf(pluginUrl, videoId);
                 resolve(mediaUrl);
             });
         }
