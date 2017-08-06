@@ -8,32 +8,50 @@
             super(player);
             console.log("DefaultSite");
 
-            contextMenu.addSite("default", this, [
-                "*://*/*.mp4*",
-                "*://*/*.mov*",
-                "*://*/*.webm*",
-                "*://*/*.ogg*",
-                "*://*/*.3gp*",
-                "*://*/*.flv*",
-                "*://*/*.avi*",
-                "*://*/*.mpeg*",
-                "*://*/*.m4a*",
-                "*://*/*.ogv*",
-                "*://*/*.mp3*"
-            ]);
+            let videoExtensions = [
+                "mp4",
+                "mov",
+                "webm",
+                "3gp",
+                "flv",
+                "avi",
+                "ogv",
+                "wmv",
+                "asf",
+                "mkv",
+                "m4v"
+            ];
 
-            browserAction.addSite("default", this, [
-                ".*\\.mp4.*",
-                ".*\\.mov.*",
-                ".*\\.webm.*",
-                ".*\\.ogg.*",
-                ".*\\.flv.*",
-                ".*\\.avi.*",
-                ".*\\.mpeg.*",
-                ".*\\.m4a.*",
-                ".*\\.ogv.*",
-                ".*\\.mp3.*"
-            ]);
+            let audioExtensions = [
+                "mp3",
+                "ogg",
+                "midi",
+                "wav",
+                "aiff",
+                "aac",
+                "flac",
+                "ape",
+                "wma",
+                "m4a",
+                "mka"
+            ];
+
+            let validExtensions = [... videoExtensions, ... audioExtensions];
+
+            let contextMenuFilterList = [];
+            let browserActionFilterList = [];
+
+            for (let extension of validExtensions) {
+                let contextItem = "*://*/*." + extension + "*";
+                contextMenuFilterList.push(contextItem);
+
+                let actionItem = ".*\\." + extension + ".*";
+                browserActionFilterList.push(actionItem);
+            }
+
+
+            contextMenu.addSite("default", this, contextMenuFilterList);
+            browserAction.addSite("default", this, browserActionFilterList);
         }
 
         getFileFromUrl(url)
