@@ -3,8 +3,7 @@
     "use strict";
 
     function getSrcFromTag(tag) {
-        const tagVisible = tag && tag.offsetWidth > 0 && tag.offsetHeight > 0;
-        if(tagVisible) {
+        if(tag) {
             let mediaType = tag.getAttribute("type") || "video";
             mediaType = mediaType.toLowerCase();
             const isMedia = mediaType.indexOf("video") >= 0 || mediaType.indexOf("audio") >= 0;
@@ -18,12 +17,39 @@
         return null;
     }
 
+    function nodeVisible(node) {
+        return node && node.offsetWidth > 0 && node.offsetHeight > 0;
+    }
+
 
     function geMediaSrcUrl() {
-        let videoTagCollection = document.getElementsByTagName("video");
-        let audioTagCollection = document.getElementsByTagName("audio");
 
-        let mediaTags = [...videoTagCollection, ...audioTagCollection];
+        let noscripts = [... document.getElementsByTagName("noscript")]
+            .map(function(node) {
+
+                function htmlDecode(input){
+                    var e = document.createElement('div');
+                    e.innerHTML = input;
+                    return e.childNodes[0].nodeValue;
+                }
+
+                let htmlText = htmlDecode(node.innerText.trim());
+                let frag = document.createRange().createContextualFragment(htmlText);
+                let media = frag.firstElementChild;
+                return media;
+            })
+            .filter(function(htmlTag) {
+                const tagName = htmlTag.tagName ? htmlTag.tagName.toLowerCase() : null;
+                return tagName == "video" || tagName == "audio";
+            });
+
+        let videoTagCollection = [... document.getElementsByTagName("video")]
+            .filter(nodeVisible);
+
+        let audioTagCollection = [... document.getElementsByTagName("audio")]
+            .filter(nodeVisible);
+
+        let mediaTags = [... videoTagCollection, ... audioTagCollection, ... noscripts];
         for(let media of mediaTags) {
 
             const srcUrl = getSrcFromTag(media);
@@ -40,6 +66,8 @@
                 }
             }
         }
+
+
         return null;
     }
 
