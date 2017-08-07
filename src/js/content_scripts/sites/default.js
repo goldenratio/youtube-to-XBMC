@@ -39,8 +39,12 @@
                 return media;
             })
             .filter(function(htmlTag) {
-                const tagName = htmlTag.tagName ? htmlTag.tagName.toLowerCase() : null;
-                return tagName == "video" || tagName == "audio";
+                let tagName;
+                try {
+                    tagName = htmlTag.tagName ? htmlTag.tagName.toLowerCase() : null;
+                } catch (err) {}
+
+                return tagName && (tagName == "video" || tagName == "audio");
             });
 
         let videoTagCollection = [... document.getElementsByTagName("video")]
@@ -60,9 +64,21 @@
             let sourceTags = [... media.getElementsByTagName("source")];
             sourceTags = sourceTags.reverse();
             for (let source of sourceTags) {
-                const srcUrl = getSrcFromTag(source);
-                if(srcUrl) {
-                    return srcUrl;
+                const srcTagUrl = getSrcFromTag(source);
+                if(srcTagUrl) {
+                    return srcTagUrl;
+                }
+            }
+        }
+
+        const player = document.getElementById("player");
+        if(player) {
+            const playerId = player.getAttribute("data-video-id");
+            if(playerId) {
+                const varName = "flashvars_" + playerId;
+                const flashVar = window[varName];
+                if(flashVar) {
+                    return flashVar["quality_720p"] || flashVar["quality_480p"] || flashVar["quality_240p"];
                 }
             }
         }
