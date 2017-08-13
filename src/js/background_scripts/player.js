@@ -100,6 +100,30 @@ class Player
         return this.rpc.send("JSONRPC.Ping");
     }
 
+    setSubtitles(urls) {
+
+        return new Promise((resolve, reject) => {
+
+            this._getActivePlayers()
+                .then(response => {
+
+                    const params = {
+                        playerid: 1,
+                        subtitle : "on",
+                        enable: true
+                    };
+
+                    return this.rpc.send("Player.SetSubtitle", params);
+                })
+                .then(response => {
+
+                })
+                .catch(err => {
+
+                });
+        });
+    }
+
     /**
      * @param file {string}
      * @returns {Promise}
@@ -122,9 +146,7 @@ class Player
                     return this._playFromPlaylist();
                 })
                 .then(response => {
-
                     resolve(response);
-
                 }).catch(() => {
                     reject();
                 });

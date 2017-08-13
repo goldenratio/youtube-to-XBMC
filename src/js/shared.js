@@ -80,23 +80,25 @@ class RPCService
             let urlRequest = new URLRequest(this.kodiConf.url);
             urlRequest.method = "POST";
 
-            urlRequest.send(strData).then(response => {
+            urlRequest.send(strData)
+                .then(response => {
 
-                this.isPending = false;
+                    this.isPending = false;
 
-                const data = JSON.parse(response);
-                console.log(">> " + method, data);
-                if(data.error) {
-                    reject(data);
-                }
-                else {
-                    resolve(data);
-                }
+                    const data = JSON.parse(response);
+                    console.log(">> " + method, data);
+                    if(data.error) {
+                        reject(data);
+                    }
+                    else {
+                        resolve(data);
+                    }
 
-            }).catch(() => {
-                this.isPending = false;
-                reject();
-            });
+                })
+                .catch(() => {
+                    this.isPending = false;
+                    reject();
+                });
 
 
         });

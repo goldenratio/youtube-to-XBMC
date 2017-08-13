@@ -50,7 +50,8 @@ class AbstractSite
                     response = response || {};
                     this._messagePlayVideo(ResultData.OK, response.message);
                     resolve();
-                }).catch(response => {
+                })
+                .catch(response => {
                     response = response || {};
                     console.log("err playing video ", response);
                     this._messagePlayVideo(ResultData.ERROR, response.message);
@@ -129,6 +130,13 @@ class AbstractSite
     }
 
     getPlaylistFromUrl(url)
+    {
+        return new Promise((resolve, reject) => {
+            reject();
+        });
+    }
+
+    getSubtitleFiles(url)
     {
         return new Promise((resolve, reject) => {
             reject();
