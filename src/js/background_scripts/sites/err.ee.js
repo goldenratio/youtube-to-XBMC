@@ -8,6 +8,9 @@
             super(player);
             console.log("err.ee");
             this.contentApiUrl = "https://etv.err.ee/api/loader/GetTimeLineContent/%s";
+            this.subtitleIdApiUrl = "http://etv.err.ee/services/api/subtitles/check?file=%s";
+
+            this.subtitleContentUrl = "http://etv.err.ee/services/subtitles/file/%s/%s_%s";
             this.liveStreams = {
                 "etv": "http://etvstream.err.ee/live/smil:etv/playlist.m3u8",
                 "etv2": "http://etv2stream.err.ee/live/smil:etv2/playlist.m3u8",
@@ -42,22 +45,8 @@
             return "";
         }
 
-        getFileFromUrl(url)
-        {
+        _getContentUrl(videoId) {
             return new Promise((resolve, reject) => {
-
-                let videoId = this._getVideoIdFromUrl(url);
-                console.log("videoId " + videoId);
-
-                const isLive = url.indexOf("otse.err.ee") >= 0;
-                if(isLive) {
-                    console.log("live video");
-                    let mediaUrl = this.liveStreams[videoId];
-                    if(mediaUrl) {
-                        resolve(mediaUrl);
-                        return;
-                    }
-                }
 
                 const apiUrl = sprintf(this.contentApiUrl, videoId);
 
@@ -66,45 +55,97 @@
 
                     const responseData = JSON.parse(response);
                     let mediaSources = responseData.MediaSources;
-                    const len = mediaSources.length;
 
-                    let mediaUrl = null;
+                    const len = mediaSources.length;
                     for (let i = 0; i < len; i++)
                     {
                         let media = mediaSources[i];
                         const videoUrl = media.Content;
                         if(videoUrl)
                         {
-                            mediaUrl = "rtmp" + videoUrl.replace("@", "_definst_/");
-                            break;
+                            resolve(videoUrl);
+                            return;
                         }
                     }
 
+                    throw new Error("Content url not found");
+
+                }).catch(err => {
+                    console.error(err);
+                    reject();
+                });
+
+            });
+        }
+
+        getSubtitleFiles(url) {
+
+            return new Promise((resolve, reject) => {
+
+                const subtitleIdApiUrl = sprintf(this.subtitleIdApiUrl, url);
+
+                new URLRequest(subtitleIdApiUrl)
+                    .send()
+                    .then(content => {
+                        console.log(content);
+
+                        let subtitleUrls = [];
+                        let contentJSON = JSON.parse(content);
+                        let subData = contentJSON["subtitles"];
+
+                        if(subData) {
+                            let langs = ["ET", "VA", "RU"];
+                            langs.forEach((lang) => {
+                                if(subData[lang] && subData[lang]["id"]) {
+                                    const subId = subData[lang]["id"].toString();
+                                    let sUrl = sprintf(this.subtitleContentUrl, subId, subId, lang);
+                                    subtitleUrls.push(sUrl);
+                                }
+                            });
+                        }
+
+                        if(subtitleUrls.length > 0) {
+                            return subtitleUrls;
+                        }
+
+                        throw new Error("subtitles not found!");
+                    })
+                    .then(subUrls => {
+                        resolve(subUrls);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        reject();
+                    });
+
+            });
+        }
+
+        getFileFromUrl(url) {
+
+            return new Promise((resolve, reject) => {
+
+                let videoId = this._getVideoIdFromUrl(url);
+                console.log("videoId " + videoId);
+
+                const isLive = url.indexOf("otse.err.ee") >= 0;
+                if(isLive) {
+                    console.log("live video, videoId " + videoId);
+                    let mediaUrl = this.liveStreams[videoId];
                     if(mediaUrl) {
                         resolve(mediaUrl);
-                    } else {
-                        // check if we can play live video
-                        const scheduleTimeString = responseData.Updated;
-
-                        let scheduledDate = new Date(scheduleTimeString);
-                        let scheduledDateUTC = scheduledDate.getTime();
-                        let currentTimeUTC = new Date().getTime();
-
-                        const diff = currentTimeUTC - scheduledDateUTC;
-                        console.log(diff + " milliseconds");
-                        if(diff >= 0) {
-                            // probably it is a live video
-                            let portalName = responseData.Portal.PortalName.toLowerCase();
-                            resolve(this.liveStreams[portalName]);
-                        }
-                        else {
-                            reject({message: "Video is scheduled for " + scheduledDate.toString()});
-                        }
+                        return;
                     }
+                }
 
-                }).catch(() => {
-                    resolve(null);
-                });
+                this._getContentUrl(videoId)
+                    .then(rawVideoUrl => {
+                        let mediaUrl = "rtmp" + rawVideoUrl.replace("@", "_definst_/");
+                        resolve(mediaUrl);
+                    })
+                    .catch(err => {
+                        reject();
+                    });
             });
         }
     }
