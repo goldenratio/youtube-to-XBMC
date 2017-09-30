@@ -261,7 +261,7 @@
                 ".video-list-item, .playlist-video-item, .yt-lockup-content, .recent-activity-snippet, " +
                 ".playlist-actions, .pl-video-title, ytd-thumbnail";
 
-            let divList = document.querySelectorAll(classes) || [];
+            let divList = [... document.querySelectorAll(classes)]; // convert to array
             const divListLen = divList.length;
 
             for(let i = 0; i < divListLen; i++)
@@ -282,6 +282,7 @@
                 // (home / subscription on home page), search page, video manager, (user page / user browse video / Popular on YouTube)
                 let df = el.querySelectorAll(".feed-video-title, .yt-uix-tile-link, .vm-video-title-content, " +
                     ".yt-uix-sessionlink, a");
+                df = [... df]; // convert to array
                 let len = df.length;
 
                 for (let j = 0; j < len; j++)
@@ -305,7 +306,7 @@
                     return true;
                 }
             }
-            else if(checkParent) {
+            else {
                 let list = el.parentNode.querySelectorAll(".xbmc_control") || [];
                 return list.length > 0;
             }
