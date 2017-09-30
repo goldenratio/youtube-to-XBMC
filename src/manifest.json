@@ -81,13 +81,6 @@
       "all_frames": true
     },
     {
-      "matches": ["*://*.youtube.com/*"],
-      "css": ["css/legacy_youtube.css"],
-      "js": ["js/content_scripts/sites/legacy_youtube.js"],
-      "run_at": "document_end",
-      "all_frames": true
-    },
-    {
       "matches": ["*://*.postimees.ee/*"],
       "js": ["js/content_scripts/sites/postimees.ee.js"],
       "run_at": "document_end",
