@@ -8,6 +8,10 @@
             super(player);
             console.log("DefaultSite");
 
+            let customExtensions = [
+                "/videoplayback?"
+            ];
+
             let videoExtensions = [
                 "mp4",
                 "mov",
@@ -49,6 +53,10 @@
                 browserActionFilterList.push(actionItem);
             }
 
+            for (let extension of customExtensions) {
+                let actionItem = ".*" + extension + ".*";
+                browserActionFilterList.push(actionItem);
+            }
 
             contextMenu.addSite("default", this, contextMenuFilterList);
             browserAction.addSite("default", this, browserActionFilterList);
