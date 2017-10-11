@@ -3,7 +3,7 @@
 
   "name": "Kassi Share - Send to Kodi",
   "description": "Send videos to Kodi Media Center",
-  "version": "5.2",
+  "version": "5.3",
   "permissions": [
     "http://*/*",
     "https://*/*",
