@@ -8,7 +8,7 @@
             super(player);
 
             console.log("youtube");
-            this.pluginURL = "plugin://plugin.video.youtube/?action=play_video&videoid=%s";
+            this.pluginURL = "plugin://plugin.video.youtube/play/?video_id=%s";
             this.gService = new GService();
 
             contextMenu.addSite("youtube.com", this, ["*://www.youtube.com/*v=*"], ["*://www.youtube.com/*list=*"]);
